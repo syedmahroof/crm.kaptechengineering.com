@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
@@ -62,14 +63,20 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            $role = $userData['role'];
+            $roleName = $userData['role'];
             unset($userData['role']);
             
             $user = User::create(array_merge($userData, [
                 'email_verified_at' => now(),
             ]));
             
-            $user->assignRole($role);
+            // Find role by name to ensure it exists (using findByName handles guard properly)
+            try {
+                $role = Role::findByName($roleName, 'web');
+                $user->assignRole($role);
+            } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
+                $this->command->warn("Role '{$roleName}' not found for user {$user->email}. Skipping role assignment.");
+            }
         }
 
         $this->command->info('Additional users created successfully!');

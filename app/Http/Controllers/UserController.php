@@ -29,8 +29,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'roles' => 'array',
-            'roles.*' => 'exists:roles,id',
+            'roles' => 'nullable|array',
         ]);
 
         $user = User::create([
@@ -39,8 +38,41 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        if (isset($validated['roles'])) {
-            $user->syncRoles($validated['roles']);
+        // Handle roles - ALWAYS convert to role names (never pass IDs)
+        // This ensures we never pass numeric IDs to syncRoles
+        $roleNames = [];
+        if (isset($validated['roles']) && is_array($validated['roles'])) {
+            foreach ($validated['roles'] as $role) {
+                // Convert to string first to handle all cases
+                $roleValue = (string) $role;
+                
+                // If it's numeric or looks like an ID, convert to name
+                if (is_numeric($role) || ctype_digit($roleValue)) {
+                    $roleModel = Role::find((int)$role);
+                    if ($roleModel) {
+                        $roleNames[] = $roleModel->name;
+                    }
+                } else {
+                    // It's already a name - validate it exists
+                    $roleModel = Role::where('name', $role)->first();
+                    if ($roleModel) {
+                        $roleNames[] = $roleModel->name;
+                    }
+                }
+            }
+        }
+        
+        // Always call syncRoles with an array of role names (never IDs)
+        try {
+            $user->syncRoles($roleNames);
+        } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
+            // If we still get this error, log it and try to recover
+            \Log::error('Role sync error: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'roles_received' => $validated['roles'] ?? [],
+                'roles_converted' => $roleNames
+            ]);
+            throw $e;
         }
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
@@ -56,7 +88,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all();
-        $userRoles = $user->roles->pluck('id')->toArray();
+        $userRoles = $user->roles->pluck('name')->toArray();
 
         return view('users.edit', compact('user', 'roles', 'userRoles'));
     }
@@ -67,8 +99,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:8|confirmed',
-            'roles' => 'array',
-            'roles.*' => 'exists:roles,id',
+            'roles' => 'nullable|array',
         ]);
 
         $user->update([
@@ -80,10 +111,41 @@ class UserController extends Controller
             $user->update(['password' => Hash::make($validated['password'])]);
         }
 
-        if (isset($validated['roles'])) {
-            $user->syncRoles($validated['roles']);
-        } else {
-            $user->syncRoles([]);
+        // Handle roles - ALWAYS convert to role names (never pass IDs)
+        // This ensures we never pass numeric IDs to syncRoles
+        $roleNames = [];
+        if (isset($validated['roles']) && is_array($validated['roles'])) {
+            foreach ($validated['roles'] as $role) {
+                // Convert to string first to handle all cases
+                $roleValue = (string) $role;
+                
+                // If it's numeric or looks like an ID, convert to name
+                if (is_numeric($role) || ctype_digit($roleValue)) {
+                    $roleModel = Role::find((int)$role);
+                    if ($roleModel) {
+                        $roleNames[] = $roleModel->name;
+                    }
+                } else {
+                    // It's already a name - validate it exists
+                    $roleModel = Role::where('name', $role)->first();
+                    if ($roleModel) {
+                        $roleNames[] = $roleModel->name;
+                    }
+                }
+            }
+        }
+        
+        // Always call syncRoles with an array of role names (never IDs)
+        try {
+            $user->syncRoles($roleNames);
+        } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
+            // If we still get this error, log it and try to recover
+            \Log::error('Role sync error: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'roles_received' => $validated['roles'] ?? [],
+                'roles_converted' => $roleNames
+            ]);
+            throw $e;
         }
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
