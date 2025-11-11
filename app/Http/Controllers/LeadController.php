@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\City;
+use App\Models\Country;
 use App\Models\Lead;
 use App\Models\LeadStatus;
 use App\Models\Product;
+use App\Models\State;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -117,8 +120,44 @@ class LeadController extends Controller
         $users = User::all();
         $products = Product::where('status', 'active')->get();
         $branches = Branch::all();
+        $countries = Country::where('is_active', true)->orderBy('name')->get();
+        
+        // Get default country (India)
+        $defaultCountry = Country::where('name', 'India')->first();
+        $defaultState = null;
+        $states = collect();
+        $cities = collect();
+        
+        if ($defaultCountry) {
+            $states = State::where('country_id', $defaultCountry->id)
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get();
+            
+            // Get default state (Kerala)
+            $defaultState = State::where('country_id', $defaultCountry->id)
+                ->where('name', 'Kerala')
+                ->first();
+            
+            if ($defaultState) {
+                $cities = City::where('state_id', $defaultState->id)
+                    ->where('is_active', true)
+                    ->orderBy('name')
+                    ->get();
+            }
+        }
 
-        return view('leads.create', compact('statuses', 'users', 'products', 'branches'));
+        return view('leads.create', compact(
+            'statuses', 
+            'users', 
+            'products', 
+            'branches',
+            'countries',
+            'states',
+            'cities',
+            'defaultCountry',
+            'defaultState'
+        ));
     }
 
     public function store(Request $request)
@@ -133,6 +172,9 @@ class LeadController extends Controller
             'product_ids' => 'nullable|array',
             'product_ids.*' => 'exists:products,id',
             'branch_id' => 'nullable|exists:branches,id',
+            'country_id' => 'nullable|exists:countries,id',
+            'state_id' => 'nullable|exists:states,id',
+            'city_id' => 'nullable|exists:cities,id',
             'source' => 'nullable|string|max:255',
             'lead_type' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
@@ -187,7 +229,7 @@ class LeadController extends Controller
 
     public function show(Lead $lead)
     {
-        $lead->load(['status', 'assignedUser', 'product', 'products', 'branch', 'leadNotes.user', 'followups.user']);
+        $lead->load(['status', 'assignedUser', 'product', 'products', 'branch', 'country', 'state', 'city', 'leadNotes.user', 'followups.user']);
         $statuses = LeadStatus::all();
 
         return view('leads.show', compact('lead', 'statuses'));
@@ -199,8 +241,35 @@ class LeadController extends Controller
         $users = User::all();
         $products = Product::where('status', 'active')->get();
         $branches = Branch::all();
+        $countries = Country::where('is_active', true)->orderBy('name')->get();
+        
+        $states = collect();
+        $cities = collect();
+        
+        if ($lead->country_id) {
+            $states = State::where('country_id', $lead->country_id)
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get();
+        }
+        
+        if ($lead->state_id) {
+            $cities = City::where('state_id', $lead->state_id)
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get();
+        }
 
-        return view('leads.edit', compact('lead', 'statuses', 'users', 'products', 'branches'));
+        return view('leads.edit', compact(
+            'lead', 
+            'statuses', 
+            'users', 
+            'products', 
+            'branches',
+            'countries',
+            'states',
+            'cities'
+        ));
     }
 
     public function update(Request $request, Lead $lead)
@@ -217,6 +286,9 @@ class LeadController extends Controller
             'products.*.quantity' => 'nullable|integer|min:1',
             'products.*.description' => 'nullable|string|max:1000',
             'branch_id' => 'nullable|exists:branches,id',
+            'country_id' => 'nullable|exists:countries,id',
+            'state_id' => 'nullable|exists:states,id',
+            'city_id' => 'nullable|exists:cities,id',
             'source' => 'nullable|string|max:255',
             'lead_type' => 'nullable|string|max:255',
             'notes' => 'nullable|string',

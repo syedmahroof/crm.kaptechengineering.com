@@ -143,6 +143,54 @@
                             </div>
 
                             <div class="col-md-6">
+                                <label for="country_id" class="form-label">Country <span class="text-danger">*</span></label>
+                                <select class="form-select select2 @error('country_id') is-invalid @enderror" 
+                                        id="country_id" name="country_id" required>
+                                    <option value="">Select Country</option>
+                                    @foreach($countries as $country)
+                                        <option value="{{ $country->id }}" {{ old('country_id', $defaultCountry?->id) == $country->id ? 'selected' : '' }}>
+                                            {{ $country->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('country_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="state_id" class="form-label">State <span class="text-danger">*</span></label>
+                                <select class="form-select select2 @error('state_id') is-invalid @enderror" 
+                                        id="state_id" name="state_id" required>
+                                    <option value="">Select State</option>
+                                    @foreach($states as $state)
+                                        <option value="{{ $state->id }}" {{ old('state_id', $defaultState?->id) == $state->id ? 'selected' : '' }}>
+                                            {{ $state->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('state_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="city_id" class="form-label">City</label>
+                                <select class="form-select select2 @error('city_id') is-invalid @enderror" 
+                                        id="city_id" name="city_id">
+                                    <option value="">Select City</option>
+                                    @foreach($cities as $city)
+                                        <option value="{{ $city->id }}" {{ old('city_id') == $city->id ? 'selected' : '' }}>
+                                            {{ $city->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('city_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
                                 <label for="source" class="form-label">
                                     <i class="bi bi-funnel-fill me-1"></i>Source
                                 </label>
@@ -212,9 +260,102 @@
                             </div>
                         </div>
                     </form>
+                    @push('styles')
+                    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+                    <style>
+                        .select2-container--default .select2-selection--single {
+                            height: 42px;
+                            border: 2px solid #e2e8f0;
+                            border-radius: 10px;
+                        }
+                        .select2-container--default .select2-selection--single .select2-selection__rendered {
+                            line-height: 42px;
+                            padding-left: 16px;
+                        }
+                        .select2-container--default .select2-selection--single .select2-selection__arrow {
+                            height: 40px;
+                        }
+                        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+                            background-color: #6366f1;
+                        }
+                    </style>
+                    @endpush
                     @push('scripts')
+                    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
                     <script>
                         (function(){
+                            // Initialize Select2 for searchable selects
+                            $('.select2').select2({
+                                width: '100%',
+                                placeholder: function() {
+                                    return $(this).data('placeholder') || 'Select an option';
+                                }
+                            });
+
+                            // Handle country change
+                            $('#country_id').on('change', function() {
+                                const countryId = $(this).val();
+                                const stateSelect = $('#state_id');
+                                const citySelect = $('#city_id');
+                                
+                                // Clear and disable state and city
+                                stateSelect.empty().append('<option value="">Select State</option>').val('').trigger('change');
+                                citySelect.empty().append('<option value="">Select City</option>').val('').trigger('change');
+                                
+                                if (countryId) {
+                                    // Fetch states for selected country
+                                    fetch(`/api/states?country_id=${countryId}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            stateSelect.empty().append('<option value="">Select State</option>');
+                                            data.forEach(function(state) {
+                                                stateSelect.append(new Option(state.name, state.id));
+                                            });
+                                            
+                                            // Set default to Kerala if available and country is India
+                                            const countryName = $('#country_id option:selected').text();
+                                            if (countryName === 'India') {
+                                                const keralaOption = stateSelect.find('option').filter(function() {
+                                                    return $(this).text() === 'Kerala';
+                                                });
+                                                if (keralaOption.length) {
+                                                    stateSelect.val(keralaOption.val()).trigger('change');
+                                                }
+                                            }
+                                        })
+                                        .catch(() => {
+                                            console.error('Error loading states');
+                                        });
+                                }
+                            });
+
+                            // Handle state change
+                            $('#state_id').on('change', function() {
+                                const stateId = $(this).val();
+                                const citySelect = $('#city_id');
+                                
+                                // Clear city
+                                citySelect.empty().append('<option value="">Select City</option>').val('').trigger('change');
+                                
+                                if (stateId) {
+                                    // Fetch cities for selected state
+                                    fetch(`/api/cities?state_id=${stateId}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            citySelect.empty().append('<option value="">Select City</option>');
+                                            data.forEach(function(city) {
+                                                citySelect.append(new Option(city.name, city.id));
+                                            });
+                                        })
+                                        .catch(() => {
+                                            // Fallback: reload page with state filter
+                                            const countryId = $('#country_id').val();
+                                            window.location.href = '{{ route("leads.create") }}?country_id=' + countryId + '&state_id=' + stateId;
+                                        });
+                                }
+                            });
+
+                            // Product rows functionality
                             let rowIndex = 1;
                             document.getElementById('addProductRow').addEventListener('click', function(){
                                 const tbody = document.getElementById('productRows');

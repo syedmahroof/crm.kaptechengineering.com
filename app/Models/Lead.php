@@ -17,6 +17,9 @@ class Lead extends Model
         'assigned_to',
         'product_id',
         'branch_id',
+        'country_id',
+        'state_id',
+        'city_id',
         'source',
         'lead_type',
         'notes',
@@ -58,5 +61,20 @@ class Lead extends Model
     public function followups()
     {
         return $this->hasMany(Followup::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
     }
 }

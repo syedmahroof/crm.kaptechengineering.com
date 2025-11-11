@@ -5,15 +5,21 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CityController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FollowupController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LeadSourceController;
+use App\Http\Controllers\LeadTypeController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StateController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -28,6 +34,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Leads Management
     Route::resource('leads', LeadController::class);
     Route::patch('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.updateStatus');
+    
+    // Lead Types Management
+    Route::resource('lead-types', LeadTypeController::class);
+    
+    // Lead Sources Management
+    Route::resource('lead-sources', LeadSourceController::class);
 
     // Products Management
     Route::resource('products', ProductController::class);
@@ -60,6 +72,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Roles Management
     Route::resource('roles', RoleController::class);
+
+    // Master Data Management
+    Route::resource('countries', CountryController::class);
+    Route::resource('states', StateController::class);
+    Route::resource('cities', CityController::class);
+    
+    // API endpoints for dynamic selects
+    Route::get('/api/states', function (Request $request) {
+        $query = \App\Models\State::where('is_active', true)->orderBy('name');
+        if ($request->filled('country_id')) {
+            $query->where('country_id', $request->country_id);
+        }
+        return response()->json($query->get(['id', 'name']));
+    });
+    
+    Route::get('/api/cities', function (Request $request) {
+        $query = \App\Models\City::where('is_active', true)->orderBy('name');
+        if ($request->filled('state_id')) {
+            $query->where('state_id', $request->state_id);
+        }
+        return response()->json($query->get(['id', 'name']));
+    });
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

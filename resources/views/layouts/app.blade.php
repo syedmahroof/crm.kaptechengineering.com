@@ -114,6 +114,10 @@
             width: 20px;
             margin-right: 12px;
             font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         
         .sidebar .nav-link:hover {
@@ -152,6 +156,15 @@
             background: transparent;
             border: none;
             width: 100%;
+            margin: 3px 0;
+        }
+        
+        .nav-group-toggle .bi-chevron-down {
+            width: 16px;
+            margin-left: 8px;
+            flex-shrink: 0;
+            font-size: 12px;
+            transition: transform 0.3s;
         }
         
         .nav-group-toggle:hover {
@@ -159,10 +172,6 @@
             color: var(--primary);
         }
         
-        .nav-group-toggle .bi-chevron-down {
-            transition: transform 0.3s;
-            font-size: 12px;
-        }
         
         .nav-group.active .nav-group-toggle .bi-chevron-down {
             transform: rotate(180deg);
@@ -171,13 +180,25 @@
         .nav-group-toggle-left {
             display: flex;
             align-items: center;
+            flex: 1;
+        }
+        
+        .nav-group-toggle-left i {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         
         .nav-submenu {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
-            padding-left: 24px;
+            padding-left: 0;
+            margin-top: 4px;
         }
         
         .nav-group.active .nav-submenu {
@@ -185,13 +206,19 @@
         }
         
         .nav-submenu .nav-link {
-            padding: 10px 16px;
+            padding: 10px 16px 10px 40px;
             font-size: 13px;
             margin: 2px 0;
         }
         
         .nav-submenu .nav-link i {
+            width: 18px;
+            margin-right: 10px;
             font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         
         /* Main Content */
@@ -856,44 +883,53 @@
                 <span>Dashboard</span>
             </a>
             
-            <!-- Analytics -->
-            <a class="nav-link {{ request()->routeIs('analytics.*') ? 'active' : '' }}" href="{{ route('analytics.index') }}">
-                <i class="bi bi-graph-up"></i>
-                <span>Analytics</span>
-            </a>
+            <!-- Lead Management -->
+            <div class="nav-group {{ request()->routeIs('leads.*') || request()->routeIs('followups.*') || request()->routeIs('calendar.*') || request()->routeIs('todos.*') || request()->routeIs('analytics.*') || request()->routeIs('lead-types.*') || request()->routeIs('lead-sources.*') ? 'active' : '' }}">
+                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')">
+                    <div class="nav-group-toggle-left">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Lead Management</span>
+                    </div>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div class="nav-submenu">
+                    <a class="nav-link {{ request()->routeIs('leads.*') ? 'active' : '' }}" href="{{ route('leads.index') }}">
+                        <i class="bi bi-people"></i>
+                        <span>Leads</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('followups.*') ? 'active' : '' }}" href="{{ route('followups.index') }}">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>Follow-ups</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" href="{{ route('calendar.index') }}">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>Calendar</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('todos.*') ? 'active' : '' }}" href="{{ route('todos.index') }}">
+                        <i class="bi bi-check2-square"></i>
+                        <span>Todo List</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('analytics.*') ? 'active' : '' }}" href="{{ route('analytics.index') }}">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Analytics</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('lead-types.*') ? 'active' : '' }}" href="{{ route('lead-types.index') }}">
+                        <i class="bi bi-tag-fill"></i>
+                        <span>Lead Type</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('lead-sources.*') ? 'active' : '' }}" href="{{ route('lead-sources.index') }}">
+                        <i class="bi bi-funnel-fill"></i>
+                        <span>Lead Source</span>
+                    </a>
+                </div>
+            </div>
             
-            <!-- Lead Management Section -->
-            <div class="nav-section-title">Lead Management</div>
-            
-            <a class="nav-link {{ request()->routeIs('leads.*') ? 'active' : '' }}" href="{{ route('leads.index') }}">
-                <i class="bi bi-people-fill"></i>
-                <span>Leads</span>
-            </a>
-            
-            <a class="nav-link {{ request()->routeIs('followups.*') ? 'active' : '' }}" href="{{ route('followups.index') }}">
-                <i class="bi bi-calendar-check-fill"></i>
-                <span>Follow-ups</span>
-            </a>
-            
-            <a class="nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" href="{{ route('calendar.index') }}">
-                <i class="bi bi-calendar-event-fill"></i>
-                <span>Calendar</span>
-            </a>
-
-            <div class="nav-section-title">Productivity</div>
-            <a class="nav-link {{ request()->routeIs('todos.*') ? 'active' : '' }}" href="{{ route('todos.index') }}">
-                <i class="bi bi-check2-square"></i>
-                <span>Todo List</span>
-            </a>
-            
-            <!-- Products & Catalog Section with Sub-menu -->
-            <div class="nav-section-title">Products & Catalog</div>
-            
+            <!-- Product Management -->
             <div class="nav-group {{ request()->routeIs('products.*') || request()->routeIs('categories.*') || request()->routeIs('brands.*') ? 'active' : '' }}">
                 <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')">
                     <div class="nav-group-toggle-left">
                         <i class="bi bi-box-seam-fill"></i>
-                        <span>Product Management</span>
+                        <span>Products</span>
                     </div>
                     <i class="bi bi-chevron-down"></i>
                 </button>
@@ -917,9 +953,32 @@
                 </div>
             </div>
             
-            <!-- Organization Section with Sub-menu -->
-            <div class="nav-section-title">Organization</div>
-            
+            <!-- Master -->
+            <div class="nav-group {{ request()->routeIs('countries.*') || request()->routeIs('states.*') || request()->routeIs('cities.*') ? 'active' : '' }}">
+                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')">
+                    <div class="nav-group-toggle-left">
+                        <i class="bi bi-gear-fill"></i>
+                        <span>Master</span>
+                    </div>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div class="nav-submenu">
+                    <a class="nav-link {{ request()->routeIs('countries.*') ? 'active' : '' }}" href="{{ route('countries.index') }}">
+                        <i class="bi bi-globe"></i>
+                        <span>Country</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('states.*') ? 'active' : '' }}" href="{{ route('states.index') }}">
+                        <i class="bi bi-geo-alt"></i>
+                        <span>State</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('cities.*') ? 'active' : '' }}" href="{{ route('cities.index') }}">
+                        <i class="bi bi-building"></i>
+                        <span>City</span>
+                    </a>
+                </div>
+            </div>
+          
+            <!-- Administration -->
             <div class="nav-group {{ request()->routeIs('branches.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') ? 'active' : '' }}">
                 <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')">
                     <div class="nav-group-toggle-left">

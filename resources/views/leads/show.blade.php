@@ -89,6 +89,26 @@
                                 @endif
                             </div>
                         </div>
+                        @if($lead->country || $lead->state || $lead->city)
+                        <div class="col-12">
+                            <div class="info-item">
+                                <label class="text-muted small text-uppercase fw-semibold mb-1 d-block">
+                                    <i class="bi bi-geo-alt me-1"></i>Location
+                                </label>
+                                <p class="mb-0 fw-medium fs-6">
+                                    @if($lead->city)
+                                        {{ $lead->city->name }},
+                                    @endif
+                                    @if($lead->state)
+                                        {{ $lead->state->name }},
+                                    @endif
+                                    @if($lead->country)
+                                        {{ $lead->country->name }}
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
