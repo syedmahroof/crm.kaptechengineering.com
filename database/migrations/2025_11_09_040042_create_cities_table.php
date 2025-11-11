@@ -11,14 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cities', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('state_id')->constrained('states')->onDelete('cascade');
-            $table->string('name');
-            $table->string('district')->nullable(); // District name
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('cities')) {
+            Schema::create('cities', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('state_id')->constrained('states')->onDelete('cascade');
+                $table->string('name');
+                $table->string('district')->nullable(); // District name
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        } else {
+            // Add missing columns if table exists
+            Schema::table('cities', function (Blueprint $table) {
+                if (!Schema::hasColumn('cities', 'state_id')) {
+                    $table->foreignId('state_id')->after('id')->constrained('states')->onDelete('cascade');
+                }
+                if (!Schema::hasColumn('cities', 'district')) {
+                    $table->string('district')->nullable()->after('name');
+                }
+                if (!Schema::hasColumn('cities', 'is_active')) {
+                    $table->boolean('is_active')->default(true)->after('district');
+                }
+            });
+        }
     }
 
     /**

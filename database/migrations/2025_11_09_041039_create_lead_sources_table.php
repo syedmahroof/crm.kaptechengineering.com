@@ -11,14 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lead_sources', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->string('color_code', 7)->nullable(); // Hex color code
-            $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('lead_sources')) {
+            Schema::create('lead_sources', function (Blueprint $table) {
+                $table->id();
+                $table->string('name')->unique();
+                $table->string('color_code', 7)->nullable(); // Hex color code
+                $table->text('description')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        } else {
+            // Add missing columns if table exists
+            Schema::table('lead_sources', function (Blueprint $table) {
+                if (!Schema::hasColumn('lead_sources', 'name')) {
+                    $table->string('name')->unique()->after('id');
+                }
+                if (!Schema::hasColumn('lead_sources', 'color_code')) {
+                    $table->string('color_code', 7)->nullable()->after('name');
+                }
+                if (!Schema::hasColumn('lead_sources', 'description')) {
+                    $table->text('description')->nullable()->after('color_code');
+                }
+                if (!Schema::hasColumn('lead_sources', 'is_active')) {
+                    $table->boolean('is_active')->default(true)->after('description');
+                }
+            });
+        }
     }
 
     /**
