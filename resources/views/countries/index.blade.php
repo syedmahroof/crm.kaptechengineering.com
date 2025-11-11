@@ -4,9 +4,11 @@
 
     <!-- Action Bar -->
     <div class="d-flex justify-content-end mb-4">
+        @can('create countries')
         <a href="{{ route('countries.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>Add Country
         </a>
+        @endcan
     </div>
 
     <div class="card">
@@ -42,9 +44,12 @@
                                     <a href="{{ route('countries.show', $country) }}" class="btn btn-sm btn-primary" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    @can('edit countries')
                                     <a href="{{ route('countries.edit', $country) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    @endcan
+                                    @can('delete countries')
                                     <form action="{{ route('countries.destroy', $country) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -52,6 +57,7 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

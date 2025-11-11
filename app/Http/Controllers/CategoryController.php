@@ -9,6 +9,8 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->can('view categories'), 403, 'Unauthorized action.');
+        
         $categories = Category::withCount('products')->paginate(15);
 
         return view('categories.index', compact('categories'));
@@ -16,11 +18,15 @@ class CategoryController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create categories'), 403, 'Unauthorized action.');
+        
         return view('categories.create');
     }
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create categories'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -40,11 +46,15 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
+        abort_unless(auth()->user()->can('edit categories'), 403, 'Unauthorized action.');
+        
         return view('categories.edit', compact('category'));
     }
 
     public function update(Request $request, Category $category)
     {
+        abort_unless(auth()->user()->can('edit categories'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -57,6 +67,8 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        abort_unless(auth()->user()->can('delete categories'), 403, 'Unauthorized action.');
+        
         $category->delete();
 
         return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');

@@ -53,6 +53,15 @@ class Lead extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    /**
+     * All branches associated with this lead (many-to-many).
+     * The existing `branch()` relationship is kept as the primary branch (branch_id).
+     */
+    public function branches()
+    {
+        return $this->belongsToMany(Branch::class)->withTimestamps();
+    }
+
     public function leadNotes()
     {
         return $this->hasMany(Note::class);

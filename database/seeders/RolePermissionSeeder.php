@@ -17,22 +17,67 @@ class RolePermissionSeeder extends Seeder
 
         // Create permissions
         $permissions = [
+            // Leads
             'view leads',
             'create leads',
             'edit leads',
             'delete leads',
+            // Products
             'view products',
             'create products',
             'edit products',
             'delete products',
+            // Users
             'view users',
             'create users',
             'edit users',
             'delete users',
+            // Roles
             'view roles',
             'create roles',
             'edit roles',
             'delete roles',
+            // Lead Types
+            'view lead-types',
+            'create lead-types',
+            'edit lead-types',
+            'delete lead-types',
+            // Lead Sources
+            'view lead-sources',
+            'create lead-sources',
+            'edit lead-sources',
+            'delete lead-sources',
+            // Countries
+            'view countries',
+            'create countries',
+            'edit countries',
+            'delete countries',
+            // States
+            'view states',
+            'create states',
+            'edit states',
+            'delete states',
+            // Cities
+            'view cities',
+            'create cities',
+            'edit cities',
+            'delete cities',
+            // Branches
+            'view branches',
+            'create branches',
+            'edit branches',
+            'delete branches',
+            // Categories
+            'view categories',
+            'create categories',
+            'edit categories',
+            'delete categories',
+            // Brands
+            'view brands',
+            'create brands',
+            'edit brands',
+            'delete brands',
+            // Settings
             'manage settings',
         ];
 
@@ -52,6 +97,14 @@ class RolePermissionSeeder extends Seeder
             'view leads', 'create leads', 'edit leads', 'delete leads',
             'view products', 'create products', 'edit products', 'delete products',
             'view users', 'create users', 'edit users',
+            'view lead-types', 'create lead-types', 'edit lead-types', 'delete lead-types',
+            'view lead-sources', 'create lead-sources', 'edit lead-sources', 'delete lead-sources',
+            'view countries', 'create countries', 'edit countries', 'delete countries',
+            'view states', 'create states', 'edit states', 'delete states',
+            'view cities', 'create cities', 'edit cities', 'delete cities',
+            'view branches', 'create branches', 'edit branches', 'delete branches',
+            'view categories', 'create categories', 'edit categories', 'delete categories',
+            'view brands', 'create brands', 'edit brands', 'delete brands',
         ]);
 
         // Sales Manager - can manage leads and products

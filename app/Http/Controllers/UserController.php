@@ -11,6 +11,8 @@ class UserController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->can('view users'), 403, 'Unauthorized action.');
+        
         $users = User::with('roles')->paginate(15);
 
         return view('users.index', compact('users'));
@@ -18,6 +20,8 @@ class UserController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create users'), 403, 'Unauthorized action.');
+        
         $roles = Role::all();
 
         return view('users.create', compact('roles'));
@@ -25,6 +29,8 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create users'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users',
@@ -87,6 +93,8 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        abort_unless(auth()->user()->can('edit users'), 403, 'Unauthorized action.');
+        
         $roles = Role::all();
         $userRoles = $user->roles->pluck('name')->toArray();
 
@@ -95,6 +103,8 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        abort_unless(auth()->user()->can('edit users'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
@@ -153,6 +163,8 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        abort_unless(auth()->user()->can('delete users'), 403, 'Unauthorized action.');
+        
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');

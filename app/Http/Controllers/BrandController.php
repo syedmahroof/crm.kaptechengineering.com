@@ -9,6 +9,8 @@ class BrandController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->can('view brands'), 403, 'Unauthorized action.');
+        
         $brands = Brand::withCount('products')->paginate(15);
 
         return view('brands.index', compact('brands'));
@@ -16,11 +18,15 @@ class BrandController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create brands'), 403, 'Unauthorized action.');
+        
         return view('brands.create');
     }
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create brands'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -40,11 +46,15 @@ class BrandController extends Controller
 
     public function edit(Brand $brand)
     {
+        abort_unless(auth()->user()->can('edit brands'), 403, 'Unauthorized action.');
+        
         return view('brands.edit', compact('brand'));
     }
 
     public function update(Request $request, Brand $brand)
     {
+        abort_unless(auth()->user()->can('edit brands'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -57,6 +67,8 @@ class BrandController extends Controller
 
     public function destroy(Brand $brand)
     {
+        abort_unless(auth()->user()->can('delete brands'), 403, 'Unauthorized action.');
+        
         $brand->delete();
 
         return redirect()->route('brands.index')->with('success', 'Brand deleted successfully.');

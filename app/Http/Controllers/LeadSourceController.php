@@ -10,6 +10,8 @@ class LeadSourceController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->can('view lead-sources'), 403, 'Unauthorized action.');
+        
         $leadSources = LeadSource::orderBy('name')->get()->map(function ($source) {
             $source->leads_count = $source->leads()->count();
             return $source;
@@ -32,11 +34,15 @@ class LeadSourceController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create lead-sources'), 403, 'Unauthorized action.');
+        
         return view('lead-sources.create');
     }
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create lead-sources'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:lead_sources,name',
             'color_code' => 'nullable|string|max:7',
@@ -63,11 +69,15 @@ class LeadSourceController extends Controller
 
     public function edit(LeadSource $leadSource)
     {
+        abort_unless(auth()->user()->can('edit lead-sources'), 403, 'Unauthorized action.');
+        
         return view('lead-sources.edit', compact('leadSource'));
     }
 
     public function update(Request $request, LeadSource $leadSource)
     {
+        abort_unless(auth()->user()->can('edit lead-sources'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:lead_sources,name,' . $leadSource->id,
             'color_code' => 'nullable|string|max:7',
@@ -87,6 +97,8 @@ class LeadSourceController extends Controller
 
     public function destroy(LeadSource $leadSource)
     {
+        abort_unless(auth()->user()->can('delete lead-sources'), 403, 'Unauthorized action.');
+        
         // Check if there are leads using this source
         $leadsCount = Lead::where('source', $leadSource->name)->count();
         

@@ -10,6 +10,8 @@ class StateController extends Controller
 {
     public function index(Request $request)
     {
+        abort_unless(auth()->user()->can('view states'), 403, 'Unauthorized action.');
+        
         $query = State::with(['country'])->withCount('cities');
 
         if ($request->filled('country_id')) {
@@ -24,6 +26,8 @@ class StateController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create states'), 403, 'Unauthorized action.');
+        
         $countries = Country::orderBy('name')->get();
 
         return view('states.create', compact('countries'));
@@ -31,6 +35,8 @@ class StateController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create states'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'country_id' => 'required|exists:countries,id',
             'name' => 'required|string|max:255',
@@ -52,6 +58,8 @@ class StateController extends Controller
 
     public function edit(State $state)
     {
+        abort_unless(auth()->user()->can('edit states'), 403, 'Unauthorized action.');
+        
         $countries = Country::orderBy('name')->get();
 
         return view('states.edit', compact('state', 'countries'));
@@ -59,6 +67,8 @@ class StateController extends Controller
 
     public function update(Request $request, State $state)
     {
+        abort_unless(auth()->user()->can('edit states'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'country_id' => 'required|exists:countries,id',
             'name' => 'required|string|max:255',
@@ -73,6 +83,8 @@ class StateController extends Controller
 
     public function destroy(State $state)
     {
+        abort_unless(auth()->user()->can('delete states'), 403, 'Unauthorized action.');
+        
         $state->delete();
 
         return redirect()->route('states.index')->with('success', 'State deleted successfully.');

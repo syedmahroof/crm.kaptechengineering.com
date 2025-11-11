@@ -172,6 +172,8 @@ class LeadController extends Controller
             'product_ids' => 'nullable|array',
             'product_ids.*' => 'exists:products,id',
             'branch_id' => 'nullable|exists:branches,id',
+            'branch_ids' => 'nullable|array',
+            'branch_ids.*' => 'exists:branches,id',
             'country_id' => 'nullable|exists:countries,id',
             'state_id' => 'nullable|exists:states,id',
             'city_id' => 'nullable|exists:cities,id',
@@ -201,6 +203,19 @@ class LeadController extends Controller
             if (! empty($sync)) {
                 $lead->products()->sync($sync);
             }
+        }
+
+        // Sync many-to-many branches. Keep `branch_id` as the primary branch on leads table.
+        $branchIds = [];
+        if (! empty($validated['branch_ids'])) {
+            $branchIds = array_values($validated['branch_ids']);
+        }
+        // If a primary branch is provided but not in branch_ids, ensure it's attached
+        if (! empty($validated['branch_id']) && ! in_array($validated['branch_id'], $branchIds, true)) {
+            $branchIds[] = $validated['branch_id'];
+        }
+        if (! empty($branchIds)) {
+            $lead->branches()->sync($branchIds);
         }
         
 
@@ -286,6 +301,8 @@ class LeadController extends Controller
             'products.*.quantity' => 'nullable|integer|min:1',
             'products.*.description' => 'nullable|string|max:1000',
             'branch_id' => 'nullable|exists:branches,id',
+            'branch_ids' => 'nullable|array',
+            'branch_ids.*' => 'exists:branches,id',
             'country_id' => 'nullable|exists:countries,id',
             'state_id' => 'nullable|exists:states,id',
             'city_id' => 'nullable|exists:cities,id',
@@ -307,6 +324,16 @@ class LeadController extends Controller
             }
         }
         $lead->products()->sync($sync);
+
+        // Sync many-to-many branches and ensure primary branch is included
+        $branchIds = [];
+        if (! empty($validated['branch_ids'])) {
+            $branchIds = array_values($validated['branch_ids']);
+        }
+        if (! empty($validated['branch_id']) && ! in_array($validated['branch_id'], $branchIds, true)) {
+            $branchIds[] = $validated['branch_id'];
+        }
+        $lead->branches()->sync($branchIds);
 
         return redirect()->route('leads.index')->with('success', 'Lead updated successfully.');
     }

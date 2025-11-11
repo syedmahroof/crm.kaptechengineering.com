@@ -11,6 +11,8 @@ class CityController extends Controller
 {
     public function index(Request $request)
     {
+        abort_unless(auth()->user()->can('view cities'), 403, 'Unauthorized action.');
+        
         $query = City::with(['state.country']);
 
         if ($request->filled('state_id')) {
@@ -32,6 +34,8 @@ class CityController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create cities'), 403, 'Unauthorized action.');
+        
         $countries = Country::orderBy('name')->get();
         $states = State::orderBy('name')->get();
 
@@ -40,6 +44,8 @@ class CityController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create cities'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'state_id' => 'required|exists:states,id',
             'name' => 'required|string|max:255',
@@ -61,6 +67,8 @@ class CityController extends Controller
 
     public function edit(City $city)
     {
+        abort_unless(auth()->user()->can('edit cities'), 403, 'Unauthorized action.');
+        
         $countries = Country::orderBy('name')->get();
         $states = State::orderBy('name')->get();
 
@@ -69,6 +77,8 @@ class CityController extends Controller
 
     public function update(Request $request, City $city)
     {
+        abort_unless(auth()->user()->can('edit cities'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'state_id' => 'required|exists:states,id',
             'name' => 'required|string|max:255',
@@ -83,6 +93,8 @@ class CityController extends Controller
 
     public function destroy(City $city)
     {
+        abort_unless(auth()->user()->can('delete cities'), 403, 'Unauthorized action.');
+        
         $city->delete();
 
         return redirect()->route('cities.index')->with('success', 'City deleted successfully.');

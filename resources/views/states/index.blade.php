@@ -52,9 +52,12 @@
                                     <a href="{{ route('states.show', $state) }}" class="btn btn-sm btn-primary" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    @can('edit states')
                                     <a href="{{ route('states.edit', $state) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    @endcan
+                                    @can('delete states')
                                     <form action="{{ route('states.destroy', $state) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -62,6 +65,7 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

@@ -37,9 +37,12 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
+                                    @can('edit products')
                                     <a href="{{ route('products.edit', $product) }}" class="btn btn-outline-warning">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    @endcan
+                                    @can('delete products')
                                     <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -47,6 +50,7 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

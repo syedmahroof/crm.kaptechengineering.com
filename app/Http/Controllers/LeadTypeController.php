@@ -10,6 +10,8 @@ class LeadTypeController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->can('view lead-types'), 403, 'Unauthorized action.');
+        
         $leadTypes = LeadType::orderBy('name')->get()->map(function ($type) {
             $type->leads_count = $type->leads()->count();
             return $type;
@@ -32,11 +34,15 @@ class LeadTypeController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create lead-types'), 403, 'Unauthorized action.');
+        
         return view('lead-types.create');
     }
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create lead-types'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:lead_types,name',
             'color_code' => 'nullable|string|max:7',
@@ -63,11 +69,15 @@ class LeadTypeController extends Controller
 
     public function edit(LeadType $leadType)
     {
+        abort_unless(auth()->user()->can('edit lead-types'), 403, 'Unauthorized action.');
+        
         return view('lead-types.edit', compact('leadType'));
     }
 
     public function update(Request $request, LeadType $leadType)
     {
+        abort_unless(auth()->user()->can('edit lead-types'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:lead_types,name,' . $leadType->id,
             'color_code' => 'nullable|string|max:7',
@@ -87,6 +97,8 @@ class LeadTypeController extends Controller
 
     public function destroy(LeadType $leadType)
     {
+        abort_unless(auth()->user()->can('delete lead-types'), 403, 'Unauthorized action.');
+        
         // Check if there are leads using this type
         $leadsCount = Lead::where('lead_type', $leadType->name)->count();
         

@@ -60,9 +60,12 @@
                                     <a href="{{ route('cities.show', $city) }}" class="btn btn-sm btn-primary" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    @can('edit cities')
                                     <a href="{{ route('cities.edit', $city) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    @endcan
+                                    @can('delete cities')
                                     <form action="{{ route('cities.destroy', $city) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -70,6 +73,7 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

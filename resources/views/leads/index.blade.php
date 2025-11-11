@@ -70,9 +70,11 @@
                         <small class="text-muted">Server-side processing enabled</small>
                     </div>
                 </div>
+                @can('create leads')
                 <a href="{{ route('leads.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-circle me-2"></i>Add New Lead
                 </a>
+                @endcan
             </div>
 
             <!-- Filters Row -->

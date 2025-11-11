@@ -4,9 +4,11 @@
 
     <!-- Action Bar -->
     <div class="d-flex justify-content-end mb-4">
+        @can('create lead-types')
         <a href="{{ route('lead-types.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>Add Lead Type
         </a>
+        @endcan
     </div>
 
     <div class="card">
@@ -50,9 +52,12 @@
                                     <a href="{{ route('lead-types.show', $leadType) }}" class="btn btn-sm btn-primary" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    @can('edit lead-types')
                                     <a href="{{ route('lead-types.edit', $leadType) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    @endcan
+                                    @can('delete lead-types')
                                     <form action="{{ route('lead-types.destroy', $leadType) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -60,6 +65,7 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

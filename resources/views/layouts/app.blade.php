@@ -22,6 +22,7 @@
     <style>
         :root {
             --sidebar-width: 260px;
+            --sidebar-collapsed-width: 80px;
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --secondary: #8b5cf6;
@@ -52,6 +53,92 @@
             z-index: 1000;
             overflow-y: auto;
             border-right: 1px solid #e2e8f0;
+            transition: width 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar.collapsed .sidebar-brand h4,
+        .sidebar.collapsed .sidebar-brand small {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+        
+        .sidebar.collapsed .sidebar-brand {
+            padding: 28px 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .sidebar.collapsed .nav-link span,
+        .sidebar.collapsed .nav-group-toggle span,
+        .sidebar.collapsed .nav-section-title {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 12px;
+        }
+        
+        .sidebar.collapsed .nav-group-toggle {
+            justify-content: center;
+            padding: 12px;
+        }
+        
+        .sidebar.collapsed .nav-group-toggle .bi-chevron-down {
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-submenu {
+            display: none !important;
+        }
+        
+        .sidebar.collapsed .nav-link i,
+        .sidebar.collapsed .nav-group-toggle-left i {
+            margin-right: 0;
+        }
+        
+        .sidebar.collapsed .nav-link {
+            position: relative;
+        }
+        
+        .sidebar.collapsed .nav-link:hover::after,
+        .sidebar.collapsed .nav-group-toggle:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+        }
+        
+        .sidebar.collapsed .nav-link:hover::before,
+        .sidebar.collapsed .nav-group-toggle:hover::before {
+            content: '';
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 6px solid transparent;
+            border-right-color: #0f172a;
+            z-index: 1002;
+            pointer-events: none;
         }
         
         .sidebar::-webkit-scrollbar {
@@ -226,6 +313,11 @@
             margin-left: var(--sidebar-width);
             padding: 0;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.sidebar-collapsed {
+            margin-left: var(--sidebar-collapsed-width);
         }
         
         .content-wrapper {
@@ -244,6 +336,27 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             transition: box-shadow 0.2s;
             overflow: visible;
+        }
+        
+        .sidebar-toggle-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+            margin-right: 16px;
+        }
+        
+        .sidebar-toggle-btn:hover {
+            background: #e2e8f0;
+            color: #0f172a;
         }
         
         .top-bar.scrolled {
@@ -876,16 +989,23 @@
             <small>Lead Management System</small>
         </div>
         
+        <div style="padding: 12px; border-bottom: 1px solid #f1f5f9; display: none;" class="d-md-none">
+            <button class="sidebar-toggle-btn" onclick="toggleSidebar()" style="width: 100%;">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
         <div class="sidebar-nav">
             <!-- Dashboard -->
-            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}" data-tooltip="Dashboard">
                 <i class="bi bi-grid-fill"></i>
                 <span>Dashboard</span>
             </a>
             
             <!-- Lead Management -->
+            @canany(['view leads', 'view lead-types', 'view lead-sources'])
             <div class="nav-group {{ request()->routeIs('leads.*') || request()->routeIs('followups.*') || request()->routeIs('calendar.*') || request()->routeIs('todos.*') || request()->routeIs('analytics.*') || request()->routeIs('lead-types.*') || request()->routeIs('lead-sources.*') ? 'active' : '' }}">
-                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')">
+                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')" data-tooltip="Lead Management">
                     <div class="nav-group-toggle-left">
                         <i class="bi bi-people-fill"></i>
                         <span>Lead Management</span>
@@ -893,40 +1013,56 @@
                     <i class="bi bi-chevron-down"></i>
                 </button>
                 <div class="nav-submenu">
-                    <a class="nav-link {{ request()->routeIs('leads.*') ? 'active' : '' }}" href="{{ route('leads.index') }}">
+                    @can('view leads')
+                    <a class="nav-link {{ request()->routeIs('leads.*') ? 'active' : '' }}" href="{{ route('leads.index') }}" data-tooltip="Leads">
                         <i class="bi bi-people"></i>
                         <span>Leads</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('followups.*') ? 'active' : '' }}" href="{{ route('followups.index') }}">
+                    @endcan
+                    @can('view leads')
+                    <a class="nav-link {{ request()->routeIs('followups.*') ? 'active' : '' }}" href="{{ route('followups.index') }}" data-tooltip="Follow-ups">
                         <i class="bi bi-calendar-check"></i>
                         <span>Follow-ups</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" href="{{ route('calendar.index') }}">
+                    @endcan
+                    @can('view leads')
+                    <a class="nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" href="{{ route('calendar.index') }}" data-tooltip="Calendar">
                         <i class="bi bi-calendar-event"></i>
                         <span>Calendar</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('todos.*') ? 'active' : '' }}" href="{{ route('todos.index') }}">
+                    @endcan
+                    @can('view leads')
+                    <a class="nav-link {{ request()->routeIs('todos.*') ? 'active' : '' }}" href="{{ route('todos.index') }}" data-tooltip="Todo List">
                         <i class="bi bi-check2-square"></i>
                         <span>Todo List</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('analytics.*') ? 'active' : '' }}" href="{{ route('analytics.index') }}">
+                    @endcan
+                    @can('view leads')
+                    <a class="nav-link {{ request()->routeIs('analytics.*') ? 'active' : '' }}" href="{{ route('analytics.index') }}" data-tooltip="Analytics">
                         <i class="bi bi-graph-up"></i>
                         <span>Analytics</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('lead-types.*') ? 'active' : '' }}" href="{{ route('lead-types.index') }}">
+                    @endcan
+                    @can('view lead-types')
+                    <a class="nav-link {{ request()->routeIs('lead-types.*') ? 'active' : '' }}" href="{{ route('lead-types.index') }}" data-tooltip="Lead Type">
                         <i class="bi bi-tag-fill"></i>
                         <span>Lead Type</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('lead-sources.*') ? 'active' : '' }}" href="{{ route('lead-sources.index') }}">
+                    @endcan
+                    @can('view lead-sources')
+                    <a class="nav-link {{ request()->routeIs('lead-sources.*') ? 'active' : '' }}" href="{{ route('lead-sources.index') }}" data-tooltip="Lead Source">
                         <i class="bi bi-funnel-fill"></i>
                         <span>Lead Source</span>
                     </a>
+                    @endcan
                 </div>
             </div>
+            @endcanany
             
             <!-- Product Management -->
+            @canany(['view products', 'view categories', 'view brands'])
             <div class="nav-group {{ request()->routeIs('products.*') || request()->routeIs('categories.*') || request()->routeIs('brands.*') ? 'active' : '' }}">
-                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')">
+                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')" data-tooltip="Products">
                     <div class="nav-group-toggle-left">
                         <i class="bi bi-box-seam-fill"></i>
                         <span>Products</span>
@@ -934,28 +1070,38 @@
                     <i class="bi bi-chevron-down"></i>
                 </button>
                 <div class="nav-submenu">
-                    <a class="nav-link {{ request()->routeIs('products.index') || request()->routeIs('products.create') || request()->routeIs('products.edit') || request()->routeIs('products.show') ? 'active' : '' }}" href="{{ route('products.index') }}">
+                    @can('view products')
+                    <a class="nav-link {{ request()->routeIs('products.index') || request()->routeIs('products.create') || request()->routeIs('products.edit') || request()->routeIs('products.show') ? 'active' : '' }}" href="{{ route('products.index') }}" data-tooltip="Products">
                         <i class="bi bi-box-seam"></i>
                         <span>Products</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('products.analytics') ? 'active' : '' }}" href="{{ route('products.analytics') }}">
+                    @endcan
+                    @can('view products')
+                    <a class="nav-link {{ request()->routeIs('products.analytics') ? 'active' : '' }}" href="{{ route('products.analytics') }}" data-tooltip="Product Analytics">
                         <i class="bi bi-graph-up"></i>
                         <span>Product Analytics</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
+                    @endcan
+                    @can('view categories')
+                    <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}" data-tooltip="Categories">
                         <i class="bi bi-tag"></i>
                         <span>Categories</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('brands.*') ? 'active' : '' }}" href="{{ route('brands.index') }}">
+                    @endcan
+                    @can('view brands')
+                    <a class="nav-link {{ request()->routeIs('brands.*') ? 'active' : '' }}" href="{{ route('brands.index') }}" data-tooltip="Brands">
                         <i class="bi bi-award"></i>
                         <span>Brands</span>
                     </a>
+                    @endcan
                 </div>
             </div>
+            @endcanany
             
             <!-- Master -->
+            @canany(['view countries', 'view states', 'view cities'])
             <div class="nav-group {{ request()->routeIs('countries.*') || request()->routeIs('states.*') || request()->routeIs('cities.*') ? 'active' : '' }}">
-                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')">
+                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')" data-tooltip="Master">
                     <div class="nav-group-toggle-left">
                         <i class="bi bi-gear-fill"></i>
                         <span>Master</span>
@@ -963,24 +1109,32 @@
                     <i class="bi bi-chevron-down"></i>
                 </button>
                 <div class="nav-submenu">
-                    <a class="nav-link {{ request()->routeIs('countries.*') ? 'active' : '' }}" href="{{ route('countries.index') }}">
+                    @can('view countries')
+                    <a class="nav-link {{ request()->routeIs('countries.*') ? 'active' : '' }}" href="{{ route('countries.index') }}" data-tooltip="Country">
                         <i class="bi bi-globe"></i>
                         <span>Country</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('states.*') ? 'active' : '' }}" href="{{ route('states.index') }}">
+                    @endcan
+                    @can('view states')
+                    <a class="nav-link {{ request()->routeIs('states.*') ? 'active' : '' }}" href="{{ route('states.index') }}" data-tooltip="State">
                         <i class="bi bi-geo-alt"></i>
                         <span>State</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('cities.*') ? 'active' : '' }}" href="{{ route('cities.index') }}">
+                    @endcan
+                    @can('view cities')
+                    <a class="nav-link {{ request()->routeIs('cities.*') ? 'active' : '' }}" href="{{ route('cities.index') }}" data-tooltip="City">
                         <i class="bi bi-building"></i>
                         <span>City</span>
                     </a>
+                    @endcan
                 </div>
             </div>
+            @endcanany
           
             <!-- Administration -->
+            @canany(['view branches', 'view users', 'view roles'])
             <div class="nav-group {{ request()->routeIs('branches.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') ? 'active' : '' }}">
-                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')">
+                <button class="nav-group-toggle" onclick="this.parentElement.classList.toggle('active')" data-tooltip="Administration">
                     <div class="nav-group-toggle-left">
                         <i class="bi bi-building-fill"></i>
                         <span>Administration</span>
@@ -988,20 +1142,27 @@
                     <i class="bi bi-chevron-down"></i>
                 </button>
                 <div class="nav-submenu">
-                    <a class="nav-link {{ request()->routeIs('branches.*') ? 'active' : '' }}" href="{{ route('branches.index') }}">
+                    @can('view branches')
+                    <a class="nav-link {{ request()->routeIs('branches.*') ? 'active' : '' }}" href="{{ route('branches.index') }}" data-tooltip="Branches">
                         <i class="bi bi-building"></i>
                         <span>Branches</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                    @endcan
+                    @can('view users')
+                    <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}" data-tooltip="Users">
                         <i class="bi bi-person-fill-gear"></i>
                         <span>Users</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">
+                    @endcan
+                    @can('view roles')
+                    <a class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}" data-tooltip="Roles & Permissions">
                         <i class="bi bi-shield-fill-check"></i>
                         <span>Roles & Permissions</span>
                     </a>
+                    @endcan
                 </div>
             </div>
+            @endcanany
         </div>
     </nav>
 
@@ -1011,9 +1172,14 @@
         <div class="top-bar">
             <div class="content-wrapper" style="width: 100%; padding-top: 0; padding-bottom: 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <div>
-                        <h1 class="page-title">{{ $title ?? 'Dashboard' }}</h1>
-                        <p class="page-subtitle">{{ $subtitle ?? 'Welcome back!' }}</p>
+                    <div style="display: flex; align-items: center;">
+                        <button class="sidebar-toggle-btn d-none d-md-flex" onclick="toggleSidebarCollapse()" title="Toggle Sidebar">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <div>
+                            <h1 class="page-title">{{ $title ?? 'Dashboard' }}</h1>
+                            <p class="page-subtitle">{{ $subtitle ?? 'Welcome back!' }}</p>
+                        </div>
                     </div>
             
             <div class="user-menu">
@@ -1155,6 +1321,32 @@
             sidebar.classList.toggle('show');
             backdrop.classList.toggle('show');
         }
+        
+        function toggleSidebarCollapse() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            
+            if (isCollapsed) {
+                mainContent.classList.add('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', 'true');
+            } else {
+                mainContent.classList.remove('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            }
+        }
+        
+        // Load sidebar state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+            }
+        });
         
         // Add scrolled class to top bar on scroll
         let lastScrollTop = 0;

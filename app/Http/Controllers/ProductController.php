@@ -13,6 +13,8 @@ class ProductController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->can('view products'), 403, 'Unauthorized action.');
+        
         $products = Product::with(['category', 'brand'])->paginate(15);
 
         return view('products.index', compact('products'));
@@ -20,6 +22,8 @@ class ProductController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create products'), 403, 'Unauthorized action.');
+        
         $categories = Category::all();
         $brands = Brand::all();
 
@@ -28,6 +32,8 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create products'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -51,6 +57,8 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        abort_unless(auth()->user()->can('edit products'), 403, 'Unauthorized action.');
+        
         $categories = Category::all();
         $brands = Brand::all();
 
@@ -59,6 +67,8 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        abort_unless(auth()->user()->can('edit products'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -75,6 +85,8 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        abort_unless(auth()->user()->can('delete products'), 403, 'Unauthorized action.');
+        
         $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');

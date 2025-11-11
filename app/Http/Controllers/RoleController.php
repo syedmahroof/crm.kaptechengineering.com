@@ -10,6 +10,8 @@ class RoleController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->can('view roles'), 403, 'Unauthorized action.');
+        
         $roles = Role::withCount('permissions')->paginate(15);
 
         return view('roles.index', compact('roles'));
@@ -17,6 +19,8 @@ class RoleController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->can('create roles'), 403, 'Unauthorized action.');
+        
         $permissions = Permission::all();
 
         return view('roles.create', compact('permissions'));
@@ -24,6 +28,8 @@ class RoleController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->can('create roles'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
             'permissions' => 'array',
@@ -48,6 +54,8 @@ class RoleController extends Controller
 
     public function edit(Role $role)
     {
+        abort_unless(auth()->user()->can('edit roles'), 403, 'Unauthorized action.');
+        
         $permissions = Permission::all();
         $rolePermissions = $role->permissions->pluck('id')->toArray();
 
@@ -56,6 +64,8 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role)
     {
+        abort_unless(auth()->user()->can('edit roles'), 403, 'Unauthorized action.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:roles,name,'.$role->id,
             'permissions' => 'array',
@@ -75,6 +85,8 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
+        abort_unless(auth()->user()->can('delete roles'), 403, 'Unauthorized action.');
+        
         $role->delete();
 
         return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');

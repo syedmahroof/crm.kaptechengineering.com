@@ -4,9 +4,11 @@
 
     <!-- Action Bar -->
     <div class="d-flex justify-content-end mb-4">
+        @can('create lead-sources')
         <a href="{{ route('lead-sources.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>Add Lead Source
         </a>
+        @endcan
     </div>
 
     <div class="card">

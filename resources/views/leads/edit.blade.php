@@ -154,10 +154,27 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="branch_id" class="form-label">Branch</label>
+                                <label for="branch_ids" class="form-label">Branches (select one or more)</label>
+                                <select class="form-select @error('branch_ids') is-invalid @enderror" 
+                                        id="branch_ids" name="branch_ids[]" multiple>
+                                    @php($selected = old('branch_ids', $lead->branches->pluck('id')->toArray()))
+                                    @foreach($branches as $branch)
+                                        <option value="{{ $branch->id }}" {{ in_array($branch->id, $selected) ? 'selected' : '' }}>
+                                            {{ $branch->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('branch_ids')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">You can assign this lead to multiple branches. Choose a primary branch below.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="branch_id" class="form-label">Primary Branch</label>
                                 <select class="form-select @error('branch_id') is-invalid @enderror" 
                                         id="branch_id" name="branch_id">
-                                    <option value="">Select Branch</option>
+                                    <option value="">Select Primary Branch</option>
                                     @foreach($branches as $branch)
                                         <option value="{{ $branch->id }}" {{ old('branch_id', $lead->branch_id) == $branch->id ? 'selected' : '' }}>
                                             {{ $branch->name }}

@@ -139,7 +139,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="info-item">
-                                <label class="text-muted small text-uppercase fw-semibold mb-1 d-block">Lead Type</label>
+                                <label class="text-muted small text-uppercase fw-semibold mb-1 d-block">
+                                    <i class="bi bi-tag-fill me-1"></i>Lead Type
+                                    <small class="d-block" style="font-size: 0.7rem; font-weight: normal;">Industry/Business type</small>
+                                </label>
                                 @if($lead->lead_type)
                                     <span class="badge bg-info text-white">{{ ucfirst($lead->lead_type) }}</span>
                                 @else
@@ -303,7 +306,8 @@
             <div class="card shadow-sm border-0 mb-4" style="border-left: 4px solid {{ $lead->status->color_code }} !important;">
                 <div class="card-header bg-white border-bottom py-3">
                     <h5 class="mb-0 fw-semibold">
-                        <i class="bi bi-flag-fill me-2" style="color: {{ $lead->status->color_code }};"></i>Current Status
+                        <i class="bi bi-flag-fill me-2" style="color: {{ $lead->status->color_code }};"></i>Current Lead Status
+                        <small class="d-block text-muted" style="font-size: 0.7rem; font-weight: normal;">Sales pipeline stage</small>
                     </h5>
                 </div>
                 <div class="card-body p-4 text-center">
