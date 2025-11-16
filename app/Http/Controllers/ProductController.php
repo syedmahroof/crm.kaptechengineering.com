@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class ProductController extends Controller
 {
@@ -152,6 +153,12 @@ class ProductController extends Controller
      */
     public function analytics(Request $request)
     {
+        // Check if products table exists
+        if (!Schema::hasTable('products')) {
+            return redirect()->route('products.index')
+                ->with('error', 'Products table does not exist. Please run migrations: php artisan migrate');
+        }
+
         // Get date range from request or use default (last 365 days)
         $endDate = $request->filled('end_date') 
             ? \Carbon\Carbon::parse($request->end_date)->endOfDay()
@@ -177,10 +184,11 @@ class ProductController extends Controller
 
         // Products by category
         $productsByCategory = (clone $baseQuery)
-            ->select('category', \DB::raw('COUNT(*) as count'))
+            ->select('category', \DB::raw('COUNT(*) as total'))
+            ->where('is_active', 1)
             ->whereNotNull('category')
             ->groupBy('category')
-            ->orderByDesc('count')
+            ->orderByDesc('total')
             ->get();
 
         // Total value by category

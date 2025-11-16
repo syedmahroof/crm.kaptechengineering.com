@@ -12,30 +12,52 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Create pivot table for team leads (many-to-many)
-        Schema::create('team_lead', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('team_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-            
-            // Prevent duplicate entries
-            $table->unique(['team_id', 'user_id']);
-        });
+        // Create pivot table for team leads (many-to-many) if it doesn't exist
+        if (!Schema::hasTable('team_lead')) {
+            Schema::create('team_lead', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('team_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+                
+                // Prevent duplicate entries
+                $table->unique(['team_id', 'user_id']);
+            });
+        }
 
         // Migrate existing team_lead_id to the pivot table
-        DB::statement('
-            INSERT INTO team_lead (team_id, user_id, created_at, updated_at)
-            SELECT id, team_lead_id, NOW(), NOW()
-            FROM teams
-            WHERE team_lead_id IS NOT NULL
-        ');
+        $connection = Schema::getConnection();
+        $driver = $connection->getDriverName();
+        $now = now()->toDateTimeString();
+        
+        if ($driver === 'sqlite') {
+            // SQLite uses datetime('now') instead of NOW()
+            DB::statement("
+                INSERT INTO team_lead (team_id, user_id, created_at, updated_at)
+                SELECT id, team_lead_id, datetime('now'), datetime('now')
+                FROM teams
+                WHERE team_lead_id IS NOT NULL
+            ");
+        } else {
+            DB::statement("
+                INSERT INTO team_lead (team_id, user_id, created_at, updated_at)
+                SELECT id, team_lead_id, NOW(), NOW()
+                FROM teams
+                WHERE team_lead_id IS NOT NULL
+            ");
+        }
 
-        // Drop the old team_lead_id column
-        Schema::table('teams', function (Blueprint $table) {
-            $table->dropForeign(['team_lead_id']);
-            $table->dropColumn('team_lead_id');
-        });
+        // Drop the old team_lead_id column if it exists
+        if (Schema::hasColumn('teams', 'team_lead_id')) {
+            Schema::table('teams', function (Blueprint $table) {
+                try {
+                    $table->dropForeign(['team_lead_id']);
+                } catch (\Exception $e) {
+                    // Foreign key might not exist
+                }
+                $table->dropColumn('team_lead_id');
+            });
+        }
     }
 
     /**
