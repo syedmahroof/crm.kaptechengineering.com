@@ -30,8 +30,6 @@ final class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             // Visit Reports
             VisitReportSeeder::class,
-            // Hotels
-            HotelSeeder::class,
             // Frontend content
             BannerSeeder::class,
             // Blog content
