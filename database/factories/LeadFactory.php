@@ -2,35 +2,48 @@
 
 namespace Database\Factories;
 
-use App\Models\Branch;
-use App\Models\LeadStatus;
-use App\Models\Product;
+use App\Models\Lead;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Lead>
- */
 class LeadFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Lead::class;
+
+    /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return array
      */
-    public function definition(): array
+    public function definition()
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->phoneNumber(),
-            'status_id' => LeadStatus::inRandomOrder()->first()?->id ?? null,
-            'assigned_to' => User::inRandomOrder()->first()?->id ?? null,
-            'product_id' => Product::inRandomOrder()->first()?->id ?? null,
-            'branch_id' => Branch::inRandomOrder()->first()?->id ?? null,
-            'source' => fake()->randomElement(['Website', 'Email Campaign', 'Social Media', 'Phone Call', 'Walk-in', 'Referral']),
-            'lead_type' => fake()->randomElement(['Hot Lead', 'Warm Lead', 'Cold Lead', 'Qualified', 'Unqualified']),
-            'notes' => fake()->optional()->paragraph(),
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
+            'phone' => $this->faker->phoneNumber,
+            'company' => $this->faker->company,
+            'title' => $this->faker->jobTitle,
+            'description' => $this->faker->paragraph,
+            'status' => $this->faker->randomElement(['new', 'itinerary_sent', 'hot_lead', 'cold_lead', 'converted', 'lost']),
+            'lead_source_id' => 1, // Assuming there's at least one source
+            'lead_priority_id' => 1, // Assuming there's at least one priority
+            'lead_agent_id' => User::factory(),
+            'created_by' => 1, // Assuming user with ID 1 exists
+            'updated_by' => 1, // Assuming user with ID 1 exists
+            'converted_at' => $this->faker->optional(0.3)->dateTimeThisYear(),
+            'lost_reason' => $this->faker->optional(0.2)->sentence,
+            'lost_at' => $this->faker->optional(0.1)->dateTimeThisYear(),
+            'won_at' => $this->faker->optional(0.1)->dateTimeThisYear(),
+            'expected_close_date' => $this->faker->dateTimeBetween('now', '+3 months'),
+            'value' => $this->faker->randomFloat(2, 1000, 100000),
+            'currency' => 'USD',
+            'notes' => $this->faker->optional()->paragraph,
+            'is_public' => $this->faker->boolean(80), // 80% chance of being public
         ];
     }
 }

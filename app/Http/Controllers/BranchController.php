@@ -3,80 +3,137 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\Lead;
+use App\Models\Customer;
+use App\Http\Requests\StoreBranchRequest;
+use App\Http\Requests\UpdateBranchRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\View\View;
 
 class BranchController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request): View
     {
-        abort_unless(auth()->user()->can('view branches'), 403, 'Unauthorized action.');
-        
-        $branches = Branch::withCount('leads')->paginate(15);
+        $query = Branch::query();
 
-        return view('branches.index', compact('branches'));
-    }
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('manager_name', 'like', "%{$search}%");
+            });
+        }
 
-    public function create()
-    {
-        abort_unless(auth()->user()->can('create branches'), 403, 'Unauthorized action.');
-        
-        return view('branches.create');
-    }
+        // Filter by status
+        if ($request->filled('status')) {
+            $status = $request->get('status');
+            if ($status === 'active') {
+                $query->active();
+            } elseif ($status === 'inactive') {
+                $query->inactive();
+            }
+        }
 
-    public function store(Request $request)
-    {
-        abort_unless(auth()->user()->can('create branches'), 403, 'Unauthorized action.');
-        
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'contact_person' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
+        $branches = $query->latest()->paginate(15)->withQueryString();
+
+        return view('admin.branches.index', [
+            'branches' => $branches,
+            'filters' => $request->only(['search', 'status']),
         ]);
-
-        Branch::create($validated);
-
-        return redirect()->route('branches.index')->with('success', 'Branch created successfully.');
     }
 
-    public function show(Branch $branch)
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): View
     {
-        $branch->load('leads');
-
-        return view('branches.show', compact('branch'));
+        return view('admin.branches.create');
     }
 
-    public function edit(Branch $branch)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreBranchRequest $request)
     {
-        abort_unless(auth()->user()->can('edit branches'), 403, 'Unauthorized action.');
-        
-        return view('branches.edit', compact('branch'));
+        $branch = Branch::create($request->validated());
+
+        return redirect()
+            ->route('branches.index')
+            ->with('success', 'Branch created successfully.');
     }
 
-    public function update(Request $request, Branch $branch)
+    /**
+     * Display the specified resource.
+     */
+    public function show(Branch $branch): View
     {
-        abort_unless(auth()->user()->can('edit branches'), 403, 'Unauthorized action.');
-        
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'contact_person' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
+        $branch->load(['users', 'leads', 'customers']);
+
+        return view('admin.branches.show', [
+            'branch' => $branch,
         ]);
-
-        $branch->update($validated);
-
-        return redirect()->route('branches.index')->with('success', 'Branch updated successfully.');
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Branch $branch): View
+    {
+        return view('admin.branches.edit', [
+            'branch' => $branch,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateBranchRequest $request, Branch $branch)
+    {
+        $branch->update($request->validated());
+
+        return redirect()
+            ->route('branches.index')
+            ->with('success', 'Branch updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Branch $branch)
     {
-        abort_unless(auth()->user()->can('delete branches'), 403, 'Unauthorized action.');
-        
-        $branch->delete();
+        DB::transaction(function () use ($branch) {
+            // Detach users from pivot to avoid FK blocks
+            $branch->users()->detach();
 
-        return redirect()->route('branches.index')->with('success', 'Branch deleted successfully.');
+            // Nullify related foreign keys so we can delete the branch
+            Lead::where('branch_id', $branch->id)->update(['branch_id' => null]);
+            Customer::where('branch_id', $branch->id)->update(['branch_id' => null]);
+
+            // Delete the branch
+            $branch->delete();
+        });
+
+        return redirect()
+            ->route('branches.index')
+            ->with('success', 'Branch deleted successfully.');
+    }
+
+    /**
+     * Toggle branch status.
+     */
+    public function toggleStatus(Branch $branch)
+    {
+        $branch->update(['is_active' => !$branch->is_active]);
+
+        $status = $branch->is_active ? 'activated' : 'deactivated';
+
+        return back()->with('success', "Branch {$status} successfully.");
     }
 }

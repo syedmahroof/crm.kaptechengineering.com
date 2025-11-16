@@ -2,70 +2,178 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Lead;
 use App\Models\Note;
 use Illuminate\Http\Request;
 
 class NoteController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
     {
-        $notes = Note::with(['lead', 'user'])->latest()->paginate(15);
+        // Get standalone notes (where noteable_id is null)
+        $query = Note::with('user')
+            ->where('user_id', auth()->id())
+            ->whereNull('noteable_id');
 
-        return view('notes.index', compact('notes'));
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('pinned')) {
+            $query->where('is_pinned', $request->pinned == '1');
+        }
+
+        // Sort: pinned first, then by created_at
+        $query->orderBy('is_pinned', 'desc')
+              ->orderBy('created_at', 'desc');
+
+        $notes = $query->paginate(20);
+
+        $categories = Note::getCategories();
+
+        return view('admin.notes.index', [
+            'notes' => $notes,
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'category', 'pinned']),
+        ]);
     }
 
-    public function create()
-    {
-        $leads = Lead::all();
-
-        return view('notes.create', compact('leads'));
-    }
-
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'lead_id' => 'required|exists:leads,id',
-            'note' => 'required|string',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'category' => 'nullable|string',
+            'is_pinned' => 'boolean',
         ]);
 
         $validated['user_id'] = auth()->id();
+        // Ensure noteable fields are null for standalone notes
+        $validated['noteable_id'] = null;
+        $validated['noteable_type'] = null;
 
-        Note::create($validated);
+        $note = Note::create($validated);
 
-        return redirect()->back()->with('success', 'Note added successfully.');
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note created successfully.',
+                'note' => $note->load('user'),
+            ]);
+        }
+
+        return redirect()->route('notes.index')
+                        ->with('success', 'Note created successfully.');
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show(Note $note)
     {
-        $note->load(['lead', 'user']);
+        // Ensure user can only view their own notes and it's a standalone note
+        if ($note->user_id !== auth()->id() || $note->noteable_id !== null) {
+            abort(403);
+        }
 
-        return view('notes.show', compact('note'));
+        $note->load('user');
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'note' => $note,
+            ]);
+        }
+
+        return view('admin.notes.show', [
+            'note' => $note,
+        ]);
     }
 
-    public function edit(Note $note)
-    {
-        $leads = Lead::all();
-
-        return view('notes.edit', compact('note', 'leads'));
-    }
-
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, Note $note)
     {
+        // Ensure user can only update their own notes and it's a standalone note
+        if ($note->user_id !== auth()->id() || $note->noteable_id !== null) {
+            abort(403);
+        }
+
         $validated = $request->validate([
-            'lead_id' => 'required|exists:leads,id',
-            'note' => 'required|string',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'category' => 'nullable|string',
+            'is_pinned' => 'boolean',
         ]);
 
         $note->update($validated);
 
-        return redirect()->back()->with('success', 'Note updated successfully.');
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note updated successfully.',
+                'note' => $note->load('user'),
+            ]);
+        }
+
+        return redirect()->route('notes.index')
+                        ->with('success', 'Note updated successfully.');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Note $note)
     {
+        // Ensure user can only delete their own notes and it's a standalone note
+        if ($note->user_id !== auth()->id() || $note->noteable_id !== null) {
+            abort(403);
+        }
+
         $note->delete();
 
-        return redirect()->back()->with('success', 'Note deleted successfully.');
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note deleted successfully.',
+            ]);
+        }
+
+        return redirect()->route('notes.index')
+                        ->with('success', 'Note deleted successfully.');
+    }
+
+    /**
+     * Toggle pin status
+     */
+    public function togglePin(Note $note)
+    {
+        // Ensure user can only pin their own notes and it's a standalone note
+        if ($note->user_id !== auth()->id() || $note->noteable_id !== null) {
+            abort(403);
+        }
+
+        $note->update(['is_pinned' => !$note->is_pinned]);
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => $note->is_pinned,
+            'message' => $note->is_pinned ? 'Note pinned.' : 'Note unpinned.',
+        ]);
     }
 }

@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LeadSource extends Model
 {
     protected $fillable = [
         'name',
-        'color_code',
         'description',
         'is_active',
     ];
@@ -17,14 +17,8 @@ class LeadSource extends Model
         'is_active' => 'boolean',
     ];
 
-    public function leads()
+    public function leads(): HasMany
     {
-        // Since leads table uses string for source, we query by name
-        return Lead::where('source', $this->name);
-    }
-    
-    public function getLeadsCountAttribute()
-    {
-        return $this->leads()->count();
+        return $this->hasMany(Lead::class);
     }
 }

@@ -3,22 +3,46 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Note extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'lead_id',
+        'title',
+        'content',
         'user_id',
-        'note',
+        'category',
+        'is_pinned',
+        'noteable_id',
+        'noteable_type',
     ];
 
-    public function lead()
-    {
-        return $this->belongsTo(Lead::class);
-    }
+    protected $casts = [
+        'is_pinned' => 'boolean',
+    ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get available note categories
+     */
+    public static function getCategories(): array
+    {
+        return [
+            'general' => 'General',
+            'meeting' => 'Meeting',
+            'project' => 'Project',
+            'personal' => 'Personal',
+            'reminder' => 'Reminder',
+            'idea' => 'Idea',
+            'todo' => 'To Do',
+            'other' => 'Other',
+        ];
     }
 }

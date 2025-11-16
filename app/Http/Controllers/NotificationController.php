@@ -2,93 +2,135 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NotificationResource;
 use App\Models\Notification;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
     /**
-     * Display a listing of the notifications.
+     * Display a listing of the resource (API).
      */
     public function index()
     {
-        $notifications = Auth::user()->notifications()->paginate(20);
-        $unreadCount = Auth::user()->unreadNotifications()->count();
+        $notifications = Auth::user()->unreadNotifications()
+            ->orderBy('created_at', 'desc')
+            ->take(50)
+            ->get();
 
-        return view('notifications.index', compact('notifications', 'unreadCount'));
+        return NotificationResource::collection($notifications);
     }
 
     /**
-     * Get notifications for dropdown (AJAX)
+     * Display a listing of notifications (Web).
      */
-    public function getRecent()
+    public function list()
     {
-        $notifications = Auth::user()->notifications()->take(10)->get();
-        $unreadCount = Auth::user()->unreadNotifications()->count();
+        $user = Auth::user();
+        $notifications = $user->notifications()
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
 
-        return response()->json([
+        return view('admin.notifications.index', [
             'notifications' => $notifications,
-            'unread_count' => $unreadCount,
+            'unreadCount' => $user->unreadNotifications()->count(),
         ]);
     }
 
     /**
-     * Mark a notification as read.
+     * Get recent notifications for dropdown.
      */
-    public function markAsRead($id)
+    public function recent()
     {
-        $notification = Auth::user()->notifications()->findOrFail($id);
-        $notification->markAsRead();
+        $notifications = Auth::user()->notifications()
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
 
-        if (request()->wantsJson()) {
+        return response()->json([
+            'notifications' => NotificationResource::collection($notifications),
+            'unreadCount' => Auth::user()->unreadNotifications()->count(),
+        ]);
+    }
+
+    /**
+     * Mark notification as read.
+     */
+    public function markAsRead(Request $request, $notificationId)
+    {
+        $notification = Auth::user()->notifications()->find($notificationId);
+        
+        if ($notification && !$notification->read_at) {
+            $notification->markAsRead();
+        }
+
+        if ($request->expectsJson()) {
             return response()->json(['success' => true]);
         }
 
-        return redirect()->back()->with('success', 'Notification marked as read');
+        return back();
     }
 
     /**
      * Mark all notifications as read.
      */
-    public function markAllAsRead()
+    public function markAllAsRead(Request $request)
     {
-        Auth::user()->unreadNotifications()->update([
-            'is_read' => true,
-            'read_at' => now(),
-        ]);
+        Auth::user()->unreadNotifications->each->markAsRead();
 
-        if (request()->wantsJson()) {
+        if ($request->expectsJson()) {
             return response()->json(['success' => true]);
         }
 
-        return redirect()->back()->with('success', 'All notifications marked as read');
+        return back();
     }
 
     /**
-     * Delete a notification.
+     * Show the form for creating a new resource.
      */
-    public function destroy($id)
+    public function create()
     {
-        $notification = Auth::user()->notifications()->findOrFail($id);
-        $notification->delete();
-
-        if (request()->wantsJson()) {
-            return response()->json(['success' => true]);
-        }
-
-        return redirect()->back()->with('success', 'Notification deleted');
+        //
     }
 
     /**
-     * Delete all read notifications.
+     * Store a newly created resource in storage.
      */
-    public function deleteAllRead()
+    public function store(Request $request)
     {
-        Auth::user()->notifications()->where('is_read', true)->delete();
+        //
+    }
 
-        return redirect()->back()->with('success', 'All read notifications deleted');
+    /**
+     * Display the specified resource.
+     */
+    public function show(Notification $notification)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Notification $notification)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Notification $notification)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Notification $notification)
+    {
+        //
     }
 }
-
-
-

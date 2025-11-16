@@ -2,206 +2,277 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Lead;
 use App\Models\Product;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
     {
-        abort_unless(auth()->user()->can('view products'), 403, 'Unauthorized action.');
-        
-        $products = Product::with(['category', 'brand'])->paginate(15);
+        $query = Product::with('creator')->orderBy('created_at', 'desc');
 
-        return view('products.index', compact('products'));
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            } elseif ($request->status === 'low_stock') {
+                $query->whereColumn('stock_quantity', '<=', 'min_stock_level');
+            }
+        }
+
+        $products = $query->paginate(15);
+        $categories = Product::distinct()->whereNotNull('category')->pluck('category');
+        $totalProducts = Product::count();
+
+        return view('admin.products.index', [
+            'products' => $products,
+            'categories' => $categories,
+            'totalProducts' => $totalProducts,
+            'filters' => $request->only(['search', 'category', 'status']),
+        ]);
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        abort_unless(auth()->user()->can('create products'), 403, 'Unauthorized action.');
-        
-        $categories = Category::all();
-        $brands = Brand::all();
-
-        return view('products.create', compact('categories', 'brands'));
+        return view('admin.products.create');
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        abort_unless(auth()->user()->can('create products'), 403, 'Unauthorized action.');
-        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'required|exists:brands,id',
-            'price' => 'nullable|numeric|min:0',
+            'sku' => 'nullable|string|max:255|unique:products,sku',
+            'code' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'required|in:active,inactive',
+            'category' => 'nullable|string|max:255',
+            'unit' => 'nullable|string|max:50',
+            'price' => 'required|numeric|min:0',
+            'cost' => 'nullable|numeric|min:0',
+            'stock_quantity' => 'nullable|integer|min:0',
+            'min_stock_level' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
         ]);
+
+        $validated['created_by'] = auth()->id();
+        $validated['is_active'] = $request->boolean('is_active', true);
 
         Product::create($validated);
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+        return redirect()->route('products.index')
+                        ->with('success', 'Product created successfully.');
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show(Product $product)
     {
-        $product->load(['category', 'brand', 'leads']);
+        $product->load('creator', 'quotationItems.quotation');
 
-        return view('products.show', compact('product'));
+        return view('admin.products.show', [
+            'product' => $product,
+        ]);
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit(Product $product)
     {
-        abort_unless(auth()->user()->can('edit products'), 403, 'Unauthorized action.');
-        
-        $categories = Category::all();
-        $brands = Brand::all();
-
-        return view('products.edit', compact('product', 'categories', 'brands'));
+        return view('admin.products.edit', [
+            'product' => $product,
+        ]);
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, Product $product)
     {
-        abort_unless(auth()->user()->can('edit products'), 403, 'Unauthorized action.');
-        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'required|exists:brands,id',
-            'price' => 'nullable|numeric|min:0',
+            'sku' => 'nullable|string|max:255|unique:products,sku,' . $product->id,
+            'code' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'required|in:active,inactive',
+            'category' => 'nullable|string|max:255',
+            'unit' => 'nullable|string|max:50',
+            'price' => 'required|numeric|min:0',
+            'cost' => 'nullable|numeric|min:0',
+            'stock_quantity' => 'nullable|integer|min:0',
+            'min_stock_level' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
         ]);
+
+        $validated['is_active'] = $request->boolean('is_active', true);
 
         $product->update($validated);
 
-        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+        return redirect()->route('products.index')
+                        ->with('success', 'Product updated successfully.');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Product $product)
     {
-        abort_unless(auth()->user()->can('delete products'), 403, 'Unauthorized action.');
-        
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+        return redirect()->route('products.index')
+                        ->with('success', 'Product deleted successfully.');
     }
 
-    public function analytics()
+    /**
+     * Show product analytics dashboard.
+     */
+    public function analytics(Request $request)
     {
-        // Total Products
-        $totalProducts = Product::count();
-        
-        // Active vs Inactive Products
-        $activeProducts = Product::where('status', 'active')->count();
-        $inactiveProducts = Product::where('status', 'inactive')->count();
-        
-        // Products Growth (last 30 days vs previous 30 days)
-        $productsThisMonth = Product::where('created_at', '>=', Carbon::now()->subDays(30))->count();
-        $productsLastMonth = Product::whereBetween('created_at', [
-            Carbon::now()->subDays(60),
-            Carbon::now()->subDays(30),
-        ])->count();
-        $productsGrowth = $productsLastMonth > 0
-            ? round((($productsThisMonth - $productsLastMonth) / $productsLastMonth) * 100, 1)
-            : ($productsThisMonth > 0 ? 100 : 0);
-        
-        // Products by Category
-        $productsByCategory = Category::withCount('products')->get()->map(function ($category) {
-            return [
-                'name' => $category->name,
-                'count' => $category->products_count,
-            ];
-        });
-        
-        // Products by Brand
-        $productsByBrand = Brand::withCount('products')->get()->map(function ($brand) {
-            return [
-                'name' => $brand->name,
-                'count' => $brand->products_count,
-            ];
-        });
-        
-        // Top Products by Lead Count (products with most associated leads)
-        $topProducts = Product::withCount('leads')
-            ->orderByDesc('leads_count')
+        // Get date range from request or use default (last 365 days)
+        $endDate = $request->filled('end_date') 
+            ? \Carbon\Carbon::parse($request->end_date)->endOfDay()
+            : now();
+            
+        $startDate = $request->filled('start_date')
+            ? \Carbon\Carbon::parse($request->start_date)->startOfDay()
+            : $endDate->copy()->subYear();
+
+        $baseQuery = Product::query()
+            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                return $query->whereBetween('created_at', [$startDate, $endDate]);
+            });
+
+        // Overall statistics
+        $totalProducts = (clone $baseQuery)->count();
+        $activeProducts = (clone $baseQuery)->where('is_active', true)->count();
+        $inactiveProducts = (clone $baseQuery)->where('is_active', false)->count();
+        $lowStockProducts = Product::whereColumn('stock_quantity', '<=', 'min_stock_level')
+            ->whereNotNull('stock_quantity')
+            ->whereNotNull('min_stock_level')
+            ->count();
+
+        // Products by category
+        $productsByCategory = (clone $baseQuery)
+            ->select('category', \DB::raw('COUNT(*) as count'))
+            ->whereNotNull('category')
+            ->groupBy('category')
+            ->orderByDesc('count')
+            ->get();
+
+        // Total value by category
+        $valueByCategory = (clone $baseQuery)
+            ->select('category', \DB::raw('SUM(price * COALESCE(stock_quantity, 0)) as total_value'), \DB::raw('COUNT(*) as count'))
+            ->whereNotNull('category')
+            ->whereNotNull('stock_quantity')
+            ->groupBy('category')
+            ->orderByDesc('total_value')
+            ->get();
+
+        // Monthly trends (products created)
+        $monthlyTrends = (clone $baseQuery)
+            ->select(\DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), \DB::raw('COUNT(*) as count'))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'month' => \Carbon\Carbon::parse($item->month . '-01')->format('M Y'),
+                    'count' => $item->count,
+                ];
+            });
+
+        // Top products by stock value
+        $topProductsByValue = Product::whereNotNull('stock_quantity')
+            ->whereNotNull('price')
+            ->select('id', 'name', 'category', 'price', 'stock_quantity', \DB::raw('(price * stock_quantity) as total_value'))
+            ->orderByDesc('total_value')
             ->limit(10)
             ->get();
-        
-        // Average Price
-        $avgPrice = Product::whereNotNull('price')->avg('price') ?? 0;
-        $totalValue = Product::whereNotNull('price')->sum('price') ?? 0;
-        
-        // Trend Data (Last 30 days)
-        $trendLabels = [];
-        $trendData = [];
-        for ($i = 29; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
-            $trendLabels[] = $date->format('M d');
-            $trendData[] = Product::whereDate('created_at', $date)->count();
-        }
-        
-        // Monthly Comparison (Last 6 months)
-        $monthlyLabels = [];
-        $monthlyNew = [];
-        $monthlyActive = [];
-        
-        for ($i = 5; $i >= 0; $i--) {
-            $month = Carbon::now()->subMonths($i);
-            $monthlyLabels[] = $month->format('M Y');
-            
-            $newProducts = Product::whereYear('created_at', $month->year)
-                ->whereMonth('created_at', $month->month)
-                ->count();
-            $monthlyNew[] = $newProducts;
-            
-            $active = Product::whereYear('created_at', $month->year)
-                ->whereMonth('created_at', $month->month)
-                ->where('status', 'active')
-                ->count();
-            $monthlyActive[] = $active;
-        }
-        
-        // Products with Leads (engagement)
-        $productsWithLeads = Product::has('leads')->count();
-        $productsWithoutLeads = Product::doesntHave('leads')->count();
-        $engagementRate = $totalProducts > 0 
-            ? round(($productsWithLeads / $totalProducts) * 100, 1) 
-            : 0;
-        
-        // Price Distribution
-        $priceRanges = [
-            'Under $100' => Product::whereNotNull('price')->where('price', '<', 100)->count(),
-            '$100 - $500' => Product::whereNotNull('price')->whereBetween('price', [100, 500])->count(),
-            '$500 - $1000' => Product::whereNotNull('price')->whereBetween('price', [500, 1000])->count(),
-            '$1000 - $5000' => Product::whereNotNull('price')->whereBetween('price', [1000, 5000])->count(),
-            'Over $5000' => Product::whereNotNull('price')->where('price', '>', 5000)->count(),
+
+        // Stock status breakdown
+        $stockStatus = [
+            'in_stock' => Product::whereNotNull('stock_quantity')
+                ->whereNotNull('min_stock_level')
+                ->whereColumn('stock_quantity', '>', 'min_stock_level')
+                ->count(),
+            'low_stock' => Product::whereNotNull('stock_quantity')
+                ->whereNotNull('min_stock_level')
+                ->whereColumn('stock_quantity', '<=', 'min_stock_level')
+                ->whereColumn('stock_quantity', '>', \DB::raw('0'))
+                ->count(),
+            'out_of_stock' => Product::where(function($q) {
+                $q->where('stock_quantity', 0)
+                  ->orWhereNull('stock_quantity');
+            })->count(),
+            'no_tracking' => Product::where(function($q) {
+                $q->whereNull('stock_quantity')
+                  ->orWhereNull('min_stock_level');
+            })->count(),
         ];
-        
-        return view('products.analytics', compact(
-            'totalProducts',
-            'activeProducts',
-            'inactiveProducts',
-            'productsGrowth',
-            'productsByCategory',
-            'productsByBrand',
-            'topProducts',
-            'avgPrice',
-            'totalValue',
-            'trendLabels',
-            'trendData',
-            'monthlyLabels',
-            'monthlyNew',
-            'monthlyActive',
-            'productsWithLeads',
-            'productsWithoutLeads',
-            'engagementRate',
-            'priceRanges'
-        ));
+
+        // Products by creator
+        $productsByCreator = (clone $baseQuery)
+            ->select('created_by', \DB::raw('COUNT(*) as count'))
+            ->with('creator')
+            ->whereNotNull('created_by')
+            ->groupBy('created_by')
+            ->orderByDesc('count')
+            ->limit(10)
+            ->get();
+
+        // Average price by category
+        $avgPriceByCategory = (clone $baseQuery)
+            ->select('category', \DB::raw('AVG(price) as avg_price'), \DB::raw('COUNT(*) as count'))
+            ->whereNotNull('category')
+            ->whereNotNull('price')
+            ->groupBy('category')
+            ->orderByDesc('avg_price')
+            ->get();
+
+        $stats = [
+            'total_products' => $totalProducts,
+            'active_products' => $activeProducts,
+            'inactive_products' => $inactiveProducts,
+            'low_stock_products' => $lowStockProducts,
+            'products_by_category' => $productsByCategory,
+            'value_by_category' => $valueByCategory,
+            'monthly_trends' => $monthlyTrends,
+            'top_products_by_value' => $topProductsByValue,
+            'stock_status' => $stockStatus,
+            'products_by_creator' => $productsByCreator,
+            'avg_price_by_category' => $avgPriceByCategory,
+        ];
+
+        return view('admin.products.analytics', [
+            'stats' => $stats,
+            'filters' => [
+                'start_date' => $startDate->toDateString(),
+                'end_date' => $endDate->toDateString(),
+            ],
+        ]);
     }
 }

@@ -2,44 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Followup;
+use App\Actions\Calendar\GetCalendarDataAction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CalendarController extends Controller
 {
-    public function index()
+    public function __construct(
+        private GetCalendarDataAction $getCalendarDataAction
+    ) {}
+
+    public function index(Request $request)
     {
-        return view('calendar.index');
-    }
+        $user = Auth::user();
+        
+        $data = $this->getCalendarDataAction->execute($user);
 
-    public function events()
-    {
-        $followups = Followup::with(['lead', 'user'])->get();
-
-        $events = $followups->map(function ($followup) {
-            return [
-                'id' => $followup->id,
-                'title' => $followup->lead->name.' - '.$followup->status,
-                'start' => $followup->followup_date->toIso8601String(),
-                'backgroundColor' => $this->getStatusColor($followup->status),
-                'borderColor' => $this->getStatusColor($followup->status),
-                'extendedProps' => [
-                    'lead_id' => $followup->lead_id,
-                    'remarks' => $followup->remarks,
-                    'status' => $followup->status,
-                ],
-            ];
-        });
-
-        return response()->json($events);
-    }
-
-    private function getStatusColor($status)
-    {
-        return match ($status) {
-            'pending' => '#ffc107',
-            'completed' => '#28a745',
-            'cancelled' => '#dc3545',
-            default => '#6c757d',
-        };
+        return view('admin.calendar.index', $data);
     }
 }

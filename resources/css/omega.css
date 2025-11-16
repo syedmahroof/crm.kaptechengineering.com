@@ -1,0 +1,145 @@
+#omega{
+    padding:0 2em;
+}
+#omega-button{
+    display:none;
+}
+#omega-content nav ul {
+    display:inline-block;
+    margin-right: 0;
+}
+#omega-content nav ul li a{
+    padding:0 0.5em;
+}
+#omega-content nav ul li, #omega-content #logo, #omega-content nav {
+    display: inline-block;
+}
+.omega-links{
+    display:inline-block;
+}
+#omega-content{
+    float: right;
+}
+#omega-overlay {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background-color: rgba(0, 0, 0, .5);
+}
+#omega-sidebar{
+    display:none;
+    position: fixed;
+    width:50%;
+    z-index: 20;
+    height:100%;
+    top:0;
+    left:0;
+    background-color: #fff;
+    transform: translateX(-100%);
+    transition: transform .4s ease-in-out;
+}
+#omega-sidebar-header{
+    background-image: url(../img/bg.png);
+    background-size: cover;
+    height:180px;
+}
+#omega-sidebar-body{
+    padding:1px;
+}
+#omega-sidebar-body nav ul li{
+    list-style: none;
+    display: block;
+    padding: 12px;
+}
+
+#omega-sidebar-body nav ul li a{
+    display: inline-block;
+    text-transform: uppercase;
+
+    font-size: 15px;
+    padding: 1em 0;
+    color:#fff;
+}
+#omega-sidebar-body nav ul li a:hover{
+    color: #bc3542;
+}
+#omega-sidebar-body .omega-links a{
+    display:block;
+    margin-bottom:1em;
+}
+
+@media only screen and (max-width:  2991px){
+
+    #omega-content{
+        display:none;
+        
+    }
+    #omega-button{
+        float: right;
+        cursor: pointer;
+    }
+    .omega-activated #omega-button{
+        position: fixed!important;
+    }
+    .omega-links{
+        display: block;
+        margin-top:2em;
+    }
+    #omega-button, #omega-sidebar, .omega-activated #omega-overlay{
+        display:block;
+    }
+    .omega-activated #omega-sidebar{
+        transform: translateX(0);
+        background-color:#fff; 
+        z-index:500;
+        width: 50%;
+
+    }
+    #omega-sidebar-body nav ul li{
+    list-style: none;
+    display: inline-block;
+    padding: 0;
+    width: 100%;
+    }
+
+    #omega-sidebar-body nav ul li a{
+        font-size: 14px;
+
+    }
+
+
+
+}
+
+
+@media only screen and (max-width: 767px){
+
+
+#omega-sidebar-body nav ul li{
+  
+    padding: 4px;
+}
+#omega-sidebar-body nav ul li a{
+    font-size: 13px;
+
+}
+}
+
+
+@media only screen and (max-width: 500px){
+
+
+#omega-sidebar-body nav ul li{
+    list-style: none;
+    display: block;
+    padding: 0px;
+}
+#omega-sidebar-body nav ul li a{
+    font-size: 11px;
+
+}
+}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -16,6 +18,16 @@ return [
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
+    ],
+
+    'apple_gsx' => [
+        'base_url' => env('APPLE_GSX_BASE_URL', 'https://gsxapi.apple.com'),
+        'sold_to' => env('APPLE_SOLD_TO'),
+        'service_version' => env('APPLE_SERVICE_VERSION', '1.0'),
+        'ship_to' => env('APPLE_SHIP_TO'),
+        'operator_user_id' => env('APPLE_OPERATOR_USER_ID'),
+        'client_locale' => env('APPLE_CLIENT_LOCALE', 'en-US'),
+        'client_timezone' => env('APPLE_CLIENT_TIMEZONE', 'UTC'),
     ],
 
     'ses' => [

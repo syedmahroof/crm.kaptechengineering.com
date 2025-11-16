@@ -2,85 +2,85 @@
 
 namespace Database\Seeders;
 
+use App\Models\LeadAgent;
+use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $users = [
+        // Create admin user
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
             [
-                'name' => 'John Anderson',
-                'email' => 'john@example.com',
+                'name' => 'Admin User',
                 'password' => Hash::make('password'),
-                'role' => 'Sales Executive',
+                'email_verified_at' => now(),
+            ]
+        );
+        $admin->assignRole('admin');
+
+        // Create manager user
+        $manager = User::firstOrCreate(
+            ['email' => 'manager@example.com'],
+            [
+                'name' => 'Manager User',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $manager->assignRole('manager');
+
+        // Create agent users
+        $agents = [
+            [
+                'name' => 'Agent One',
+                'email' => 'agent1@example.com',
             ],
             [
-                'name' => 'Sarah Johnson',
-                'email' => 'sarah@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'Sales Executive',
+                'name' => 'Agent Two',
+                'email' => 'agent2@example.com',
             ],
             [
-                'name' => 'Michael Brown',
-                'email' => 'michael@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'Sales Executive',
-            ],
-            [
-                'name' => 'Emily Davis',
-                'email' => 'emily@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'Sales Manager',
-            ],
-            [
-                'name' => 'David Wilson',
-                'email' => 'david@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'Sales Executive',
-            ],
-            [
-                'name' => 'Jessica Martinez',
-                'email' => 'jessica@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'Admin',
-            ],
-            [
-                'name' => 'Robert Taylor',
-                'email' => 'robert@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'Sales Executive',
-            ],
-            [
-                'name' => 'Lisa Anderson',
-                'email' => 'lisa@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'Sales Manager',
+                'name' => 'Agent Three',
+                'email' => 'agent3@example.com',
             ],
         ];
 
-        foreach ($users as $userData) {
-            $roleName = $userData['role'];
-            unset($userData['role']);
+        foreach ($agents as $agentData) {
+            $user = User::firstOrCreate(
+                ['email' => $agentData['email']],
+                [
+                    'name' => $agentData['name'],
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ]
+            );
             
-            $user = User::create(array_merge($userData, [
-                'email_verified_at' => now(),
-            ]));
+            // Assign agent role
+            $user->assignRole('agent');
             
-            // Find role by name to ensure it exists (using findByName handles guard properly)
-            try {
-                $role = Role::findByName($roleName, 'web');
-                $user->assignRole($role);
-            } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
-                $this->command->warn("Role '{$roleName}' not found for user {$user->email}. Skipping role assignment.");
-            }
+            // Create lead agent record
+            LeadAgent::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'is_active' => true,
+                    'leads_count' => 0,
+                    'converted_leads_count' => 0,
+                ]
+            );
         }
 
-        $this->command->info('Additional users created successfully!');
-        $this->command->info('All users have password: password');
+        $this->command->info('Users seeded successfully!');
+        $this->command->info('Admin Login: admin@example.com / password');
+        $this->command->info('Manager Login: manager@example.com / password');
+        $this->command->info('Agents Login: agent1@example.com, agent2@example.com, agent3@example.com / password');
     }
 }
-

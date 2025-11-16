@@ -2,76 +2,75 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
 
-class Notification extends Model
+class Notification extends BaseDatabaseNotification
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'user_id',
-        'type',
-        'title',
-        'message',
-        'action_url',
-        'icon',
-        'color',
-        'is_read',
-        'read_at',
-    ];
-
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
     protected $casts = [
-        'is_read' => 'boolean',
+        'data' => 'array',
         'read_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /**
-     * Get the user that owns the notification.
+     * Get the notifiable entity that the notification belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function user()
+    public function notifiable(): MorphTo
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
-
+    
     /**
-     * Scope for unread notifications
+     * Mark the notification as read.
+     *
+     * @return void
      */
-    public function scopeUnread($query)
+    public function markAsRead(): void
     {
-        return $query->where('is_read', false);
+        if (is_null($this->read_at)) {
+            $this->forceFill(['read_at' => $this->freshTimestamp()])->save();
+        }
     }
-
+    
     /**
-     * Scope for read notifications
+     * Mark the notification as unread.
+     *
+     * @return void
      */
-    public function scopeRead($query)
+    public function markAsUnread(): void
     {
-        return $query->where('is_read', true);
+        if (! is_null($this->read_at)) {
+            $this->forceFill(['read_at' => null])->save();
+        }
     }
-
+    
     /**
-     * Mark notification as read
+     * Determine if a notification has been read.
+     *
+     * @return bool
      */
-    public function markAsRead()
+    public function read(): bool
     {
-        $this->update([
-            'is_read' => true,
-            'read_at' => now(),
-        ]);
+        return $this->read_at !== null;
     }
-
+    
     /**
-     * Mark notification as unread
+     * Determine if a notification has not been read.
+     *
+     * @return bool
      */
-    public function markAsUnread()
+    public function unread(): bool
     {
-        $this->update([
-            'is_read' => false,
-            'read_at' => null,
-        ]);
+        return $this->read_at === null;
     }
 }
-
-
-

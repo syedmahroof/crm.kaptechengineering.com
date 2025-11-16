@@ -4,28 +4,39 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LeadType extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'name',
-        'color_code',
+        'slug',
         'description',
+        'color',
+        'icon',
         'is_active',
+        'order',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'order' => 'integer',
     ];
 
-    public function leads()
+    public function leads(): HasMany
     {
-        // Since leads table uses string for lead_type, we query by name
-        return Lead::where('lead_type', $this->name);
+        return $this->hasMany(Lead::class);
     }
-    
-    public function getLeadsCountAttribute()
+
+    public function scopeActive($query)
     {
-        return $this->leads()->count();
+        return $query->where('is_active', true);
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('order')->orderBy('name');
     }
 }

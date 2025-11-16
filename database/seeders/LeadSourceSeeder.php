@@ -12,26 +12,49 @@ class LeadSourceSeeder extends Seeder
      */
     public function run(): void
     {
-        $leadSources = [
-            ['name' => 'Website', 'color_code' => '#3b82f6', 'description' => 'Leads from company website'],
-            ['name' => 'Email Campaign', 'color_code' => '#8b5cf6', 'description' => 'Leads from email marketing campaigns'],
-            ['name' => 'Social Media', 'color_code' => '#ec4899', 'description' => 'Leads from social media platforms'],
-            ['name' => 'Phone Call', 'color_code' => '#10b981', 'description' => 'Leads from incoming phone calls'],
-            ['name' => 'Walk-in', 'color_code' => '#f59e0b', 'description' => 'Walk-in customers'],
-            ['name' => 'Referral', 'color_code' => '#6366f1', 'description' => 'Referred by existing customers'],
-            ['name' => 'Trade Show', 'color_code' => '#14b8a6', 'description' => 'Leads from trade shows and exhibitions'],
-            ['name' => 'Online Ad', 'color_code' => '#ef4444', 'description' => 'Leads from online advertisements'],
-            ['name' => 'Partner', 'color_code' => '#06b6d4', 'description' => 'Leads from business partners'],
-            ['name' => 'Direct Marketing', 'color_code' => '#a855f7', 'description' => 'Leads from direct marketing efforts'],
+        $sources = [
+            [
+                'name' => 'Website',
+                'description' => 'Leads from company website forms',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Referral',
+                'description' => 'Leads from customer referrals',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Social Media',
+                'description' => 'Leads from social media platforms',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Email Campaign',
+                'description' => 'Leads from email marketing campaigns',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Event',
+                'description' => 'Leads from trade shows and events',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Cold Call',
+                'description' => 'Leads from outbound calling',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Partner',
+                'description' => 'Leads from business partners',
+                'is_active' => true,
+            ],
         ];
 
-        foreach ($leadSources as $source) {
-            LeadSource::firstOrCreate(
+        foreach ($sources as $source) {
+            LeadSource::updateOrCreate(
                 ['name' => $source['name']],
                 $source
             );
         }
-
-        $this->command->info('Lead sources seeded successfully!');
     }
 }

@@ -3,78 +3,158 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
+use App\Http\Requests\Country\StoreCountryRequest;
+use App\Http\Requests\Country\UpdateCountryRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CountryController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
     {
-        abort_unless(auth()->user()->can('view countries'), 403, 'Unauthorized action.');
-        
-        $countries = Country::withCount('states')->orderBy('name')->paginate(15);
+        $query = Country::query();
 
-        return view('countries.index', compact('countries'));
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('capital', 'like', "%{$search}%")
+                  ->orWhere('continent', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('continent')) {
+            $query->where('continent', $request->continent);
+        }
+
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->boolean('is_active'));
+        }
+
+        // Apply sorting
+        $sortBy = $request->get('sort_by', 'sort_order');
+        $sortDirection = $request->get('sort_direction', 'asc');
+        $query->orderBy($sortBy, $sortDirection);
+
+        $countries = $query->paginate(15);
+
+        $continents = Country::select('continent')
+                           ->whereNotNull('continent')
+                           ->distinct()
+                           ->pluck('continent')
+                           ->sort()
+                           ->values();
+
+        return view('admin.countries.index', [
+            'countries' => $countries,
+            'continents' => $continents,
+            'filters' => $request->only(['search', 'continent', 'is_active', 'sort_by', 'sort_direction']),
+        ]);
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        abort_unless(auth()->user()->can('create countries'), 403, 'Unauthorized action.');
-        
-        return view('countries.create');
+        return view('admin.countries.create');
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreCountryRequest $request)
     {
-        abort_unless(auth()->user()->can('create countries'), 403, 'Unauthorized action.');
+        $data = $request->validated();
         
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:3|unique:countries,code',
-            'phone_code' => 'nullable|string|max:5',
-            'is_active' => 'boolean',
-        ]);
+        // Handle flag image upload
+        if ($request->hasFile('flag_image')) {
+            $data['flag_image'] = $request->file('flag_image')->store('countries', 'public');
+        }
 
-        Country::create($validated);
+        Country::create($data);
 
-        return redirect()->route('countries.index')->with('success', 'Country created successfully.');
+        return redirect()->route('countries.index')
+                        ->with('success', 'Country created successfully.');
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show(Country $country)
     {
-        $country->load('states.cities');
-
-        return view('countries.show', compact('country'));
+        $country->load(['destinations', 'attractions', 'hotels']);
+        
+        return view('admin.countries.show', [
+            'country' => $country,
+        ]);
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit(Country $country)
     {
-        abort_unless(auth()->user()->can('edit countries'), 403, 'Unauthorized action.');
-        
-        return view('countries.edit', compact('country'));
-    }
-
-    public function update(Request $request, Country $country)
-    {
-        abort_unless(auth()->user()->can('edit countries'), 403, 'Unauthorized action.');
-        
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:3|unique:countries,code,' . $country->id,
-            'phone_code' => 'nullable|string|max:5',
-            'is_active' => 'boolean',
+        return view('admin.countries.edit', [
+            'country' => $country,
         ]);
-
-        $country->update($validated);
-
-        return redirect()->route('countries.index')->with('success', 'Country updated successfully.');
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateCountryRequest $request, Country $country)
+    {
+        $data = $request->validated();
+        
+        // Handle flag image upload
+        if ($request->hasFile('flag_image')) {
+            // Delete old image
+            if ($country->flag_image) {
+                Storage::disk('public')->delete($country->flag_image);
+            }
+            $data['flag_image'] = $request->file('flag_image')->store('countries', 'public');
+        }
+
+        $country->update($data);
+
+        return redirect()->route('countries.index')
+                        ->with('success', 'Country updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Country $country)
     {
-        abort_unless(auth()->user()->can('delete countries'), 403, 'Unauthorized action.');
-        
+        // Delete flag image
+        if ($country->flag_image) {
+            Storage::disk('public')->delete($country->flag_image);
+        }
+
         $country->delete();
 
-        return redirect()->route('countries.index')->with('success', 'Country deleted successfully.');
+        return redirect()->route('countries.index')
+                        ->with('success', 'Country deleted successfully.');
+    }
+
+    /**
+     * Toggle active status.
+     */
+    public function toggleActive(Country $country)
+    {
+        $country->update(['is_active' => !$country->is_active]);
+
+        return response()->json([
+            'success' => true,
+            'is_active' => $country->is_active,
+        ]);
     }
 }
+
+
