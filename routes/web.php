@@ -329,6 +329,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/contacts/{contact}/update-priority', [\App\Http\Controllers\Admin\ContactController::class, 'updatePriority'])->name('contacts.update-priority');
         Route::post('/contacts/bulk-update', [\App\Http\Controllers\Admin\ContactController::class, 'bulkUpdate'])->name('contacts.bulk-update');
         Route::get('/contacts/export', [\App\Http\Controllers\Admin\ContactController::class, 'export'])->name('contacts.export');
+        Route::post('/contacts/update-preference', [\App\Http\Controllers\Admin\ContactController::class, 'updatePreference'])->name('contacts.update-preference');
         
         // Admin Newsletter Routes
         Route::resource('newsletters', \App\Http\Controllers\Admin\NewsletterController::class);

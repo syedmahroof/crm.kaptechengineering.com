@@ -23,7 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             HandleAppearance::class,
-            HandleInertiaRequests::class,
+            // Only register Inertia middleware if the package is installed
+            ...(class_exists(\Inertia\Middleware::class) ? [HandleInertiaRequests::class] : []),
             AddLinkHeadersForPreloadedAssets::class,
         ]);
     })

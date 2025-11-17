@@ -43,8 +43,34 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 
         @routes
-        @viteReactRefresh
-        @vite(['resources/js/app.tsx'])
+        
+        {{-- Vite Assets with Smart Fallback --}}
+        @php
+            $manifestPath = public_path('build/manifest.json');
+            $hasManifest = file_exists($manifestPath);
+        @endphp
+        
+        @if($hasManifest)
+            {{-- Use Vite helper when manifest exists (preferred method) --}}
+            @viteReactRefresh
+            @vite(['resources/js/app.tsx'])
+        @else
+            {{-- Fallback: Load assets directly if manifest doesn't exist --}}
+            @php
+                $cssFile = 'build/assets/app.css';
+                $jsFiles = glob(public_path('build/assets/app-*.js'));
+                $jsFile = !empty($jsFiles) ? 'build/assets/' . basename($jsFiles[0]) : null;
+            @endphp
+            
+            @if(file_exists(public_path($cssFile)))
+                <link rel="stylesheet" href="{{ asset($cssFile) }}">
+            @endif
+            
+            @if($jsFile && file_exists(public_path($jsFile)))
+                <script type="module" src="{{ asset($jsFile) }}"></script>
+            @endif
+        @endif
+        
         @inertiaHead
     </head>
     <body class="font-sans antialiased">

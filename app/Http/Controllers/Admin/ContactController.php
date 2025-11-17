@@ -95,6 +95,15 @@ class ContactController extends Controller
             });
         }
 
+        // Get projects by type statistics
+        $projectsByType = \App\Models\Project::query()
+            ->selectRaw('project_type, COUNT(*) as count')
+            ->whereNotNull('project_type')
+            ->groupBy('project_type')
+            ->orderByDesc('count')
+            ->pluck('count', 'project_type')
+            ->toArray();
+
         $stats = [
             'total' => $statsQuery->count(),
             'by_type' => (clone $statsQuery)
@@ -103,6 +112,7 @@ class ContactController extends Controller
                 ->groupBy('contact_type')
                 ->pluck('count', 'contact_type')
                 ->toArray(),
+            'projects_by_type' => $projectsByType,
         ];
 
         $projects = \App\Models\Project::orderBy('name')->get();
@@ -121,15 +131,23 @@ class ContactController extends Controller
             $districts = \App\Models\District::where('state_id', $request->state_id)->active()->ordered()->get();
         }
 
+        $projectTypes = \App\Models\Project::getProjectTypes();
+        
+        // Get user preferences for dashboard cards visibility
+        $userPreferences = auth()->user()->preferences ?? [];
+        $showProjectsByType = $userPreferences['show_projects_by_type_card'] ?? true;
+
         return view('admin.contacts.index', [
             'contacts' => $contacts,
             'stats' => $stats,
             'projects' => $projects,
+            'projectTypes' => $projectTypes,
             'contactTypes' => $contactTypes,
             'countries' => $countries,
             'states' => $states,
             'districts' => $districts,
             'filters' => $request->only(['priority', 'search', 'project_id', 'contact_type', 'country_id', 'state_id', 'district_id', 'sort_by', 'sort_direction']),
+            'showProjectsByType' => $showProjectsByType,
         ]);
     }
 
@@ -415,5 +433,36 @@ class ContactController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Update user preference for dashboard cards
+     */
+    public function updatePreference(Request $request)
+    {
+        $request->validate([
+            'key' => 'required|string',
+            'value' => 'required',
+        ]);
+
+        $user = auth()->user();
+        $preferences = $user->preferences ?? [];
+        
+        // Convert boolean strings to actual booleans
+        $value = $request->value;
+        if ($value === 'true' || $value === true) {
+            $value = true;
+        } elseif ($value === 'false' || $value === false) {
+            $value = false;
+        }
+        
+        $preferences[$request->key] = $value;
+        
+        $user->update(['preferences' => $preferences]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Preference updated successfully.',
+        ]);
     }
 }
