@@ -69,6 +69,24 @@
             @endif
         @endforeach
     </div>
+
+    <!-- Project Type Counts -->
+    @if(!empty($projectTypeCounts))
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-chart-pie mr-2 text-gray-400"></i>Projects by Type
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            @foreach($projectTypeCounts as $type => $count)
+                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $count }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ Str::limit($projectTypes[$type] ?? $type, 15) }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <!-- Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6" x-data="{ filtersOpen: false }">
         <div class="flex items-center justify-between mb-4">

@@ -100,64 +100,7 @@
         </div>
     </div>
 
-    <!-- Projects by Type Card -->
-    @if($showProjectsByType)
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6" x-data="{ projectsByTypeOpen: {{ (auth()->user()->preferences['projects_by_type_card_open'] ?? true) ? 'true' : 'false' }} }">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-                <i class="fas fa-chart-pie mr-2 text-gray-400"></i>Projects by Type
-                @if(!empty($stats['projects_by_type']))
-                <span class="ml-3 px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 rounded-full">
-                    {{ count($stats['projects_by_type']) }}
-                </span>
-                @endif
-            </h3>
-            <div class="flex items-center space-x-2">
-                <button @click="updatePreference('show_projects_by_type_card', false)" 
-                        class="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" 
-                        title="Hide this card">
-                    <i class="fas fa-eye-slash"></i>
-                </button>
-                <button @click="projectsByTypeOpen = !projectsByTypeOpen; updatePreference('projects_by_type_card_open', projectsByTypeOpen)" 
-                        class="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
-                    <i class="fas fa-chevron-down mr-1 transition-transform duration-200" :class="{ 'rotate-180': projectsByTypeOpen }"></i>
-                    <span x-text="projectsByTypeOpen ? 'Hide' : 'Show'">Hide</span>
-                </button>
-            </div>
-        </div>
-        <div x-show="projectsByTypeOpen" x-collapse>
-            @if(!empty($stats['projects_by_type']))
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    @foreach($stats['projects_by_type'] as $type => $count)
-                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-5 border border-purple-200 dark:border-purple-800 hover:shadow-md transition-shadow">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1">
-                                    <p class="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">
-                                        {{ $projectTypes[$type] ?? ucfirst(str_replace('_', ' ', $type)) }}
-                                    </p>
-                                    <p class="text-2xl font-bold text-purple-900 dark:text-purple-100">{{ number_format($count) }}</p>
-                                    @php
-                                        $totalProjects = array_sum($stats['projects_by_type']);
-                                        $percentage = $totalProjects > 0 ? round(($count / $totalProjects) * 100, 1) : 0;
-                                    @endphp
-                                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-1">{{ $percentage }}% of total</p>
-                                </div>
-                                <div class="w-12 h-12 bg-purple-200 dark:bg-purple-800 rounded-lg flex items-center justify-center ml-3">
-                                    <i class="fas fa-building text-purple-700 dark:text-purple-300 text-lg"></i>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-building text-4xl mb-3 opacity-50"></i>
-                    <p>No projects with types found</p>
-                </div>
-            @endif
-        </div>
-    </div>
-    @endif
+   
 
     <!-- Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6" x-data="{ filtersOpen: false }">
