@@ -6,7 +6,6 @@
 @php
     $statusIcons = [
         'new' => 'fa-star',
-        'itinerary_sent' => 'fa-paper-plane',
         'hot_lead' => 'fa-fire',
         'convert_this_week' => 'fa-calendar-week',
         'cold_lead' => 'fa-snowflake',
@@ -26,7 +25,6 @@
                         $status = $lead->lead_status->slug ?? $lead->status ?? 'new';
                         $statusClasses = [
                             'new' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-                            'itinerary_sent' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
                             'hot_lead' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
                             'convert_this_week' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
                             'cold_lead' => 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
@@ -142,6 +140,75 @@
                 </div>
                 @endif
             </div>
+
+            <!-- Products Section -->
+            @if($lead->leadProducts && $lead->leadProducts->count() > 0)
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <i class="fas fa-box mr-2 text-indigo-600"></i>Products
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Unit Price</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            @foreach($lead->leadProducts as $leadProduct)
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ $leadProduct->product->name ?? 'N/A' }}
+                                    </div>
+                                    @if($leadProduct->product && $leadProduct->product->sku)
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        SKU: {{ $leadProduct->product->sku }}
+                                    </div>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                    {{ $leadProduct->quantity }}
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                    @if($leadProduct->unit_price)
+                                        {{ number_format($leadProduct->unit_price, 2) }}
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                    @if($leadProduct->total_price)
+                                        {{ number_format($leadProduct->total_price, 2) }}
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $leadProduct->notes ?? '-' }}
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <td colspan="3" class="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white">
+                                    Grand Total:
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                                    {{ number_format($lead->leadProducts->sum('total_price'), 2) }}
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            @endif
 
             <!-- Lead Notes -->
             <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">

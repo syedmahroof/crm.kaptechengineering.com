@@ -165,19 +165,6 @@
             </div>
         </a>
 
-        <a href="{{ route('leads.index', array_merge(request()->query(), ['status' => 'itinerary_sent'])) }}" 
-           class="stat-card p-5 rounded-xl cursor-pointer {{ request('status') == 'itinerary_sent' ? 'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 border-2 border-green-200 dark:border-green-800 shadow-lg' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md' }}">
-            <div class="flex items-center">
-                <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900/30">
-                    <i class="fas fa-envelope text-green-600 dark:text-green-400 text-lg"></i>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-xs font-medium text-green-600 dark:text-green-400">Itinerary Sent</h3>
-                    <p class="text-2xl font-bold text-green-900 dark:text-green-100">{{ $stats['itinerary_sent'] }}</p>
-                </div>
-            </div>
-        </a>
-
         <a href="{{ route('leads.index', array_merge(request()->query(), ['status' => 'hot_lead'])) }}" 
            class="stat-card p-5 rounded-xl cursor-pointer {{ request('status') == 'hot_lead' ? 'bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20 border-2 border-red-200 dark:border-red-800 shadow-lg' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md' }}">
             <div class="flex items-center">
@@ -274,7 +261,6 @@
                     <select name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">All Status</option>
                         <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>New</option>
-                        <option value="itinerary_sent" {{ request('status') == 'itinerary_sent' ? 'selected' : '' }}>Itinerary Sent</option>
                         <option value="hot_lead" {{ request('status') == 'hot_lead' ? 'selected' : '' }}>Hot Lead</option>
                         <option value="convert_this_week" {{ request('status') == 'convert_this_week' ? 'selected' : '' }}>Convert This Week</option>
                         <option value="cold_lead" {{ request('status') == 'cold_lead' ? 'selected' : '' }}>Cold Lead</option>
@@ -467,7 +453,6 @@
                                 @php
                                     $statusClasses = [
                                         'new' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-                                        'itinerary_sent' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
                                         'hot_lead' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
                                         'convert_this_week' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
                                         'cold_lead' => 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',

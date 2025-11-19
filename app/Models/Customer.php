@@ -63,4 +63,17 @@ class Customer extends Model
     {
         return "{$this->first_name} {$this->last_name}";
     }
+
+    /**
+     * Backwards-compatible `name` accessor for templates and code that expect a `name` attribute.
+     */
+    public function getNameAttribute(): string
+    {
+        $full = trim("{$this->first_name} {$this->last_name}");
+        if (!empty($full)) {
+            return $full;
+        }
+
+        return $this->company ?? ($this->email ?? '');
+    }
 }

@@ -44,6 +44,11 @@ class StoreLeadRequest extends FormRequest
             'project_id' => 'nullable|exists:projects,id',
             'description' => 'nullable|string',
             'send_itinerary' => 'nullable|boolean',
+            'products' => 'nullable|array',
+            'products.*.product_id' => 'required_with:products|exists:products,id',
+            'products.*.quantity' => 'required_with:products.*.product_id|integer|min:1',
+            'products.*.unit_price' => 'nullable|numeric|min:0',
+            'products.*.notes' => 'nullable|string|max:1000',
         ];
     }
 

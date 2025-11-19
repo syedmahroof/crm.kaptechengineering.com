@@ -52,9 +52,6 @@ class LeadAnalyticsController
             'new' => (clone $baseQuery)->whereHas('lead_status', function($q) {
                 $q->where('slug', 'new');
             })->count(),
-            'itinerary_sent' => (clone $baseQuery)->whereHas('lead_status', function($q) {
-                $q->where('slug', 'itinerary_sent');
-            })->count(),
             'hot_lead' => (clone $baseQuery)->whereHas('lead_status', function($q) {
                 $q->where('slug', 'hot_lead');
             })->count(),
@@ -105,7 +102,6 @@ class LeadAnalyticsController
             'itinerary_metrics' => $this->getItineraryMetrics($startDate, $endDate, $user),
             'lead_age_analysis' => $this->getLeadAgeAnalysis($startDate, $endDate, $user),
             'lost_reason_stats' => $this->getLostReasonStats($startDate, $endDate, $user),
-            'trending_master_itineraries' => $this->getTrendingMasterItineraries(),
             'date_range' => [
                 'start' => $startDate->toDateString(),
                 'end' => $endDate->toDateString(),
@@ -546,9 +542,6 @@ class LeadAnalyticsController
             $q->where('slug', 'new');
         })->count();
         $contacted = (clone $baseQuery)->whereNotNull('last_contacted_at')->count();
-        $itinerarySent = (clone $baseQuery)->whereHas('lead_status', function($q) {
-            $q->where('slug', 'itinerary_sent');
-        })->count();
         $hotLead = (clone $baseQuery)->whereHas('lead_status', function($q) {
             $q->where('slug', 'hot_lead');
         })->count();
@@ -563,12 +556,10 @@ class LeadAnalyticsController
             'total_leads' => $total,
             'new' => $new,
             'contacted' => $contacted,
-            'itinerary_sent' => $itinerarySent,
             'hot_lead' => $hotLead,
             'converted' => $converted,
             'lost' => $lost,
             'contact_rate' => $total > 0 ? round(($contacted / $total) * 100, 2) : 0,
-            'itinerary_rate' => $total > 0 ? round(($itinerarySent / $total) * 100, 2) : 0,
             'hot_lead_rate' => $total > 0 ? round(($hotLead / $total) * 100, 2) : 0,
             'conversion_rate' => $total > 0 ? round(($converted / $total) * 100, 2) : 0,
             'loss_rate' => $total > 0 ? round(($lost / $total) * 100, 2) : 0,
@@ -714,24 +705,6 @@ class LeadAnalyticsController
             ->values();
     }
 
-    protected function getTrendingMasterItineraries()
-    {
-        return \App\Models\Itinerary::master()
-            ->with(['country', 'destinations'])
-            ->withCount('customItineraries')
-            ->orderBy('custom_itineraries_count', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(function ($itinerary) {
-                return [
-                    'id' => $itinerary->id,
-                    'name' => $itinerary->name,
-                    'country' => $itinerary->country->name ?? 'N/A',
-                    'duration_days' => $itinerary->duration_days,
-                    'usage_count' => $itinerary->custom_itineraries_count,
-                ];
-            });
-    }
 
     /**
      * Apply lead visibility rules based on user role.

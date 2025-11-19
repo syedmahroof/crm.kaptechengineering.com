@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,7 @@ use App\Models\LeadPerson;
 use App\Models\LeadFollowUp;
 use App\Models\LeadNote;
 use App\Models\LeadLossReason;
+use App\Models\LeadProduct;
 
 class Lead extends Model
 {
@@ -167,15 +169,8 @@ class Lead extends Model
         return $this->hasMany(LeadActivity::class)->latest();
     }
 
-    public function flight_tickets(): HasMany
-    {
-        return $this->hasMany(FlightTicket::class);
-    }
 
-    public function itineraries(): HasMany
-    {
-        return $this->hasMany(Itinerary::class);
-    }
+
 
     public function recordActivity(string $type, array $properties = []): void
     {
@@ -219,6 +214,18 @@ class Lead extends Model
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'fileable');
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'lead_products')
+            ->withPivot('quantity', 'unit_price', 'total_price', 'notes')
+            ->withTimestamps();
+    }
+
+    public function leadProducts(): HasMany
+    {
+        return $this->hasMany(LeadProduct::class);
     }
 
     public function scopeNew($query)

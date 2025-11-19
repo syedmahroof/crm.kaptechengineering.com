@@ -271,6 +271,32 @@
 
             </div>
 
+            <!-- Products Section -->
+            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-box mr-2"></i>Products
+                    </label>
+                    <button type="button" id="addProductBtn" class="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <i class="fas fa-plus mr-1"></i>Add Product
+                    </button>
+                </div>
+                
+                <!-- Product Header (for reference) -->
+                <div class="hidden md:flex items-center gap-3 mb-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <div class="flex-1">Product</div>
+                    <div class="w-24 text-center">Qty</div>
+                    <div class="w-32 text-center">Unit Price</div>
+                    <div class="w-32 text-center">Total</div>
+                    <div class="w-40">Notes</div>
+                    <div class="w-12"></div>
+                </div>
+                
+                <div id="productsContainer" class="space-y-2">
+                    <!-- Products will be added here dynamically -->
+                </div>
+            </div>
+
             <!-- Form Actions -->
             <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <a href="{{ route('leads.index') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600">
@@ -490,6 +516,85 @@
         if (selectedCountryId) {
             loadStatesForCountry(selectedCountryId);
         }
+
+        // Products Management
+        let productIndex = 0;
+        const products = @json($products);
+
+        function addProductRow() {
+            const productRow = `
+                <div class="product-row flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-200 dark:border-gray-600" data-index="${productIndex}">
+                    <div class="flex-1 min-w-0">
+                        <select name="products[${productIndex}][product_id]" class="product-select w-full px-3 py-2 text-sm border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="">Select Product...</option>
+                            ${products.map(p => `<option value="${p.id}" data-price="${p.price || 0}">${p.name} ${p.sku ? '(' + p.sku + ')' : ''}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="w-24">
+                        <input type="number" name="products[${productIndex}][quantity]" value="1" min="1" class="product-quantity w-full px-2 py-2 text-sm border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Qty" required>
+                    </div>
+                    <div class="w-32">
+                        <input type="number" name="products[${productIndex}][unit_price]" step="0.01" min="0" class="product-unit-price w-full px-2 py-2 text-sm border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Unit Price">
+                    </div>
+                    <div class="w-32">
+                        <input type="text" class="product-total w-full px-2 py-2 text-sm border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white bg-gray-100 dark:bg-gray-600 font-medium" readonly value="0.00" placeholder="Total">
+                    </div>
+                    <div class="w-40">
+                        <input type="text" name="products[${productIndex}][notes]" class="w-full px-2 py-2 text-sm border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Notes (optional)">
+                    </div>
+                    <div class="w-12 flex-shrink-0">
+                        <button type="button" class="remove-product-btn w-full px-3 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 dark:bg-gray-700 dark:border-red-600 dark:text-red-400 dark:hover:bg-gray-600" title="Remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            $('#productsContainer').append(productRow);
+            
+            // Initialize Select2 for the new product select
+            $(`.product-row[data-index="${productIndex}"] .product-select`).select2({
+                placeholder: 'Select Product...',
+                allowClear: true,
+                width: '100%',
+                theme: 'bootstrap-5'
+            });
+            
+            // Auto-fill unit price when product is selected
+            $(`.product-row[data-index="${productIndex}"] .product-select`).on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const price = parseFloat(selectedOption.data('price')) || 0;
+                $(this).closest('.product-row').find('.product-unit-price').val(price.toFixed(2));
+                calculateProductTotal($(this).closest('.product-row'));
+            });
+            
+            // Calculate total when quantity or price changes
+            $(`.product-row[data-index="${productIndex}"] .product-quantity, .product-row[data-index="${productIndex}"] .product-unit-price`).on('input', function() {
+                calculateProductTotal($(this).closest('.product-row'));
+            });
+            
+            productIndex++;
+        }
+
+        function calculateProductTotal(row) {
+            const quantity = parseFloat(row.find('.product-quantity').val()) || 0;
+            const unitPrice = parseFloat(row.find('.product-unit-price').val()) || 0;
+            const total = (quantity * unitPrice).toFixed(2);
+            row.find('.product-total').val(total);
+        }
+
+        function removeProductRow(btn) {
+            $(btn).closest('.product-row').remove();
+        }
+
+        // Add product button click
+        $('#addProductBtn').on('click', function() {
+            addProductRow();
+        });
+
+        // Remove product button click (delegated)
+        $(document).on('click', '.remove-product-btn', function() {
+            removeProductRow(this);
+        });
     });
 </script>
 @endpush

@@ -90,10 +90,6 @@
             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($stats['new']) }}</p>
         </div>
         <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-            <p class="text-sm text-gray-600 dark:text-gray-400">Itinerary Sent</p>
-            <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ number_format($stats['itinerary_sent']) }}</p>
-        </div>
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
             <p class="text-sm text-gray-600 dark:text-gray-400">Lost Leads</p>
             <p class="text-2xl font-bold text-gray-600 dark:text-gray-400">{{ number_format($stats['lost']) }}</p>
         </div>
@@ -148,13 +144,6 @@
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-gray-600 dark:text-gray-400">{{ $stats['conversion_funnel']['contact_rate'] }}%</span>
                     <span class="text-lg font-bold text-gray-900 dark:text-white">{{ number_format($stats['conversion_funnel']['contacted']) }}</span>
-                </div>
-            </div>
-            <div class="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Itinerary Sent</span>
-                <div class="flex items-center gap-3">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ $stats['conversion_funnel']['itinerary_rate'] }}%</span>
-                    <span class="text-lg font-bold text-purple-600 dark:text-purple-400">{{ number_format($stats['conversion_funnel']['itinerary_sent']) }}</span>
                 </div>
             </div>
             <div class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">

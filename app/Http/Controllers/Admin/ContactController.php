@@ -378,13 +378,17 @@ class ContactController extends Controller
         $contactTypes = Contact::getContactTypes();
 
         $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=contacts_' . now()->format('Y-m-d') . '.csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="contacts_' . now()->format('Y-m-d') . '.csv"',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Pragma' => 'public',
         ];
 
         $callback = function() use ($contacts, $contactTypes) {
             $file = fopen('php://output', 'w');
-            
+            // Write UTF-8 BOM for Excel compatibility
+            fwrite($file, "\xEF\xBB\xBF");
+
             // CSV headers
             fputcsv($file, [
                 'ID',

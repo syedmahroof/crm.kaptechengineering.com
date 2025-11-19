@@ -23,7 +23,9 @@ class QuotationController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('quotation_number', 'like', "%{$search}%")
                   ->orWhereHas('customer', function ($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
+                      $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('company', 'like', "%{$search}%");
                   })
                   ->orWhereHas('lead', function ($q) use ($search) {
                       $q->where('name', 'like', "%{$search}%");
@@ -55,7 +57,7 @@ class QuotationController extends Controller
     public function create(Request $request)
     {
         $products = Product::active()->orderBy('name')->get();
-        $customers = \App\Models\Customer::orderBy('name')->get();
+        $customers = \App\Models\Customer::orderBy('first_name')->orderBy('last_name')->get();
         $leads = \App\Models\Lead::orderBy('name')->get();
         $projects = \App\Models\Project::orderBy('name')->get();
 
@@ -177,7 +179,7 @@ class QuotationController extends Controller
     {
         $quotation->load('items');
         $products = Product::active()->orderBy('name')->get();
-        $customers = \App\Models\Customer::orderBy('name')->get();
+        $customers = \App\Models\Customer::orderBy('first_name')->orderBy('last_name')->get();
         $leads = \App\Models\Lead::orderBy('name')->get();
         $projects = \App\Models\Project::orderBy('name')->get();
 

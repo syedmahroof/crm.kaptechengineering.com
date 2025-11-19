@@ -13,20 +13,40 @@ class StoreLeadAction
         try {
             DB::beginTransaction();
             
-            // Extract send_itinerary flag
+            // Extract send_itinerary flag (status update removed per user request)
             $sendItinerary = $data['send_itinerary'] ?? false;
             unset($data['send_itinerary']);
+            
+            // Extract products
+            $products = $data['products'] ?? [];
+            unset($data['products']);
             
             $lead = Lead::create(array_merge($data, [
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
             ]));
             
-            // If send_itinerary is true, update the lead status to 'itinerary_sent'
+            // If send_itinerary is true, only update timestamp (status update removed)
             if ($sendItinerary) {
-                $itinerarySentStatus = \App\Models\LeadStatus::where('slug', 'itinerary_sent')->first();
-                if ($itinerarySentStatus) {
-                    $lead->update(['lead_status_id' => $itinerarySentStatus->id]);
+                $lead->update(['itinerary_sent_at' => now()]);
+            }
+            
+            // Attach products to lead
+            if (!empty($products)) {
+                foreach ($products as $productData) {
+                    if (!empty($productData['product_id'])) {
+                        $quantity = $productData['quantity'] ?? 1;
+                        $unitPrice = $productData['unit_price'] ?? null;
+                        $totalPrice = $unitPrice ? ($quantity * $unitPrice) : null;
+                        
+                        $lead->leadProducts()->create([
+                            'product_id' => $productData['product_id'],
+                            'quantity' => $quantity,
+                            'unit_price' => $unitPrice,
+                            'total_price' => $totalPrice,
+                            'notes' => $productData['notes'] ?? null,
+                        ]);
+                    }
                 }
             }
             

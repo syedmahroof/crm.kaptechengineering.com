@@ -171,9 +171,6 @@ class LeadsController
             'new' => (clone $baseQuery)->whereHas('lead_status', function($q) {
                 $q->where('slug', 'new');
             })->count(),
-            'itinerary_sent' => (clone $baseQuery)->whereHas('lead_status', function($q) {
-                $q->where('slug', 'itinerary_sent');
-            })->count(),
             'hot_lead' => (clone $baseQuery)->whereHas('lead_status', function($q) {
                 $q->where('slug', 'hot_lead');
             })->count(),
@@ -239,6 +236,7 @@ class LeadsController
         
         $branches = \App\Models\Branch::where('is_active', true)->orderBy('name')->get();
         $projects = \App\Models\Project::orderBy('name')->get();
+        $products = \App\Models\Product::where('is_active', true)->orderBy('name')->get();
 
         return view('admin.leads.create', [
             'sources' => $sources,
@@ -251,6 +249,7 @@ class LeadsController
             'indiaStates' => $indiaStates,
             'branches' => $branches,
             'projects' => $projects,
+            'products' => $products,
         ]);
     }
 
@@ -292,15 +291,13 @@ class LeadsController
             'follow_ups',
             'notes',
             'notes.creator',
-            'itineraries.days.items',
-            'flight_tickets',
+            'leadProducts.product',
             'files.user',
         ])->loadCount([
             'persons',
             'follow_ups',
             'notes',
-            'itineraries',
-            'flight_tickets',
+           
             'files',
         ]);
 
@@ -388,11 +385,7 @@ class LeadsController
             'activities_count' => $activities->count(),
         ]);
 
-        // Get master itineraries for import option
-        $masterItineraries = \App\Models\Itinerary::master()
-            ->with(['country', 'destinations'])
-            ->orderBy('name')
-            ->get();
+        
 
         $leadStatuses = LeadStatus::active()->ordered()->get();
         $lossReasons = LeadLossReason::active()->ordered()->get();
@@ -404,7 +397,6 @@ class LeadsController
             'lead' => $lead,
             'activities' => $activities,
             'timelineItems' => $timelineItems,
-            'masterItineraries' => $masterItineraries,
             'leadStatuses' => $leadStatuses,
             'lossReasons' => $lossReasons,
             'analytics' => $analytics,
@@ -468,11 +460,8 @@ class LeadsController
         $this->authorize('update', $lead);
 
         try {
-            // Update lead status to 'itinerary_sent'
-            $itinerarySentStatus = \App\Models\LeadStatus::where('slug', 'itinerary_sent')->first();
-            if ($itinerarySentStatus) {
-                $lead->update(['lead_status_id' => $itinerarySentStatus->id]);
-            }
+            // Update itinerary_sent_at timestamp (status update removed per user request)
+            $lead->update(['itinerary_sent_at' => now()]);
 
             // Here you can add logic to actually send the itinerary
             // For example: send email, generate PDF, etc.
@@ -613,22 +602,6 @@ class LeadsController
         ]);
     }
 
-    public function importMasterItinerary(Request $request, Lead $lead)
-    {
-        $this->authorize('update', $lead);
-
-        $validated = $request->validate([
-            'master_itinerary_id' => 'required|exists:itineraries,id',
-        ]);
-
-        $masterItinerary = \App\Models\Itinerary::with(['days.items'])->findOrFail($validated['master_itinerary_id']);
-        
-        // Create custom itinerary from master
-        $customItinerary = $masterItinerary->createCustomFromMaster($masterItinerary, $lead->id);
-
-        return redirect()->route('itineraries.builder.edit', $customItinerary)
-            ->with('success', 'Master itinerary imported successfully. You can now customize it.');
-    }
 
     public function markItinerarySent(Request $request, Lead $lead)
     {
@@ -638,11 +611,7 @@ class LeadsController
             'itinerary_sent_at' => now(),
         ]);
 
-        // Update lead status to 'itinerary_sent'
-        $itinerarySentStatus = \App\Models\LeadStatus::where('slug', 'itinerary_sent')->first();
-        if ($itinerarySentStatus) {
-            $lead->update(['lead_status_id' => $itinerarySentStatus->id]);
-        }
+        // Status update removed per user request - only tracking timestamp
 
         $lead->recordActivity('itinerary_sent', [
             'sent_at' => now()->toDateTimeString(),
@@ -752,22 +721,7 @@ class LeadsController
             ->sortByDesc('count')
             ->values();
 
-        // Trending master itineraries (most used)
-        $trendingMasterItineraries = \App\Models\Itinerary::master()
-            ->with(['country', 'destinations'])
-            ->withCount('customItineraries')
-            ->orderBy('custom_itineraries_count', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(function ($itinerary) {
-                return [
-                    'id' => $itinerary->id,
-                    'name' => $itinerary->name,
-                    'country' => $itinerary->country->name ?? 'N/A',
-                    'duration_days' => $itinerary->duration_days,
-                    'usage_count' => $itinerary->custom_itineraries_count,
-                ];
-            });
+       
 
         // Overall lead statistics
         $totalLeads = Lead::count();
@@ -868,7 +822,6 @@ class LeadsController
 
         return [
             'lost_reason_stats' => $lostReasonStats,
-            'trending_master_itineraries' => $trendingMasterItineraries,
             'overall_stats' => [
                 'total_leads' => $totalLeads,
                 'converted_leads' => $convertedLeads,

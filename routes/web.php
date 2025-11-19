@@ -94,9 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('leads', LeadsController::class);
     Route::get('leads/export', [LeadsController::class, 'export'])->name('leads.export');
     Route::post('leads/{lead}/send-itinerary', [LeadsController::class, 'sendItinerary'])->name('leads.send-itinerary');
-    Route::post('leads/{lead}/import-master-itinerary', [LeadsController::class, 'importMasterItinerary'])->name('leads.import-master-itinerary');
-    Route::post('leads/{lead}/mark-itinerary-sent', [LeadsController::class, 'markItinerarySent'])->name('leads.mark-itinerary-sent');
-    Route::post('leads/{lead}/mark-flight-details-sent', [LeadsController::class, 'markFlightDetailsSent'])->name('leads.mark-flight-details-sent');
+
     Route::post('leads/{lead}/mark-as-lost', [LeadsController::class, 'markAsLost'])->name('leads.mark-as-lost');
     Route::post('leads/{lead}/status', [LeadsController::class, 'updateStatus'])->name('leads.update-status');
     Route::post('api/leads/{lead}/follow-ups', [LeadsController::class, 'storeFollowUp'])->name('leads.follow-ups.store');
