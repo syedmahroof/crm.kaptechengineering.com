@@ -72,16 +72,19 @@
 
     <!-- Projects by Type -->
     @if(!empty($projectTypeCounts))
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6" x-data="{ open: {{ request()->has('project_type') ? 'true' : 'false' }} }">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <button @click="open = !open" class="flex items-center text-lg font-semibold text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                 <i class="fas fa-chart-pie mr-2 text-gray-400"></i>Projects by Type
-            </h3>
-            <a href="{{ route('project-types.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                <i class="fas fa-cog mr-1"></i>Manage Types
-            </a>
+                <i class="fas fa-chevron-down text-xs ml-2 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+            </button>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('project-types.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                    <i class="fas fa-cog mr-1"></i>Manage Types
+                </a>
+            </div>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+        <div x-show="open" x-collapse class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             @foreach($projectTypeCounts as $typeName => $data)
                 @php
                     $count = $data['count'];
