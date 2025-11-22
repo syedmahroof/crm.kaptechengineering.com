@@ -98,36 +98,11 @@ class RoleAndPermissionSeeder extends Seeder
             'edit customers',
             'delete customers',
             
-            // Itinerary permissions
-            'view itineraries',
-            'create itineraries',
-            'edit itineraries',
-            'delete itineraries',
-            'manage master itineraries',
-            
             // Destination permissions
             'view destinations',
             'create destinations',
             'edit destinations',
             'delete destinations',
-            
-            // Attraction permissions
-            'view attractions',
-            'create attractions',
-            'edit attractions',
-            'delete attractions',
-            
-            // Hotel permissions
-            'view hotels',
-            'create hotels',
-            'edit hotels',
-            'delete hotels',
-            
-            // Blog permissions
-            'view blogs',
-            'create blogs',
-            'edit blogs',
-            'delete blogs',
             
             // Testimonial permissions
             'view testimonials',

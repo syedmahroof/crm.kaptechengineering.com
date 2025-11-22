@@ -33,13 +33,6 @@ class State extends Model
         return $this->belongsTo(Country::class);
     }
 
-    /**
-     * Get the destinations for the state.
-     */
-    public function destinations(): HasMany
-    {
-        return $this->hasMany(Destination::class);
-    }
 
     /**
      * Get the hotels for the state.

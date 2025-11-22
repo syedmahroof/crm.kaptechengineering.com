@@ -53,10 +53,10 @@
 
                 <!-- Phone -->
                 <div class="space-y-1">
-                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
-                    <div class="flex gap-2">
-                        <div class="flex-shrink-0" style="width: 200px;">
-                            <select name="phone_code" id="phone_code" class="w-full px-2.5 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+                    <div class="phone-input-group flex items-stretch border {{ $errors->has('phone') || $errors->has('phone_code') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 bg-white dark:bg-gray-700">
+                        <div class="flex-shrink-0 border-r border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+                            <select name="phone_code" id="phone_code" class="h-full px-3 py-2 bg-transparent border-0 text-sm text-gray-700 dark:text-gray-300 focus:ring-0 focus:outline-none">
                                 @php
                                     $defaultPhoneCode = old('phone_code', $lead->phone_code ?? '+91');
                                     if (!$defaultPhoneCode && $lead->country_id) {
@@ -73,20 +73,22 @@
                                 @endforeach
                             </select>
                         </div>
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value="{{ old('phone', $lead->phone) }}"
-                            class="flex-1 px-3 py-2 border rounded-md {{ $errors->has('phone') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Enter phone number"
-                        >
+                        <div class="flex-1 min-w-0">
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                value="{{ old('phone', $lead->phone) }}"
+                                class="w-full h-full px-3 py-2 border-0 bg-transparent dark:text-white focus:ring-0 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+                                placeholder="Enter phone number"
+                            >
+                        </div>
                     </div>
                     @error('phone')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                     @error('phone_code')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -240,20 +242,67 @@
                     @enderror
                 </div>
 
-                <!-- Project -->
-                <div class="space-y-1">
-                    <label for="project_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Project</label>
-                    <select id="project_id" name="project_id" class="w-full px-3 py-2 border rounded-md {{ $errors->has('project_id') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Select a project...</option>
-                        @foreach($projects as $project)
-                            <option value="{{ $project->id }}" {{ old('project_id', $lead->project_id) == $project->id ? 'selected' : '' }}>
-                                {{ $project->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('project_id')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                <!-- Linked Entities Section -->
+                <div class="space-y-1 md:col-span-2 lg:col-span-3">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Link to Entities</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Projects -->
+                        <div>
+                            <label for="project_ids" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-project-diagram mr-2 text-blue-500"></i>Projects
+                            </label>
+                            <select name="project_ids[]" id="project_ids" multiple
+                                    class="w-full px-3 py-2 border rounded-md {{ $errors->has('project_ids') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} dark:bg-gray-700 dark:text-white">
+                                @foreach($projects as $project)
+                                    <option value="{{ $project->id }}" {{ (old('project_ids') && in_array($project->id, old('project_ids'))) || (in_array($project->id, $lead->projects->pluck('id')->toArray())) ? 'selected' : '' }}>{{ $project->name }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Search and select one or more projects.</p>
+                            @error('project_ids')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Customers -->
+                        <div>
+                            <label for="customer_ids" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-users mr-2 text-green-500"></i>Customers
+                            </label>
+                            <select name="customer_ids[]" id="customer_ids" multiple
+                                    class="w-full px-3 py-2 border rounded-md {{ $errors->has('customer_ids') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} dark:bg-gray-700 dark:text-white">
+                                @foreach($customers as $customer)
+                                    <option value="{{ $customer->id }}" {{ (old('customer_ids') && in_array($customer->id, old('customer_ids'))) || (in_array($customer->id, $lead->customers->pluck('id')->toArray())) ? 'selected' : '' }}>{{ $customer->name }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Search and select one or more customers.</p>
+                            @error('customer_ids')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Contacts -->
+                        <div>
+                            <label for="contact_ids" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-address-book mr-2 text-purple-500"></i>Contacts
+                            </label>
+                            <select name="contact_ids[]" id="contact_ids" multiple
+                                    class="w-full px-3 py-2 border rounded-md {{ $errors->has('contact_ids') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} dark:bg-gray-700 dark:text-white">
+                                @foreach($contacts as $contact)
+                                    <option value="{{ $contact->id }}" {{ (old('contact_ids') && in_array($contact->id, old('contact_ids'))) || (in_array($contact->id, $lead->contacts->pluck('id')->toArray())) ? 'selected' : '' }}>{{ $contact->name }} @if($contact->email)({{ $contact->email }})@endif</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Search and select one or more contacts.</p>
+                            @error('contact_ids')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Description -->
@@ -326,38 +375,47 @@
         background-color: #374151;
         border-color: #4b5563;
     }
-    /* Phone code Select2 styling */
+    /* Phone code Select2 styling - grouped input */
     #phone_code + .select2-container {
-        width: 200px !important;
+        width: auto !important;
+        min-width: 140px;
+        max-width: 180px;
     }
     #phone_code + .select2-container .select2-selection--single {
-        height: 42px;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        background-color: #fff;
+        height: 100%;
+        min-height: 42px;
+        border: 0 !important;
+        border-radius: 0;
+        background-color: transparent !important;
+        box-shadow: none !important;
     }
     #phone_code + .select2-container .select2-selection--single .select2-selection__rendered {
-        line-height: 40px;
-        padding-left: 0.625rem;
+        line-height: 42px;
+        padding-left: 0.75rem;
+        padding-right: 1.75rem;
         color: #111827;
         font-size: 0.875rem;
     }
     #phone_code + .select2-container .select2-selection--single .select2-selection__arrow {
-        height: 40px;
+        height: 42px;
         right: 8px;
     }
-    #phone_code + .select2-container .select2-selection--single:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    #phone_code + .select2-container .select2-selection--single:focus,
+    #phone_code + .select2-container .select2-selection--single:active {
+        outline: none !important;
+        border: 0 !important;
+        box-shadow: none !important;
     }
     .dark #phone_code + .select2-container .select2-selection--single {
-        background-color: #374151;
-        border-color: #4b5563;
-        color: #fff;
+        background-color: transparent !important;
+        border: 0 !important;
     }
     .dark #phone_code + .select2-container .select2-selection--single .select2-selection__rendered {
-        color: #fff;
+        color: #d1d5db;
+    }
+    /* Ensure the phone input group maintains proper height */
+    .phone-input-group {
+        min-height: 42px;
     }
 </style>
 @endpush
@@ -386,7 +444,7 @@
         $('#phone_code').select2({
             placeholder: 'Select country code...',
             allowClear: false,
-            width: '200px',
+            width: '100%',
             minimumResultsForSearch: 0,
             dropdownAutoWidth: false,
             templateResult: function(data) {
@@ -411,6 +469,57 @@
             allowClear: true,
             width: '100%',
             theme: 'bootstrap-5'
+        });
+
+        // Initialize Select2 for projects (multi-select with searchable autocomplete)
+        $('#project_ids').select2({
+            placeholder: 'Search and select projects...',
+            allowClear: true,
+            width: '100%',
+            theme: 'bootstrap-5',
+            closeOnSelect: false,
+            minimumInputLength: 0,
+            templateResult: function(data) {
+                if (!data.id) { return data.text; }
+                return $('<span><i class="fas fa-project-diagram mr-2 text-blue-500"></i>' + data.text + '</span>');
+            },
+            templateSelection: function(data) {
+                return $('<span><i class="fas fa-project-diagram mr-2 text-blue-500"></i>' + data.text + '</span>');
+            }
+        });
+
+        // Initialize Select2 for customers (multi-select with searchable autocomplete)
+        $('#customer_ids').select2({
+            placeholder: 'Search and select customers...',
+            allowClear: true,
+            width: '100%',
+            theme: 'bootstrap-5',
+            closeOnSelect: false,
+            minimumInputLength: 0,
+            templateResult: function(data) {
+                if (!data.id) { return data.text; }
+                return $('<span><i class="fas fa-users mr-2 text-green-500"></i>' + data.text + '</span>');
+            },
+            templateSelection: function(data) {
+                return $('<span><i class="fas fa-users mr-2 text-green-500"></i>' + data.text + '</span>');
+            }
+        });
+
+        // Initialize Select2 for contacts (multi-select with searchable autocomplete)
+        $('#contact_ids').select2({
+            placeholder: 'Search and select contacts...',
+            allowClear: true,
+            width: '100%',
+            theme: 'bootstrap-5',
+            closeOnSelect: false,
+            minimumInputLength: 0,
+            templateResult: function(data) {
+                if (!data.id) { return data.text; }
+                return $('<span><i class="fas fa-address-book mr-2 text-purple-500"></i>' + data.text + '</span>');
+            },
+            templateSelection: function(data) {
+                return $('<span><i class="fas fa-address-book mr-2 text-purple-500"></i>' + data.text + '</span>');
+            }
         });
 
         // Update country text field when country_id changes

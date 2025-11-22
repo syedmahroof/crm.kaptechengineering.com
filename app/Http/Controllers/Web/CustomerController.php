@@ -66,6 +66,7 @@ class CustomerController extends Controller
             'email' => 'required|email|unique:customers,email',
             'phone' => 'nullable|string|max:20',
             'company' => 'nullable|string|max:100',
+            'job_title' => 'nullable|string|max:100',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
@@ -74,6 +75,7 @@ class CustomerController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $validated['user_id'] = auth()->id();
         $customer = Customer::create($validated);
 
         return redirect()->route('customers.index')

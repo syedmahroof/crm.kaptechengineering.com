@@ -37,14 +37,6 @@ class Country extends Model
     ];
 
     /**
-     * Get the destinations for the country.
-     */
-    public function destinations(): HasMany
-    {
-        return $this->hasMany(Destination::class);
-    }
-
-    /**
      * Get the attractions for the country.
      */
     public function attractions(): HasMany

@@ -29,6 +29,7 @@ Route::middleware('web')->group(function () {
     Route::get('/lead-sources', [LeadSourceController::class, 'index']);
     Route::get('/lead-priorities', [LeadPriorityController::class, 'index']);
     Route::get('/lead-agents', [\App\Http\Controllers\Api\LeadAgentController::class, 'index']);
+    Route::get('/countries', [\App\Http\Controllers\Api\CountryController::class, 'index']);
     Route::get('/states', [\App\Http\Controllers\Api\StateController::class, 'index']);
     Route::get('/districts', [\App\Http\Controllers\Api\DistrictController::class, 'index']);
     

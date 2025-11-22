@@ -217,6 +217,43 @@
                         
                         <!-- Settings - Collapsible -->
                         <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700" x-show="!sidebarCollapsed">
+                            <p class="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Master Data</p>
+                        </div>
+                        
+                        <div x-data="{ open: {{ request()->routeIs('product-categories.*') || request()->routeIs('project-types.*') || request()->routeIs('lead-types.*') || request()->routeIs('lead-sources.*') || request()->routeIs('lead-priorities.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="w-full sidebar-link group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" :class="{ 'justify-center': sidebarCollapsed }" title="Master Data">
+                                <div class="flex items-center" :class="{ 'justify-center': sidebarCollapsed }">
+                                    <i class="fas fa-database" :class="{ 'mr-3': !sidebarCollapsed }"></i>
+                                    <span x-show="!sidebarCollapsed">Master Data</span>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': open, 'hidden': sidebarCollapsed }"></i>
+                            </button>
+                            <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">
+                                <a href="{{ route('product-categories.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('product-categories.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-tags text-xs mr-3"></i>Product Categories
+                                </a>
+                                <a href="{{ route('project-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('project-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-project-diagram text-xs mr-3"></i>Project Types
+                                </a>
+                                @can('view lead types')
+                                <a href="{{ route('lead-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('lead-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-tag text-xs mr-3"></i>Lead Types
+                                </a>
+                                @endcan
+                                @can('view lead sources')
+                                <a href="{{ route('lead-sources.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('lead-sources.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-source text-xs mr-3"></i>Lead Sources
+                                </a>
+                                @endcan
+                                @can('view lead priorities')
+                                <a href="{{ route('lead-priorities.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('lead-priorities.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-star text-xs mr-3"></i>Lead Priorities
+                                </a>
+                                @endcan
+                            </div>
+                        </div>
+                        
+                        <div>
                             <p class="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Settings</p>
                         </div>
                         
@@ -532,6 +569,39 @@
                                 </div>
                             </div>
                             @endcanany
+                            
+                            <!-- Master Data - Collapsible -->
+                            <div x-data="{ open: {{ request()->routeIs('product-categories.*') || request()->routeIs('project-types.*') || request()->routeIs('lead-types.*') || request()->routeIs('lead-sources.*') || request()->routeIs('lead-priorities.*') ? 'true' : 'false' }} }">
+                                <button @click="open = !open" class="w-full sidebar-link group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-database mr-3"></i>Master Data
+                                    </div>
+                                    <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                                </button>
+                                <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1">
+                                    <a href="{{ route('product-categories.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('product-categories.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                        <i class="fas fa-tags text-xs mr-3"></i>Product Categories
+                                    </a>
+                                    <a href="{{ route('project-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('project-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                        <i class="fas fa-project-diagram text-xs mr-3"></i>Project Types
+                                    </a>
+                                    @can('view lead types')
+                                    <a href="{{ route('lead-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('lead-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                        <i class="fas fa-tag text-xs mr-3"></i>Lead Types
+                                    </a>
+                                    @endcan
+                                    @can('view lead sources')
+                                    <a href="{{ route('lead-sources.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('lead-sources.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                        <i class="fas fa-source text-xs mr-3"></i>Lead Sources
+                                    </a>
+                                    @endcan
+                                    @can('view lead priorities')
+                                    <a href="{{ route('lead-priorities.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('lead-priorities.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                        <i class="fas fa-star text-xs mr-3"></i>Lead Priorities
+                                    </a>
+                                    @endcan
+                                </div>
+                            </div>
                             
                             <!-- Settings - Collapsible -->
                             @canany(['view users', 'view roles', 'view permissions', 'view branches'])

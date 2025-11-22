@@ -399,6 +399,7 @@
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Lead</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Linked Entities</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Agent</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Priority</th>
@@ -433,6 +434,31 @@
                                     <i class="fas fa-phone mr-2 text-gray-400"></i>{{ $lead->phone }}
                                 </div>
                                 @endif
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                <div class="flex flex-wrap gap-1">
+                                    @forelse($lead->projects as $project)
+                                        <a href="{{ route('projects.show', $project->id) }}" class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800">
+                                            <i class="fas fa-project-diagram mr-1"></i>{{ Str::limit($project->name, 15) }}
+                                        </a>
+                                    @empty
+                                    @endforelse
+                                    @forelse($lead->customers as $customer)
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                            <i class="fas fa-users mr-1"></i>{{ Str::limit($customer->name, 15) }}
+                                        </span>
+                                    @empty
+                                    @endforelse
+                                    @forelse($lead->contacts as $contact)
+                                        <a href="{{ route('admin.contacts.show', $contact->id) }}" class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800">
+                                            <i class="fas fa-address-book mr-1"></i>{{ Str::limit($contact->name, 15) }}
+                                        </a>
+                                    @empty
+                                    @endforelse
+                                    @if($lead->projects->isEmpty() && $lead->customers->isEmpty() && $lead->contacts->isEmpty())
+                                        <span class="text-gray-400 text-xs">-</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($lead->assigned_user)

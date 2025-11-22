@@ -163,22 +163,59 @@ class DashboardController extends Controller
             ->where('next_meeting_date', '<=', $endOfDay->copy()->addDays(7))
             ->count();
 
-        // Get quote of the day (you can replace this with a database query if you have quotes stored)
-        $quotes = [
-            [
-                'text' => "The journey of a thousand miles begins with a single step.",
-                'author' => "Lao Tzu"
-            ],
-            [
-                'text' => "Travel makes one modest. You see what a tiny place you occupy in the world.",
-                'author' => "Gustave Flaubert"
-            ],
-            [
-                'text' => "The world is a book, and those who do not travel read only one page.",
-                'author' => "Saint Augustine"
-            ]
+        // Get quote of the day - Business Quotes
+        $businessQuotes = [
+            ['text' => "The way to get started is to quit talking and begin doing.", 'author' => "Walt Disney"],
+            ['text' => "Don't be afraid to give up the good to go for the great.", 'author' => "John D. Rockefeller"],
+            ['text' => "Innovation distinguishes between a leader and a follower.", 'author' => "Steve Jobs"],
+            ['text' => "The only way to do great work is to love what you do.", 'author' => "Steve Jobs"],
+            ['text' => "Success is not final, failure is not fatal: it is the courage to continue that counts.", 'author' => "Winston Churchill"],
+            ['text' => "The future belongs to those who believe in the beauty of their dreams.", 'author' => "Eleanor Roosevelt"],
+            ['text' => "The customer's perception is your reality.", 'author' => "Kate Zabriskie"],
+            ['text' => "Your most unhappy customers are your greatest source of learning.", 'author' => "Bill Gates"],
+            ['text' => "The goal of a company is to have customer service that is not just the best, but legendary.", 'author' => "Sam Walton"],
+            ['text' => "Business opportunities are like buses, there's always another one coming.", 'author' => "Richard Branson"],
+            ['text' => "The secret of getting ahead is getting started.", 'author' => "Mark Twain"],
+            ['text' => "Price is what you pay. Value is what you get.", 'author' => "Warren Buffett"],
+            ['text' => "The best time to plant a tree was 20 years ago. The second best time is now.", 'author' => "Chinese Proverb"],
+            ['text' => "Success usually comes to those who are too busy to be looking for it.", 'author' => "Henry David Thoreau"],
+            ['text' => "The only place where success comes before work is in the dictionary.", 'author' => "Vidal Sassoon"],
+            ['text' => "If you are not willing to risk the usual, you will have to settle for the ordinary.", 'author' => "Jim Rohn"],
+            ['text' => "The biggest risk is not taking any risk. In a world that's changing really quickly, the only strategy that is guaranteed to fail is not taking risks.", 'author' => "Mark Zuckerberg"],
+            ['text' => "I find that the harder I work, the more luck I seem to have.", 'author' => "Thomas Jefferson"],
+            ['text' => "People don't buy what you do; they buy why you do it.", 'author' => "Simon Sinek"],
+            ['text' => "The best customer service is if the customer doesn't need to call you, doesn't need to talk to you. It just works.", 'author' => "Jeff Bezos"],
+            ['text' => "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work.", 'author' => "Steve Jobs"],
+            ['text' => "The greatest glory in living lies not in never falling, but in rising every time we fall.", 'author' => "Nelson Mandela"],
+            ['text' => "In the middle of difficulty lies opportunity.", 'author' => "Albert Einstein"],
+            ['text' => "The only impossible journey is the one you never begin.", 'author' => "Tony Robbins"],
+            ['text' => "Success is walking from failure to failure with no loss of enthusiasm.", 'author' => "Winston Churchill"],
+            ['text' => "The customer experience is the next competitive battleground.", 'author' => "Jerry Gregoire"],
+            ['text' => "A satisfied customer is the best business strategy of all.", 'author' => "Michael LeBoeuf"],
+            ['text' => "Make every detail perfect and limit the number of details to perfect.", 'author' => "Jack Dorsey"],
+            ['text' => "The goal isn't to be perfect. The goal is to be better than yesterday.", 'author' => "Unknown"],
+            ['text' => "Excellence is not a skill, it's an attitude.", 'author' => "Ralph Marston"],
+            ['text' => "The best preparation for tomorrow is doing your best today.", 'author' => "H. Jackson Brown Jr."],
+            ['text' => "Believe you can and you're halfway there.", 'author' => "Theodore Roosevelt"],
+            ['text' => "The only person you are destined to become is the person you decide to be.", 'author' => "Ralph Waldo Emerson"],
+            ['text' => "It does not matter how slowly you go as long as you do not stop.", 'author' => "Confucius"],
+            ['text' => "The expert in anything was once a beginner.", 'author' => "Helen Hayes"],
+            ['text' => "Focus on being productive instead of busy.", 'author' => "Tim Ferriss"],
+            ['text' => "Don't wait for opportunity. Create it.", 'author' => "George Bernard Shaw"],
+            ['text' => "The difference between a successful person and others is not a lack of strength, not a lack of knowledge, but rather a lack of will.", 'author' => "Vince Lombardi"],
+            ['text' => "The only limit to our realization of tomorrow will be our doubts of today.", 'author' => "Franklin D. Roosevelt"],
+            ['text' => "Great things in business are never done by one person. They're done by a team of people.", 'author' => "Steve Jobs"],
+            ['text' => "The best way to predict the future is to create it.", 'author' => "Peter Drucker"],
+            ['text' => "Your brand is what other people say about you when you're not in the room.", 'author' => "Jeff Bezos"],
+            ['text' => "Do what you do so well that they will want to see it again and bring their friends.", 'author' => "Walt Disney"],
+            ['text' => "The purpose of a business is to create a customer.", 'author' => "Peter Drucker"],
+            ['text' => "If you're not embarrassed by the first version of your product, you've launched too late.", 'author' => "Reid Hoffman"],
+            ['text' => "Success is not just about making money. It's about making a difference.", 'author' => "Unknown"],
+            ['text' => "The best way to find out if you can trust somebody is to trust them.", 'author' => "Ernest Hemingway"],
+            ['text' => "Quality is not an act, it is a habit.", 'author' => "Aristotle"],
+            ['text' => "It is during our darkest moments that we must focus to see the light.", 'author' => "Aristotle"],
         ];
-        $quoteOfTheDay = $quotes[now()->dayOfYear % count($quotes)];
+        $quoteOfTheDay = $businessQuotes[now()->dayOfYear % count($businessQuotes)];
 
         return view('admin.dashboard', [
             'stats' => [

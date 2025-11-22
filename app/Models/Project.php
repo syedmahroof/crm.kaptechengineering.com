@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * @property-read int $id
@@ -31,6 +32,7 @@ final class Project extends Model
     protected $fillable = [
         'name',
         'description',
+        'address',
         'user_id',
         'status',
         'project_type',
@@ -96,11 +98,23 @@ final class Project extends Model
     /**
      * Get the visit reports for the project.
      *
-     * @return HasMany<VisitReport, $this>
+     * @return MorphToMany<VisitReport>
      */
-    public function visitReports(): HasMany
+    public function visitReports(): MorphToMany
     {
-        return $this->hasMany(VisitReport::class);
+        return $this->morphToMany(VisitReport::class, 'visit_reportable', 'visit_reportables', 'visit_reportable_id', 'visit_report_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the leads for the project.
+     *
+     * @return MorphToMany<Lead>
+     */
+    public function leads(): MorphToMany
+    {
+        return $this->morphToMany(Lead::class, 'leadable', 'leadables', 'leadable_id', 'lead_id')
+            ->withTimestamps();
     }
 
     /**

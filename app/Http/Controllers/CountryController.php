@@ -7,6 +7,7 @@ use App\Http\Requests\Country\StoreCountryRequest;
 use App\Http\Requests\Country\UpdateCountryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class CountryController extends Controller
 {
@@ -88,10 +89,11 @@ class CountryController extends Controller
      */
     public function show(Country $country)
     {
-        $country->load(['destinations', 'attractions', 'hotels']);
+        $destinationsCount = DB::table('destinations')->where('country_id', $country->id)->count();
         
         return view('admin.countries.show', [
             'country' => $country,
+            'destinationsCount' => $destinationsCount,
         ]);
     }
 

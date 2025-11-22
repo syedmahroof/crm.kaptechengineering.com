@@ -255,7 +255,20 @@
                                 <div class="font-medium text-gray-900 dark:text-white">{{ $contact->name }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{{ $contact->email }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{{ $contact->phone ?? '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($contact->phone)
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-gray-500 dark:text-gray-400">{{ $contact->phone }}</span>
+                                        <a href="tel:{{ $contact->phone }}" 
+                                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 transition-colors" 
+                                           title="Click to call">
+                                            <i class="fas fa-phone mr-1"></i>Call
+                                        </a>
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($contact->contact_type)
                                     <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">

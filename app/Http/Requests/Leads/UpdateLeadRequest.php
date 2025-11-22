@@ -62,7 +62,12 @@ class UpdateLeadRequest extends FormRequest
             'lead_status_id' => 'nullable|exists:lead_statuses,id',
             'business_type_id' => 'nullable|exists:business_types,id',
             'branch_id' => 'nullable|exists:branches,id',
-            'project_id' => 'nullable|exists:projects,id',
+            'project_ids' => 'nullable|array',
+            'project_ids.*' => 'exists:projects,id',
+            'customer_ids' => 'nullable|array',
+            'customer_ids.*' => 'exists:customers,id',
+            'contact_ids' => 'nullable|array',
+            'contact_ids.*' => 'exists:contacts,id',
             'description' => 'nullable|string',
         ];
     }

@@ -14,10 +14,10 @@
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Notes</h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">Manage your personal notes</p>
         </div>
-        <button @click="showAddModal = true; formData = { title: '', content: '', category: '', is_pinned: false }" 
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <a href="{{ route('notes.create') }}" 
+           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             <i class="fas fa-plus mr-2"></i>New Note
-        </button>
+        </a>
     </div>
 
     <!-- Filters -->

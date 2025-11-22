@@ -21,10 +21,27 @@ class StoreLeadAction
             $products = $data['products'] ?? [];
             unset($data['products']);
             
+            // Extract entity IDs for polymorphic relationships
+            $projectIds = $data['project_ids'] ?? [];
+            $customerIds = $data['customer_ids'] ?? [];
+            $contactIds = $data['contact_ids'] ?? [];
+            unset($data['project_ids'], $data['customer_ids'], $data['contact_ids']);
+            
             $lead = Lead::create(array_merge($data, [
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
             ]));
+            
+            // Attach polymorphic relationships
+            if (!empty($projectIds)) {
+                $lead->projects()->attach($projectIds);
+            }
+            if (!empty($customerIds)) {
+                $lead->customers()->attach($customerIds);
+            }
+            if (!empty($contactIds)) {
+                $lead->contacts()->attach($contactIds);
+            }
             
             // If send_itinerary is true, only update timestamp (status update removed)
             if ($sendItinerary) {

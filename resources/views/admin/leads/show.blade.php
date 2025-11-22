@@ -16,45 +16,52 @@
 
 <div class="flex flex-col gap-6 rounded-xl">
     <!-- Lead Header -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 mb-6">
+    <div class="bg-white dark:bg-white rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-lg mb-6">
         <div class="flex justify-between items-center flex-wrap gap-4">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $lead->name }}</h1>
-                <div class="flex items-center space-x-3 flex-wrap">
-                    @php
-                        $status = $lead->lead_status->slug ?? $lead->status ?? 'new';
-                        $statusClasses = [
-                            'new' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-                            'hot_lead' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-                            'convert_this_week' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-                            'cold_lead' => 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
-                            'converted' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-                            'lost' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-                        ];
-                        $statusClass = $statusClasses[$status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
-                        $statusName = $lead->lead_status->name ?? ucwords(str_replace('_', ' ', $status));
-                    @endphp
-                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                        {{ $statusName }}
-                    </span>
-                    <span class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                        <i class="far fa-clock mr-1"></i>
-                        Created {{ $lead->created_at->diffForHumans() }}
-                    </span>
+            <div class="flex-1">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-100 rounded-xl flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-200">
+                        <i class="fas fa-user-tie text-3xl text-indigo-600 dark:text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-4xl font-bold text-gray-900 dark:text-gray-900 mb-2">{{ $lead->name }}</h1>
+                        <div class="flex items-center space-x-3 flex-wrap">
+                            @php
+                                $status = $lead->lead_status->slug ?? $lead->status ?? 'new';
+                                $statusClasses = [
+                                    'new' => 'bg-blue-100 text-blue-800 dark:bg-blue-100 dark:text-blue-800',
+                                    'hot_lead' => 'bg-red-100 text-red-800 dark:bg-red-100 dark:text-red-800',
+                                    'convert_this_week' => 'bg-amber-100 text-amber-800 dark:bg-amber-100 dark:text-amber-800',
+                                    'cold_lead' => 'bg-gray-100 text-gray-800 dark:bg-gray-100 dark:text-gray-800',
+                                    'converted' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-100 dark:text-emerald-800',
+                                    'lost' => 'bg-red-100 text-red-800 dark:bg-red-100 dark:text-red-800',
+                                ];
+                                $statusClass = $statusClasses[$status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-100 dark:text-gray-800';
+                                $statusName = $lead->lead_status->name ?? ucwords(str_replace('_', ' ', $status));
+                            @endphp
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
+                                {{ $statusName }}
+                            </span>
+                            <span class="text-sm text-gray-600 dark:text-gray-600 flex items-center">
+                                <i class="far fa-clock mr-1"></i>
+                                Created {{ $lead->created_at->diffForHumans() }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="flex space-x-3">
                 <button type="button"
                         onclick="openStatusModal()"
-                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 hover:border-blue-700 dark:bg-blue-500 dark:border-blue-500 dark:hover:bg-blue-400">
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 hover:border-blue-700 dark:bg-blue-600 dark:border-blue-600 dark:hover:bg-blue-700">
                     <i class="fas fa-arrows-rotate mr-2"></i>Update Status
                 </button>
                 <a href="{{ route('leads.edit', $lead->id) }}" 
-                   class="px-4 py-2 text-sm font-medium text-indigo-600 bg-white border border-indigo-600 rounded-lg hover:bg-indigo-50 dark:bg-gray-800 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-gray-700">
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 dark:bg-gray-100 dark:text-gray-700 dark:border-gray-300 dark:hover:bg-gray-200">
                     <i class="fas fa-pencil mr-2"></i>Edit
                 </a>
                 <a href="{{ route('leads.index') }}" 
-                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 dark:bg-gray-100 dark:text-gray-700 dark:border-gray-300 dark:hover:bg-gray-200">
                     <i class="fas fa-arrow-left mr-2"></i>Back
                 </a>
             </div>
@@ -65,27 +72,35 @@
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Lead Details Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Lead Details</h2>
+            <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <div class="flex items-center space-x-2 mb-6">
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-info-circle text-blue-600 dark:text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-900">Lead Details</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-500">Basic information about the lead</p>
+                    </div>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
-                        <p class="text-gray-900 dark:text-white mt-1 flex items-center">
+                        <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Email</label>
+                        <p class="text-gray-900 dark:text-gray-900 mt-1 flex items-center">
                             <i class="fas fa-envelope mr-2 text-gray-400"></i>
                             {{ $lead->email }}
                         </p>
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</label>
-                        <p class="text-gray-900 dark:text-white mt-1 flex items-center">
+                        <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Phone</label>
+                        <p class="text-gray-900 dark:text-gray-900 mt-1 flex items-center">
                             <i class="fas fa-phone mr-2 text-gray-400"></i>
                             {{ $lead->phone ?? 'N/A' }}
                         </p>
                     </div>
                     @if($lead->address)
                     <div>
-                        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Address</label>
-                        <p class="text-gray-900 dark:text-white mt-1 flex items-center">
+                        <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Address</label>
+                        <p class="text-gray-900 dark:text-gray-900 mt-1 flex items-center">
                             <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
                             {{ $lead->address }}
                         </p>
@@ -93,23 +108,23 @@
                     @endif
                     @if($lead->country)
                     <div>
-                        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Country</label>
-                        <p class="text-gray-900 dark:text-white mt-1">
+                        <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Country</label>
+                        <p class="text-gray-900 dark:text-gray-900 mt-1">
                             {{ $lead->country }}
                         </p>
                     </div>
                     @endif
                     @if($lead->lead_source)
                     <div>
-                        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Source</label>
-                        <p class="text-gray-900 dark:text-white mt-1">
+                        <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Source</label>
+                        <p class="text-gray-900 dark:text-gray-900 mt-1">
                             {{ $lead->lead_source->name }}
                         </p>
                     </div>
                     @endif
                     @if($lead->lead_priority)
                     <div>
-                        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Priority</label>
+                        <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Priority</label>
                         <span class="mt-1 inline-block px-3 py-1 text-xs font-semibold rounded-full" 
                               style="background-color: {{ $lead->lead_priority->color }}20; color: {{ $lead->lead_priority->color }}">
                             {{ $lead->lead_priority->name }}
@@ -118,38 +133,118 @@
                     @endif
                     @if($lead->business_type)
                     <div>
-                        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Business Type</label>
-                        <p class="text-gray-900 dark:text-white mt-1">
+                        <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Business Type</label>
+                        <p class="text-gray-900 dark:text-gray-900 mt-1">
                             {{ $lead->business_type->name }}
                         </p>
                     </div>
                     @endif
                     @if($lead->assigned_user)
                     <div>
-                        <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Assigned User</label>
-                        <p class="text-gray-900 dark:text-white mt-1">
+                        <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Assigned User</label>
+                        <p class="text-gray-900 dark:text-gray-900 mt-1">
                             {{ $lead->assigned_user->name ?? 'N/A' }}
                         </p>
                     </div>
                     @endif
                 </div>
                 @if($lead->description)
-                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Description</label>
-                    <p class="text-gray-900 dark:text-white mt-1">{{ $lead->description }}</p>
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-300">
+                    <label class="text-sm font-medium text-gray-500 dark:text-gray-500">Description</label>
+                    <p class="text-gray-900 dark:text-gray-900 mt-1">{{ $lead->description }}</p>
                 </div>
                 @endif
             </div>
 
+            <!-- Linked Entities Card -->
+            <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-indigo-600 dark:text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-900">Linked Entities</h2>
+                            <p class="text-xs text-gray-500 dark:text-gray-500">Projects, customers, and contacts associated with this lead</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('leads.edit', $lead->id) }}" 
+                       class="px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 dark:bg-indigo-50 dark:text-indigo-600 dark:border-indigo-200 dark:hover:bg-indigo-100 transition-colors">
+                        <i class="fas fa-edit mr-1"></i>Edit
+                    </a>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Projects -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-500 mb-2">
+                            <i class="fas fa-project-diagram mr-2 text-blue-500"></i>Projects
+                        </label>
+                        <div class="flex flex-wrap gap-2">
+                            @forelse($lead->projects as $project)
+                                <a href="{{ route('projects.show', $project->id) }}" 
+                                   class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-blue-100 text-blue-800 dark:bg-blue-100 dark:text-blue-800 hover:bg-blue-200 dark:hover:bg-blue-200 transition-colors shadow-sm">
+                                    <i class="fas fa-project-diagram mr-2"></i>{{ $project->name }}
+                                </a>
+                            @empty
+                                <span class="text-sm text-gray-400 dark:text-gray-400 italic">No projects linked</span>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Customers -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-500 mb-2">
+                            <i class="fas fa-users mr-2 text-green-500"></i>Customers
+                        </label>
+                        <div class="flex flex-wrap gap-2">
+                            @forelse($lead->customers as $customer)
+                                <span class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-green-100 text-green-800 dark:bg-green-100 dark:text-green-800 shadow-sm">
+                                    <i class="fas fa-users mr-2"></i>{{ $customer->name }}
+                                </span>
+                            @empty
+                                <span class="text-sm text-gray-400 dark:text-gray-400 italic">No customers linked</span>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Contacts -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-500 mb-2">
+                            <i class="fas fa-address-book mr-2 text-purple-500"></i>Contacts
+                        </label>
+                        <div class="flex flex-wrap gap-2">
+                            @forelse($lead->contacts as $contact)
+                                <a href="{{ route('admin.contacts.show', $contact->id) }}" 
+                                   class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-purple-100 text-purple-800 dark:bg-purple-100 dark:text-purple-800 hover:bg-purple-200 dark:hover:bg-purple-200 transition-colors shadow-sm">
+                                    <i class="fas fa-address-book mr-2"></i>{{ $contact->name }}
+                                    @if($contact->email)
+                                        <span class="ml-2 text-xs opacity-75">({{ $contact->email }})</span>
+                                    @endif
+                                </a>
+                            @empty
+                                <span class="text-sm text-gray-400 dark:text-gray-400 italic">No contacts linked</span>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Products Section -->
             @if($lead->leadProducts && $lead->leadProducts->count() > 0)
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <i class="fas fa-box mr-2 text-indigo-600"></i>Products
-                </h2>
+            <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <div class="flex items-center space-x-2 mb-6">
+                    <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-box text-indigo-600 dark:text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-900">Products</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-500">Products associated with this lead</p>
+                    </div>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-100">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
@@ -158,48 +253,48 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Notes</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody class="bg-white dark:bg-white divide-y divide-gray-200 dark:divide-gray-300">
                             @foreach($lead->leadProducts as $leadProduct)
                             <tr>
                                 <td class="px-4 py-3 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-900">
                                         {{ $leadProduct->product->name ?? 'N/A' }}
                                     </div>
                                     @if($leadProduct->product && $leadProduct->product->sku)
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    <div class="text-xs text-gray-500 dark:text-gray-500">
                                         SKU: {{ $leadProduct->product->sku }}
                                     </div>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-900">
                                     {{ $leadProduct->quantity }}
                                 </td>
-                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-900">
                                     @if($leadProduct->unit_price)
                                         {{ number_format($leadProduct->unit_price, 2) }}
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-900">
                                     @if($leadProduct->total_price)
                                         {{ number_format($leadProduct->total_price, 2) }}
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-500">
                                     {{ $leadProduct->notes ?? '-' }}
                                 </td>
                             </tr>
                             @endforeach
                         </tbody>
-                        <tfoot class="bg-gray-50 dark:bg-gray-700">
+                        <tfoot class="bg-gray-50 dark:bg-gray-100">
                             <tr>
-                                <td colspan="3" class="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white">
+                                <td colspan="3" class="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-gray-900">
                                     Grand Total:
                                 </td>
-                                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-indigo-600 dark:text-indigo-600">
                                     {{ number_format($lead->leadProducts->sum('total_price'), 2) }}
                                 </td>
                                 <td></td>
@@ -211,11 +306,17 @@
             @endif
 
             <!-- Lead Notes -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-                        <i class="fas fa-sticky-note mr-2 text-blue-600"></i>Notes
-                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-sticky-note text-blue-600 dark:text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-900">Notes</h2>
+                            <p class="text-xs text-gray-500 dark:text-gray-500">Add and view notes for this lead</p>
+                        </div>
+                    </div>
                     <button onclick="document.getElementById('noteForm').classList.toggle('hidden')" 
                             class="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400">
                         <i class="fas fa-plus mr-1"></i>Add Note
@@ -226,11 +327,11 @@
                 <form id="noteForm" class="hidden mb-4" onsubmit="addNote(event)">
                     @csrf
                     <textarea name="content" rows="3" required 
-                              class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white mb-2" 
+                              class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:text-gray-900 mb-2" 
                               placeholder="Add a note..."></textarea>
                     <div class="flex justify-end">
                         <button type="button" onclick="document.getElementById('noteForm').classList.add('hidden')" 
-                                class="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 mr-2">Cancel</button>
+                                class="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-600 mr-2">Cancel</button>
                         <button type="submit" 
                                 class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
                             Save Note
@@ -241,32 +342,38 @@
                 <!-- Notes List -->
                 <div class="space-y-3" id="notesContainer">
                     @forelse(($lead->notes ?? collect([])) as $note)
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div class="border border-gray-200 dark:border-gray-300 rounded-lg p-4 bg-white dark:bg-white">
                             <div class="flex items-start justify-between mb-2">
                                 <div class="flex items-center space-x-2">
                                     <i class="fas fa-user-circle text-gray-400"></i>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                    <span class="text-sm font-medium text-gray-900 dark:text-gray-900">
                                         {{ $note->creator->name ?? 'Unknown' }}
                                     </span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                    <span class="text-xs text-gray-500 dark:text-gray-500">
                                         {{ $note->created_at->diffForHumans() }}
                                     </span>
                                 </div>
                             </div>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $note->content }}</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-700 whitespace-pre-wrap">{{ $note->content }}</p>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No notes yet. Add one to get started!</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-500 text-center py-4">No notes yet. Add one to get started!</p>
                     @endforelse
                 </div>
             </div>
 
             <!-- Lead Follow-ups -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-                        <i class="fas fa-calendar-check mr-2 text-green-600"></i>Follow-ups
-                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-green-100 dark:bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-green-600 dark:text-green-600"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-900">Follow-ups</h2>
+                            <p class="text-xs text-gray-500 dark:text-gray-500">Scheduled follow-up activities</p>
+                        </div>
+                    </div>
                     <button onclick="document.getElementById('followUpForm').classList.toggle('hidden')" 
                             class="px-3 py-1.5 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400">
                         <i class="fas fa-plus mr-1"></i>Schedule Follow-up
@@ -278,15 +385,15 @@
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Title</label>
                             <input type="text" name="title" required 
-                                   class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" 
+                                   class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:text-gray-900" 
                                    placeholder="Follow-up title">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Type</label>
                             <select name="type" required 
-                                    class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                    class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:text-gray-900">
                                 <option value="call">Phone Call</option>
                                 <option value="email">Email</option>
                                 <option value="meeting">Meeting</option>
@@ -295,14 +402,14 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scheduled Date & Time</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Scheduled Date & Time</label>
                             <input type="datetime-local" name="scheduled_at" required 
-                                   class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                   class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:text-gray-900">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Status</label>
                             <select name="status" required 
-                                    class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                    class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:text-gray-900">
                                 <option value="scheduled">Scheduled</option>
                                 <option value="completed">Completed</option>
                                 <option value="canceled">Canceled</option>
@@ -310,14 +417,14 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Description</label>
                         <textarea name="description" rows="2" 
-                                  class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" 
+                                  class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:text-gray-900" 
                                   placeholder="Follow-up description"></textarea>
                     </div>
                     <div class="flex justify-end">
                         <button type="button" onclick="document.getElementById('followUpForm').classList.add('hidden')" 
-                                class="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 mr-2">Cancel</button>
+                                class="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-600 mr-2">Cancel</button>
                         <button type="submit" 
                                 class="px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
                             Schedule Follow-up
@@ -328,35 +435,35 @@
                 <!-- Follow-ups List -->
                 <div class="space-y-3" id="followUpsContainer">
                     @forelse(($lead->follow_ups ?? collect([]))->sortByDesc('scheduled_at') as $followUp)
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div class="border border-gray-200 dark:border-gray-300 rounded-lg p-4 bg-white dark:bg-white">
                             <div class="flex items-start justify-between mb-2">
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2 mb-1">
-                                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">{{ $followUp->title }}</h3>
+                                        <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-900">{{ $followUp->title }}</h3>
                                         <span class="px-2 py-0.5 text-xs rounded-full 
-                                            {{ $followUp->status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 
-                                               ($followUp->status === 'canceled' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 
-                                               'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300') }}">
+                                            {{ $followUp->status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-100 dark:text-green-800' : 
+                                               ($followUp->status === 'canceled' ? 'bg-red-100 text-red-800 dark:bg-red-100 dark:text-red-800' : 
+                                               'bg-blue-100 text-blue-800 dark:bg-blue-100 dark:text-blue-800') }}">
                                             {{ ucfirst($followUp->status) }}
                                         </span>
-                                        <span class="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                                        <span class="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700 dark:bg-gray-100 dark:text-gray-700">
                                             {{ \App\Models\LeadFollowUp::getTypes()[$followUp->type] ?? ucfirst($followUp->type) }}
                                         </span>
                                     </div>
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-500">
                                         <span><i class="fas fa-clock mr-1"></i>{{ $followUp->scheduled_at->format('M d, Y h:i A') }}</span>
                                         @if($followUp->creator)
                                             <span><i class="fas fa-user mr-1"></i>{{ $followUp->creator->name }}</span>
                                         @endif
                                     </div>
                                     @if($followUp->description)
-                                        <p class="text-sm text-gray-700 dark:text-gray-300 mt-2">{{ $followUp->description }}</p>
+                                        <p class="text-sm text-gray-700 dark:text-gray-700 mt-2">{{ $followUp->description }}</p>
                                     @endif
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No follow-ups scheduled. Schedule one to track your interactions!</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-500 text-center py-4">No follow-ups scheduled. Schedule one to track your interactions!</p>
                     @endforelse
                 </div>
             </div>
@@ -365,27 +472,43 @@
         <!-- Sidebar -->
         <div class="space-y-6">
             <!-- Quick Stats -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Stats</h3>
+            <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-purple-600 dark:text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900">Quick Stats</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-500">Lead statistics at a glance</p>
+                    </div>
+                </div>
                 <div class="space-y-3">
                     <div class="flex justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Persons</span>
-                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $lead->persons_count ?? 0 }}</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-500">Persons</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-gray-900">{{ $lead->persons_count ?? 0 }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Follow-ups</span>
-                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $lead->follow_ups_count ?? 0 }}</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-500">Follow-ups</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-gray-900">{{ $lead->follow_ups_count ?? 0 }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Notes</span>
-                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $lead->notes_count ?? 0 }}</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-500">Notes</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-gray-900">{{ $lead->notes_count ?? 0 }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Actions -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Actions</h3>
+            <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="w-10 h-10 bg-orange-100 dark:bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-bolt text-orange-600 dark:text-orange-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900">Actions</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-500">Quick actions for this lead</p>
+                    </div>
+                </div>
                 <div class="space-y-2">
                     <form action="{{ route('leads.destroy', $lead->id) }}" method="POST" data-confirm="Are you sure you want to delete this lead?">
                         @csrf
@@ -400,9 +523,9 @@
     </div>
 
     <!-- Lead Files/Media - Full Width -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6">
+    <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 shadow-sm">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-900 flex items-center">
                 <i class="fas fa-file-upload mr-2 text-purple-600"></i>Files & Media
             </h2>
             <button onclick="document.getElementById('fileUploadForm').classList.toggle('hidden')" 
@@ -416,16 +539,16 @@
             @csrf
             <div class="space-y-3">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select File</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Select File</label>
                     <input type="file" name="file" id="fileInput" required 
-                           class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                           class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:text-gray-900"
                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.zip,.rar">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Max file size: 10MB. Supported: PDF, DOC, DOCX, Images, ZIP, RAR</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Max file size: 10MB. Supported: PDF, DOC, DOCX, Images, ZIP, RAR</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description / Notes</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Description / Notes</label>
                     <textarea name="description" id="fileDescription" rows="3" 
-                              class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white" 
+                              class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:text-gray-900" 
                               placeholder="Add a description or notes about this file (e.g., 'Passport copy', 'Flight ticket confirmation', etc.)"></textarea>
                 </div>
                 <div class="flex justify-end">
@@ -496,28 +619,28 @@
                     </div>
                 </div>
             @empty
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-8">No files uploaded yet. Upload passport copies, tickets, or other documents here!</p>
+                <p class="text-sm text-gray-500 dark:text-gray-500 text-center py-8">No files uploaded yet. Upload passport copies, tickets, or other documents here!</p>
             @endforelse
         </div>
     </div>
 
     <!-- Comprehensive Activity Timeline -->
     @if(isset($timelineItems) && $timelineItems->count() > 0)
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6" x-data="{ open: true }">
+    <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 shadow-sm" x-data="{ open: true }">
         <button @click="open = !open" class="w-full flex items-center justify-between text-left mb-4">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-900 flex items-center">
                 <i class="fas fa-history mr-2 text-blue-600"></i>Activity Timeline
-                <span class="ml-3 px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">
+                <span class="ml-3 px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-100 dark:text-blue-800 rounded-full">
                     {{ $timelineItems->count() }}
                 </span>
             </h2>
-            <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+            <i class="fas fa-chevron-down text-gray-500 dark:text-gray-500 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
         </button>
         
         <div x-show="open" x-collapse>
             <div class="relative">
                 <!-- Timeline Line -->
-                <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+                <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-300"></div>
                 
                 <div class="space-y-6">
                     @php
@@ -533,8 +656,8 @@
                         @if($showDateHeader)
                             <div class="relative flex items-center mb-4">
                                 <div class="flex-shrink-0 w-12 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
-                                <div class="px-4 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                    <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">
+                                <div class="px-4 py-1 bg-gray-100 dark:bg-gray-100 rounded-lg">
+                                    <span class="text-xs font-semibold text-gray-600 dark:text-gray-600">
                                         @if($item->created_at->isToday())
                                             Today
                                         @elseif($item->created_at->isYesterday())
@@ -605,10 +728,10 @@
                             
                             <!-- Timeline Content -->
                             <div class="flex-1 min-w-0 pb-6">
-                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                                <div class="bg-gray-50 dark:bg-white rounded-lg p-4 border border-gray-200 dark:border-gray-300">
                                     <div class="flex items-start justify-between mb-2">
                                         <div class="flex-1">
-                                            <p class="text-sm text-gray-900 dark:text-white">
+                                            <p class="text-sm text-gray-900 dark:text-gray-900">
                                                 <span class="font-medium">{{ $item->user->name ?? 'System' }}</span>
                                                 
                                                 @if($item->type === 'follow_up')
@@ -658,7 +781,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">
                                         <i class="far fa-clock mr-1"></i>{{ $item->created_at->diffForHumans() }}
                                     </p>
                                 </div>
@@ -679,8 +802,8 @@
                     <i class="fas fa-chart-line text-indigo-600 dark:text-indigo-400 text-xl"></i>
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">View Comprehensive Analytics</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Get detailed insights on lost reasons and performance metrics</p>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900">View Comprehensive Analytics</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-600">Get detailed insights on lost reasons and performance metrics</p>
                 </div>
             </div>
             <a href="{{ route('leads.analytics') }}" 
@@ -692,12 +815,12 @@
 
     <!-- Lead Analytics - Full Width (Hidden - moved to dedicated page) -->
     @if(false && isset($analytics))
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6" x-data="{ activeTab: 'overview' }">
+    <div class="bg-white dark:bg-white rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 shadow-sm" x-data="{ activeTab: 'overview' }">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-900 flex items-center">
                 <i class="fas fa-chart-line mr-2 text-indigo-600"></i>Lead Analytics
             </h2>
-            <div class="flex flex-wrap gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <div class="flex flex-wrap gap-2 bg-gray-100 dark:bg-gray-100 rounded-lg p-1">
                 <button @click="activeTab = 'overview'" 
                         :class="activeTab === 'overview' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-600 dark:text-gray-300'"
                         class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium rounded-md transition-all">
@@ -787,7 +910,7 @@
             <!-- Status Distribution -->
             @if($analytics['status_distribution']->count() > 0)
             <div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-5">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Status Distribution</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900 mb-4">Status Distribution</h3>
                 <div class="space-y-3">
                     @foreach($analytics['status_distribution'] as $statusItem)
                         @php
@@ -804,11 +927,11 @@
                                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $statusName }}</span>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ number_format($statusCount) }}</span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">({{ $percentage }}%)</span>
+                                    <span class="text-sm font-semibold text-gray-900 dark:text-gray-900">{{ number_format($statusCount) }}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-500">({{ $percentage }}%)</span>
                                 </div>
                             </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div class="w-full bg-gray-200 dark:bg-gray-200 rounded-full h-2">
                                 <div class="h-2 rounded-full transition-all duration-300" 
                                      style="background-color: {{ $statusColor }}; width: {{ $percentage }}%"></div>
                             </div>
@@ -827,8 +950,8 @@
                         <i class="fas fa-chart-pie text-red-600 dark:text-red-400 text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Lost Reason Analytics</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Understand why leads are being lost to improve your conversion strategy</p>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900">Lost Reason Analytics</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-600">Understand why leads are being lost to improve your conversion strategy</p>
                     </div>
                 </div>
             </div>
@@ -846,14 +969,14 @@
                             $reasonIcon = $reasonItem['icon'] ?? 'fa-exclamation-triangle';
                             $reasonColor = $reasonItem['color'] ?? '#ef4444';
                         @endphp
-                        <div class="bg-white dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-shadow">
+                        <div class="bg-white dark:bg-white rounded-lg p-5 border border-gray-200 dark:border-gray-300 hover:shadow-lg transition-shadow">
                             <div class="flex items-start justify-between mb-3">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ $reasonColor }}20;">
                                         <i class="fas {{ $reasonIcon }} text-lg" style="color: {{ $reasonColor }}"></i>
                                     </div>
                                     <div>
-                                        <h4 class="font-semibold text-gray-900 dark:text-white">{{ $reasonName }}</h4>
+                                        <h4 class="font-semibold text-gray-900 dark:text-gray-900">{{ $reasonName }}</h4>
                                         <p class="text-2xl font-bold mt-1" style="color: {{ $reasonColor }}">
                                             {{ number_format($reasonCount) }}
                                         </p>
@@ -870,7 +993,7 @@
             @else
                 <div class="text-center py-12">
                     <i class="fas fa-chart-pie text-gray-300 dark:text-gray-600 text-5xl mb-4"></i>
-                    <p class="text-gray-500 dark:text-gray-400">No lost reason data available yet</p>
+                    <p class="text-gray-500 dark:text-gray-500">No lost reason data available yet</p>
                 </div>
             @endif
         </div>
@@ -880,7 +1003,7 @@
             <!-- Source Performance -->
             @if($analytics['source_performance']->count() > 0)
             <div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-5">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900 mb-4 flex items-center">
                     <i class="fas fa-funnel-dollar mr-2 text-blue-600"></i>Lead Source Performance
                 </h3>
                 <div class="space-y-3">
@@ -894,10 +1017,10 @@
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $sourceName }}</span>
                             <div class="flex items-center space-x-3">
-                                <div class="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="w-32 bg-gray-200 dark:bg-gray-200 rounded-full h-2">
                                     <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $percentage }}%"></div>
                                 </div>
-                                <span class="text-sm font-semibold text-gray-900 dark:text-white w-16 text-right">
+                                <span class="text-sm font-semibold text-gray-900 dark:text-gray-900 w-16 text-right">
                                     {{ number_format($sourceCount) }}
                                 </span>
                             </div>
@@ -910,7 +1033,7 @@
             <!-- Agent Performance -->
             @if($analytics['agent_performance']->count() > 0)
             <div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-5">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900 mb-4 flex items-center">
                     <i class="fas fa-user-tie mr-2 text-green-600"></i>Agent Performance
                 </h3>
                 <div class="space-y-4">
@@ -923,12 +1046,12 @@
                         @endphp
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="font-medium text-gray-900 dark:text-white">{{ $agentName }}</span>
+                                <span class="font-medium text-gray-900 dark:text-gray-900">{{ $agentName }}</span>
                                 <span class="text-sm font-semibold text-green-600 dark:text-green-400">
                                     {{ $agentConversionRate }}% conversion
                                 </span>
                             </div>
-                            <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                            <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-600">
                                 <span><i class="fas fa-users mr-1"></i>{{ $agentTotal }} total</span>
                                 <span><i class="fas fa-check-circle mr-1"></i>{{ $agentConverted }} converted</span>
                             </div>
@@ -944,7 +1067,7 @@
             <!-- Priority Distribution -->
             @if($analytics['priority_distribution']->count() > 0)
             <div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-5">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900 mb-4 flex items-center">
                     <i class="fas fa-flag mr-2 text-yellow-600"></i>Priority Distribution
                 </h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -978,8 +1101,8 @@
         <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Update Lead Status</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Choose a status that reflects the current stage of this lead.</p>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-900">Update Lead Status</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-500">Choose a status that reflects the current stage of this lead.</p>
                 </div>
                 <button type="button" onclick="closeStatusModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                     <i class="fas fa-times text-lg"></i>
@@ -1002,9 +1125,9 @@
                                 <i class="fas {{ $icon }} text-lg" style="color: {{ $statusOption->color ?? '#2563eb' }}"></i>
                             </div>
                             <div class="text-left">
-                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $statusOption->name }}</p>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-gray-900">{{ $statusOption->name }}</p>
                                 @if($statusOption->description)
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $statusOption->description }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ $statusOption->description }}</p>
                                 @endif
                             </div>
                         </button>
@@ -1013,9 +1136,9 @@
 
                 <div id="lostFields" class="space-y-4 hidden">
                     <div>
-                        <label for="loss_reason_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Loss Reason</label>
+                        <label for="loss_reason_id" class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Loss Reason</label>
                         <select id="loss_reason_id" name="loss_reason_id"
-                                class="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                                class="w-full px-3 py-2 border rounded-lg dark:bg-white dark:border-gray-300 dark:text-gray-900">
                             <option value="">Select a reason...</option>
                             @foreach($lossReasons as $reason)
                                 <option value="{{ $reason->id }}">{{ $reason->name }}</option>
@@ -1023,7 +1146,7 @@
                         </select>
                     </div>
                     <div>
-                        <label for="loss_remarks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remarks</label>
+                        <label for="loss_remarks" class="block text-sm font-medium text-gray-700 dark:text-gray-700 mb-1">Remarks</label>
                         <textarea id="loss_remarks" name="loss_remarks" rows="3"
                                   class="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                                   placeholder="Add a short note to explain why the lead was lost..."></textarea>
@@ -1258,42 +1381,80 @@
         const formData = new FormData(form);
         const content = formData.get('content');
         
+        if (!content || !content.trim()) {
+            alert('Please enter a note before saving.');
+            return;
+        }
+        
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+        
+        // Disable submit button to prevent double submission
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+        
         try {
-            const response = await fetch(`/api/leads/{{ $lead->id }}/notes`, {
+            const response = await fetch('{{ route("leads.notes.store", $lead->id) }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({ content })
+                body: JSON.stringify({ content: content.trim() })
             });
             
-            const note = await response.json();
-            if (response.ok) {
+            const data = await response.json();
+            
+            if (response.ok && data) {
                 // Add note to container
                 const container = document.getElementById('notesContainer');
+                
+                // Remove empty message if exists
+                const emptyMessage = container.querySelector('p.text-center');
+                if (emptyMessage) {
+                    emptyMessage.remove();
+                }
+                
+                const creatorName = data.creator?.name || '{{ auth()->user()->name }}';
                 const noteHtml = `
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <div class="border border-gray-200 dark:border-gray-300 rounded-lg p-4 bg-white dark:bg-white">
                         <div class="flex items-start justify-between mb-2">
                             <div class="flex items-center space-x-2">
                                 <i class="fas fa-user-circle text-gray-400"></i>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">${note.creator.name}</span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">Just now</span>
+                                <span class="text-sm font-medium text-gray-900 dark:text-gray-900">${escapeHtml(creatorName)}</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-500">Just now</span>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">${content}</p>
+                        <p class="text-sm text-gray-700 dark:text-gray-700 whitespace-pre-wrap">${escapeHtml(content.trim())}</p>
                     </div>
                 `;
                 container.insertAdjacentHTML('afterbegin', noteHtml);
                 form.reset();
                 form.classList.add('hidden');
             } else {
-                alert('Failed to add note. Please try again.');
+                const errorMessage = data.message || data.error || (data.errors?.content ? data.errors.content[0] : 'Failed to add note. Please try again.');
+                alert(errorMessage);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to add note. Please try again.');
+            alert('Failed to add note. Please check your connection and try again.');
+        } finally {
+            // Re-enable submit button
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
         }
+    }
+    
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
     
     async function addFollowUp(event) {

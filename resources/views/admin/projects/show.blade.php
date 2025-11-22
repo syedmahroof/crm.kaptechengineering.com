@@ -28,13 +28,19 @@
                         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $project->name }}</h1>
                         @if($project->project_type)
                             <span class="inline-block mt-1 px-3 py-1 text-sm font-medium rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                                <i class="fas fa-tag mr-1"></i>{{ $projectTypes[$project->project_type] ?? $project->project_type }}
+                                <i class="fas fa-tag mr-1"></i>{{ $project->project_type }}
                             </span>
                         @endif
                     </div>
                 </div>
                 @if($project->description)
                     <p class="text-gray-600 dark:text-gray-300 mt-2 max-w-3xl">{{ $project->description }}</p>
+                @endif
+                @if($project->address)
+                    <div class="mt-3 flex items-start">
+                        <i class="fas fa-map-marker-alt text-gray-400 mr-2 mt-1"></i>
+                        <p class="text-gray-600 dark:text-gray-300 max-w-3xl">{{ $project->address }}</p>
+                    </div>
                 @endif
             </div>
             <div class="flex items-center space-x-3">
@@ -128,6 +134,15 @@
                             <p class="text-gray-900 dark:text-white font-medium">{{ $project->user->name ?? 'N/A' }}</p>
                         </div>
                         
+                        @if($project->address)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>Address
+                            </label>
+                            <p class="text-gray-900 dark:text-white font-medium whitespace-pre-line">{{ $project->address }}</p>
+                        </div>
+                        @endif
+                        
                         @if($project->start_date)
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
@@ -187,7 +202,7 @@
                     <div x-show="showForm" x-collapse class="mt-4">
                         <form id="quickAddVisitReportForm" action="{{ route('visit-reports.store') }}" method="POST">
                             @csrf
-                            <input type="hidden" name="project_id" value="{{ $project->id }}">
+                            <input type="hidden" name="project_ids[]" value="{{ $project->id }}">
                             <input type="hidden" name="redirect_to" value="{{ route('projects.show', $project->id) }}">
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -419,12 +434,23 @@
                                         @endif
                                     </div>
                                     <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ $projectContact->role_label }}</p>
-                                    <div class="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                    <div class="flex flex-wrap gap-2 items-center text-xs">
                                         @if($projectContact->phone)
-                                            <span><i class="fas fa-phone mr-1"></i>{{ $projectContact->phone }}</span>
+                                            <div class="flex items-center space-x-2">
+                                                <a href="tel:{{ $projectContact->phone }}" class="text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400">
+                                                    <i class="fas fa-phone mr-1"></i>{{ $projectContact->phone }}
+                                                </a>
+                                                <a href="tel:{{ $projectContact->phone }}" 
+                                                   class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 transition-colors" 
+                                                   title="Click to call">
+                                                    <i class="fas fa-phone mr-1"></i>Call
+                                                </a>
+                                            </div>
                                         @endif
                                         @if($projectContact->email)
-                                            <span><i class="fas fa-envelope mr-1"></i>{{ Str::limit($projectContact->email, 20) }}</span>
+                                            <a href="mailto:{{ $projectContact->email }}" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                                                <i class="fas fa-envelope mr-1"></i>{{ Str::limit($projectContact->email, 20) }}
+                                            </a>
                                         @endif
                                     </div>
                                 </div>

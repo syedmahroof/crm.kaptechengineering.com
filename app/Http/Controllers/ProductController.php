@@ -184,11 +184,11 @@ class ProductController extends Controller
 
         // Products by category
         $productsByCategory = (clone $baseQuery)
-            ->select('category', \DB::raw('COUNT(*) as total'))
+            ->select('category', \DB::raw('COUNT(*) as count'))
             ->where('is_active', 1)
             ->whereNotNull('category')
             ->groupBy('category')
-            ->orderByDesc('total')
+            ->orderByDesc('count')
             ->get();
 
         // Total value by category

@@ -78,16 +78,8 @@ class RolesController extends Controller
                 $category = 'Tasks';
             } elseif (stripos($permission->name, 'customer') !== false) {
                 $category = 'Customers';
-            } elseif (stripos($permission->name, 'itinerary') !== false) {
-                $category = 'Itineraries';
             } elseif (stripos($permission->name, 'destination') !== false) {
                 $category = 'Destinations';
-            } elseif (stripos($permission->name, 'attraction') !== false) {
-                $category = 'Attractions';
-            } elseif (stripos($permission->name, 'hotel') !== false) {
-                $category = 'Hotels';
-            } elseif (stripos($permission->name, 'blog') !== false) {
-                $category = 'Blogs';
             } elseif (stripos($permission->name, 'testimonial') !== false) {
                 $category = 'Testimonials';
             } elseif (stripos($permission->name, 'faq') !== false) {
@@ -200,16 +192,8 @@ class RolesController extends Controller
                 $category = 'Tasks';
             } elseif (stripos($permission->name, 'customer') !== false) {
                 $category = 'Customers';
-            } elseif (stripos($permission->name, 'itinerary') !== false) {
-                $category = 'Itineraries';
             } elseif (stripos($permission->name, 'destination') !== false) {
                 $category = 'Destinations';
-            } elseif (stripos($permission->name, 'attraction') !== false) {
-                $category = 'Attractions';
-            } elseif (stripos($permission->name, 'hotel') !== false) {
-                $category = 'Hotels';
-            } elseif (stripos($permission->name, 'blog') !== false) {
-                $category = 'Blogs';
             } elseif (stripos($permission->name, 'testimonial') !== false) {
                 $category = 'Testimonials';
             } elseif (stripos($permission->name, 'faq') !== false) {

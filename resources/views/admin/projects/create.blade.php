@@ -34,9 +34,18 @@
                     @enderror
                 </div>
 
+                <div class="md:col-span-2">
+                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
+                    <textarea name="address" id="address" rows="2"
+                              class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">{{ old('address') }}</textarea>
+                    @error('address')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div>
-                    <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Owner *</label>
-                    <select name="user_id" id="user_id" required
+                    <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Owner</label>
+                    <select name="user_id" id="user_id"
                             class="mt-1 block w-full px-3 py-2 border rounded-md {{ $errors->has('user_id') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} dark:bg-gray-700 dark:text-white">
                         <option value="">Select a user...</option>
                         @foreach($users as $user)
@@ -53,8 +62,8 @@
                     <select name="project_type" id="project_type"
                             class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                         <option value="">Select a type...</option>
-                        @foreach(\App\Models\Project::getProjectTypes() as $key => $label)
-                            <option value="{{ $key }}" {{ old('project_type') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @foreach($projectTypes as $type)
+                            <option value="{{ $type->name }}" {{ old('project_type') == $type->name ? 'selected' : '' }}>{{ $type->name }}</option>
                         @endforeach
                     </select>
                 </div>

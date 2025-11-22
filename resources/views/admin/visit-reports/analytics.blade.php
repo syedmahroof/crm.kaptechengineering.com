@@ -242,9 +242,13 @@
                                 {{ $visit->visit_date->format('M d, Y') }}
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                <a href="{{ route('projects.show', $visit->project_id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400">
-                                    {{ $visit->project->name ?? 'N/A' }}
-                                </a>
+                                @if($visit->project)
+                                    <a href="{{ route('projects.show', $visit->project->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400">
+                                        {{ $visit->project->name }}
+                                    </a>
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">N/A</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                 {{ Str::limit($visit->objective, 50) }}

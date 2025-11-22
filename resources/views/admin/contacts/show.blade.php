@@ -73,17 +73,24 @@
         </div>
         <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
             <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</p>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Phone</p>
                     @if($contact->phone)
-                        <a href="tel:{{ $contact->phone }}" class="text-green-600 hover:text-green-900 dark:text-green-400 font-medium mt-1 block">
-                            {{ $contact->phone }}
-                        </a>
+                        <div class="flex items-center space-x-3">
+                            <a href="tel:{{ $contact->phone }}" class="text-green-600 hover:text-green-900 dark:text-green-400 font-medium">
+                                {{ $contact->phone }}
+                            </a>
+                            <a href="tel:{{ $contact->phone }}" 
+                               class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 transition-colors shadow-sm" 
+                               title="Click to call">
+                                <i class="fas fa-phone mr-2"></i>Call Now
+                            </a>
+                        </div>
                     @else
-                        <p class="text-gray-400 mt-1">-</p>
+                        <p class="text-gray-400">-</p>
                     @endif
                 </div>
-                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center ml-4">
                     <i class="fas fa-phone text-green-600 dark:text-green-400"></i>
                 </div>
             </div>
@@ -149,9 +156,16 @@
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
                                 <i class="fas fa-phone mr-2 text-gray-400"></i>Phone Number
                             </label>
-                            <a href="tel:{{ $contact->phone }}" class="text-green-600 hover:text-green-900 dark:text-green-400 font-medium">
-                                {{ $contact->phone }}
-                            </a>
+                            <div class="flex items-center space-x-3">
+                                <a href="tel:{{ $contact->phone }}" class="text-green-600 hover:text-green-900 dark:text-green-400 font-medium">
+                                    {{ $contact->phone }}
+                                </a>
+                                <a href="tel:{{ $contact->phone }}" 
+                                   class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 transition-colors" 
+                                   title="Click to call">
+                                    <i class="fas fa-phone mr-1"></i>Call
+                                </a>
+                            </div>
                         </div>
                         @endif
 

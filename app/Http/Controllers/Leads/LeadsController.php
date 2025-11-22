@@ -28,7 +28,7 @@ class LeadsController
     {
         $this->authorize('viewAny', Lead::class);
         
-        $query = Lead::with(['lead_source', 'lead_priority', 'assigned_user', 'lead_status', 'business_type']);
+        $query = Lead::with(['lead_source', 'lead_priority', 'assigned_user', 'lead_status', 'business_type', 'projects', 'customers', 'contacts']);
         
         // Apply visibility rules based on user role
         $user = Auth::user();
@@ -236,6 +236,8 @@ class LeadsController
         
         $branches = \App\Models\Branch::where('is_active', true)->orderBy('name')->get();
         $projects = \App\Models\Project::orderBy('name')->get();
+        $customers = \App\Models\Customer::orderBy('first_name')->orderBy('last_name')->get();
+        $contacts = \App\Models\Contact::orderBy('name')->get();
         $products = \App\Models\Product::where('is_active', true)->orderBy('name')->get();
 
         return view('admin.leads.create', [
@@ -249,6 +251,8 @@ class LeadsController
             'indiaStates' => $indiaStates,
             'branches' => $branches,
             'projects' => $projects,
+            'customers' => $customers,
+            'contacts' => $contacts,
             'products' => $products,
         ]);
     }
@@ -293,6 +297,9 @@ class LeadsController
             'notes.creator',
             'leadProducts.product',
             'files.user',
+            'projects',
+            'customers',
+            'contacts',
         ])->loadCount([
             'persons',
             'follow_ups',
@@ -418,6 +425,11 @@ class LeadsController
         $states = \App\Models\State::with('country')->orderBy('name')->get();
         $branches = \App\Models\Branch::where('is_active', true)->orderBy('name')->get();
         $projects = \App\Models\Project::orderBy('name')->get();
+        $customers = \App\Models\Customer::orderBy('first_name')->orderBy('last_name')->get();
+        $contacts = \App\Models\Contact::orderBy('name')->get();
+        
+        // Load existing relationships
+        $lead->load(['projects', 'customers', 'contacts']);
 
         return view('admin.leads.edit', [
             'lead' => $lead,
@@ -430,16 +442,29 @@ class LeadsController
             'states' => $states,
             'branches' => $branches,
             'projects' => $projects,
+            'customers' => $customers,
+            'contacts' => $contacts,
         ]);
     }
 
     public function update(UpdateLeadRequest $request, Lead $lead)
     {
         $validated = $request->validated();
+        
+        // Extract entity IDs for polymorphic relationships
+        $projectIds = $validated['project_ids'] ?? [];
+        $customerIds = $validated['customer_ids'] ?? [];
+        $contactIds = $validated['contact_ids'] ?? [];
+        unset($validated['project_ids'], $validated['customer_ids'], $validated['contact_ids']);
 
         $lead->update(array_merge($validated, [
             'updated_by' => Auth::id(),
         ]));
+        
+        // Sync polymorphic relationships
+        $lead->projects()->sync($projectIds);
+        $lead->customers()->sync($customerIds);
+        $lead->contacts()->sync($contactIds);
 
         return redirect()->route('leads.show', $lead)
             ->with('success', 'Lead updated successfully.');
@@ -505,15 +530,29 @@ class LeadsController
     {
         $this->authorize('update', $lead);
 
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ]);
+        try {
+            $validated = $request->validate([
+                'content' => 'required|string|max:10000',
+            ]);
 
-        $note = $lead->notes()->create(array_merge($validated, [
-            'created_by' => Auth::id(),
-        ]));
+            $note = $lead->notes()->create([
+                'content' => $validated['content'],
+                'created_by' => Auth::id(),
+            ]);
 
-        return response()->json($note->load('creator'));
+            return response()->json($note->load('creator'), 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error storing note: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to create note. Please try again.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function convert(Lead $lead)

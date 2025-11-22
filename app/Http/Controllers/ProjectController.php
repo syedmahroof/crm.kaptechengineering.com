@@ -16,11 +16,23 @@ class ProjectController extends Controller
         
         // Get total project count and counts by type
         $totalProjects = Project::count();
-        $projectTypeCounts = Project::selectRaw('project_type, COUNT(*) as count')
+        
+        // Get project type counts from database
+        $dbProjectTypeCounts = Project::selectRaw('project_type, COUNT(*) as count')
             ->whereNotNull('project_type')
             ->groupBy('project_type')
             ->pluck('count', 'project_type')
             ->toArray();
+        
+        // Get all project types from database and merge with counts
+        $allProjectTypes = \App\Models\ProjectType::active()->ordered()->get();
+        $projectTypeCounts = [];
+        foreach ($allProjectTypes as $type) {
+            $projectTypeCounts[$type->name] = [
+                'count' => $dbProjectTypeCounts[$type->name] ?? 0,
+                'type' => $type,
+            ];
+        }
 
         // Apply filters
         if ($request->filled('search')) {
@@ -65,7 +77,7 @@ class ProjectController extends Controller
         $projects = $query->paginate(15);
 
         $users = \App\Models\User::orderBy('name')->get();
-        $projectTypes = Project::getProjectTypes();
+        $projectTypes = \App\Models\ProjectType::active()->ordered()->get()->pluck('name', 'name')->toArray();
         $countries = \App\Models\Country::active()->ordered()->get();
         $states = collect();
         $districts = collect();
@@ -100,10 +112,12 @@ class ProjectController extends Controller
     {
         $users = \App\Models\User::orderBy('name')->get();
         $india = \App\Models\Country::where('iso_code', 'IN')->first();
+        $projectTypes = \App\Models\ProjectType::active()->ordered()->get();
 
         return view('admin.projects.create', [
             'users' => $users,
             'india' => $india,
+            'projectTypes' => $projectTypes,
         ]);
     }
 
@@ -115,7 +129,8 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'user_id' => 'required|exists:users,id',
+            'address' => 'nullable|string',
+            'user_id' => 'nullable|exists:users,id',
             'status' => 'nullable|in:planning,in_progress,on_hold,completed,cancelled',
             'project_type' => 'nullable|string',
             'start_date' => 'nullable|date',
@@ -155,10 +170,12 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $users = \App\Models\User::orderBy('name')->get();
+        $projectTypes = \App\Models\ProjectType::active()->ordered()->get();
 
         return view('admin.projects.edit', [
             'project' => $project,
             'users' => $users,
+            'projectTypes' => $projectTypes,
         ]);
     }
 
@@ -170,7 +187,8 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'user_id' => 'required|exists:users,id',
+            'address' => 'nullable|string',
+            'user_id' => 'nullable|exists:users,id',
             'status' => 'nullable|in:planning,in_progress,on_hold,completed,cancelled',
             'project_type' => 'nullable|string',
             'start_date' => 'nullable|date',

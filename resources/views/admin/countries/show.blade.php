@@ -99,7 +99,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Destinations</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $country->destinations->count() }}</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $destinationsCount }}</p>
                 </div>
                 <i class="fas fa-map text-3xl text-green-500"></i>
             </div>

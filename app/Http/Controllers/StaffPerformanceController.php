@@ -10,6 +10,7 @@ use App\Models\Task;
 use App\Models\LeadFollowUp;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 
 class StaffPerformanceController extends Controller
 {
@@ -100,7 +101,7 @@ class StaffPerformanceController extends Controller
     /**
      * Calculate performance metrics for a user.
      */
-    private function calculateUserPerformance(User $user, Carbon $startDate, Carbon $endDate, bool $detailed = false)
+    private function calculateUserPerformance(User $user, Carbon|CarbonImmutable $startDate, Carbon|CarbonImmutable $endDate, bool $detailed = false)
     {
         // Leads assigned
         $totalLeads = Lead::where('assigned_user_id', $user->id)
@@ -231,7 +232,7 @@ class StaffPerformanceController extends Controller
     /**
      * Get detailed statistics for a user.
      */
-    private function getDetailedStats(User $user, Carbon $startDate, Carbon $endDate)
+    private function getDetailedStats(User $user, Carbon|CarbonImmutable $startDate, Carbon|CarbonImmutable $endDate)
     {
         return [
             'recent_leads' => Lead::where('assigned_user_id', $user->id)

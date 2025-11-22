@@ -7,7 +7,7 @@
     <div class="flex items-center justify-between">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Visit Reports</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">Manage visit reports for projects</p>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">Manage visit reports for projects, customers, and contacts</p>
         </div>
         <div class="flex items-center space-x-3">
             <a href="{{ route('visit-reports.analytics') }}" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
@@ -21,11 +21,23 @@
 
     <!-- Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        <form method="GET" action="{{ route('visit-reports.index') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form method="GET" action="{{ route('visit-reports.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <select name="project_id" class="px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
                 <option value="">All Projects</option>
                 @foreach($projects as $project)
                     <option value="{{ $project->id }}" {{ ($filters['project_id'] ?? '') == $project->id ? 'selected' : '' }}>{{ $project->name }}</option>
+                @endforeach
+            </select>
+            <select name="customer_id" class="px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                <option value="">All Customers</option>
+                @foreach($customers as $customer)
+                    <option value="{{ $customer->id }}" {{ ($filters['customer_id'] ?? '') == $customer->id ? 'selected' : '' }}>{{ $customer->name }}</option>
+                @endforeach
+            </select>
+            <select name="contact_id" class="px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                <option value="">All Contacts</option>
+                @foreach($contacts as $contact)
+                    <option value="{{ $contact->id }}" {{ ($filters['contact_id'] ?? '') == $contact->id ? 'selected' : '' }}>{{ $contact->name }}</option>
                 @endforeach
             </select>
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Filter</button>
@@ -39,7 +51,7 @@
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Project</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Linked Entities</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Objective</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Report</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Created By</th>
@@ -52,10 +64,24 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                 {{ $visitReport->visit_date->format('M d, Y') }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                <a href="{{ route('projects.show', $visitReport->project_id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400">
-                                    {{ $visitReport->project->name }}
-                                </a>
+                            <td class="px-6 py-4 text-sm">
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($visitReport->projects as $project)
+                                        <a href="{{ route('projects.show', $project->id) }}" class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200">
+                                            <i class="fas fa-project-diagram mr-1"></i>{{ Str::limit($project->name, 15) }}
+                                        </a>
+                                    @endforeach
+                                    @foreach($visitReport->customers as $customer)
+                                        <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                            <i class="fas fa-user mr-1"></i>{{ Str::limit($customer->name, 15) }}
+                                        </span>
+                                    @endforeach
+                                    @foreach($visitReport->contacts as $contact)
+                                        <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                            <i class="fas fa-address-book mr-1"></i>{{ Str::limit($contact->name, 15) }}
+                                        </span>
+                                    @endforeach
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                 {{ Str::limit($visitReport->objective, 50) }}
@@ -98,4 +124,3 @@
     </div>
 </div>
 @endsection
-

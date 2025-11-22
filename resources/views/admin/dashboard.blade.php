@@ -307,17 +307,26 @@
                 </div>
             </div>
 
-            <!-- Clean White Quote of the Day -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-lg hover:border-indigo-200 dark:hover:border-indigo-700 transition-all duration-200">
+            <!-- Clean White Quote of the Day - Business Quotes -->
+            <div class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-800 p-6 shadow-lg hover:shadow-xl transition-all duration-200">
                 <div class="text-center">
-                    <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        <span class="text-xl">✨</span>
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-md">
+                        <i class="fas fa-quote-left text-white text-2xl"></i>
                     </div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Quote of the Day</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Get inspired for your next journey</p>
-                    <blockquote class="space-y-3">
-                        <p class="text-base italic text-gray-700 dark:text-gray-300 leading-relaxed">"{{ $quoteOfTheDay['text'] }}"</p>
-                        <footer class="text-sm font-medium text-indigo-600 dark:text-indigo-400">— {{ $quoteOfTheDay['author'] }}</footer>
+                    <div class="mb-2">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Quote of the Day</h3>
+                        <p class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">Business Inspiration</p>
+                    </div>
+                    <blockquote class="space-y-4 mt-4">
+                        <div class="relative">
+                            <i class="fas fa-quote-left text-indigo-300 dark:text-indigo-600 text-3xl absolute -top-2 -left-2 opacity-50"></i>
+                            <p class="text-lg italic text-gray-800 dark:text-gray-200 leading-relaxed px-6 py-2 relative z-10">"{{ $quoteOfTheDay['text'] }}"</p>
+                        </div>
+                        <footer class="flex items-center justify-center space-x-2 pt-2">
+                            <div class="w-8 h-px bg-indigo-300 dark:bg-indigo-600"></div>
+                            <p class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">— {{ $quoteOfTheDay['author'] }}</p>
+                            <div class="w-8 h-px bg-indigo-300 dark:bg-indigo-600"></div>
+                        </footer>
                     </blockquote>
                 </div>
             </div>

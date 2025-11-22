@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LeadPerson;
 use App\Models\LeadFollowUp;
@@ -36,7 +37,6 @@ class Lead extends Model
         'lead_priority_id',
         'assigned_user_id',
         'branch_id',
-        'project_id',
         'lead_status_id',
         'lead_loss_reason_id',
         'business_type_id',
@@ -279,5 +279,35 @@ class Lead extends Model
             'lost_reason' => $remarks,
             'lost_at' => now(),
         ]);
+    }
+
+    /**
+     * Get the projects associated with the lead.
+     */
+    public function projects(): MorphToMany
+    {
+        return $this->morphedByMany(Project::class, 'leadable');
+    }
+
+    /**
+     * Get the customers associated with the lead.
+     */
+    public function customers(): MorphToMany
+    {
+        return $this->morphedByMany(Customer::class, 'leadable');
+    }
+
+    /**
+     * Get the contacts associated with the lead.
+     */
+    public function contacts(): MorphToMany
+    {
+        return $this->morphedByMany(Contact::class, 'leadable');
+    }
+
+    // Accessor for backward compatibility if a single project is expected
+    public function getProjectAttribute()
+    {
+        return $this->projects->first();
     }
 }

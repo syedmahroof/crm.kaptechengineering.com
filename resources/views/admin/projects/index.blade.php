@@ -70,18 +70,40 @@
         @endforeach
     </div>
 
-    <!-- Project Type Counts -->
+    <!-- Projects by Type -->
     @if(!empty($projectTypeCounts))
     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <i class="fas fa-chart-pie mr-2 text-gray-400"></i>Projects by Type
-        </h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            @foreach($projectTypeCounts as $type => $count)
-                <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $count }}</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ Str::limit($projectTypes[$type] ?? $type, 15) }}</p>
-                </div>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <i class="fas fa-chart-pie mr-2 text-gray-400"></i>Projects by Type
+            </h3>
+            <a href="{{ route('project-types.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                <i class="fas fa-cog mr-1"></i>Manage Types
+            </a>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            @foreach($projectTypeCounts as $typeName => $data)
+                @php
+                    $count = $data['count'];
+                    $type = $data['type'];
+                    $color = $type->color ?? '#6b7280';
+                @endphp
+                <a href="{{ route('projects.index', ['project_type' => $typeName]) }}" 
+                   class="block text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-200 hover:scale-105">
+                    <div class="flex items-center justify-center mb-2">
+                        @if($type->icon)
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ $color }}20;">
+                            <i class="fas {{ $type->icon }} text-lg" style="color: {{ $color }}"></i>
+                        </div>
+                        @else
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ $color }}20;">
+                            <i class="fas fa-project-diagram text-lg" style="color: {{ $color }}"></i>
+                        </div>
+                        @endif
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $count }}</p>
+                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">{{ Str::limit($typeName, 20) }}</p>
+                </a>
             @endforeach
         </div>
     </div>
@@ -223,7 +245,7 @@
                             <td class="px-6 py-4">
                                 @if($project->project_type)
                                     <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                                        {{ $projectTypes[$project->project_type] ?? $project->project_type }}
+                                        {{ $project->project_type }}
                                     </span>
                                 @else
                                     <span class="text-gray-400">-</span>

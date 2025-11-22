@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Customer extends Model
 {
@@ -54,6 +55,24 @@ class Customer extends Model
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    /**
+     * Get the visit reports for the customer.
+     */
+    public function visitReports(): MorphToMany
+    {
+        return $this->morphToMany(VisitReport::class, 'visit_reportable', 'visit_reportables', 'visit_reportable_id', 'visit_report_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the leads for the customer.
+     */
+    public function leads(): MorphToMany
+    {
+        return $this->morphToMany(Lead::class, 'leadable', 'leadables', 'leadable_id', 'lead_id')
+            ->withTimestamps();
     }
 
     /**

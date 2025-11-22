@@ -28,6 +28,12 @@ class DistrictController extends Controller
             $query->where('state_id', $request->state_id);
         }
 
+        // Search by name if provided
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%");
+        }
+
         // Filter active districts only if requested
         if ($request->has('active') && $request->active == 'true') {
             $query->where('is_active', true);

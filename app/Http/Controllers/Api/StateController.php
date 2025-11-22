@@ -23,6 +23,12 @@ class StateController extends Controller
             $query->where('country_id', $request->country_id);
         }
 
+        // Search by name if provided
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%");
+        }
+
         // Filter active states only if requested
         if ($request->has('active') && $request->active == 'true') {
             $query->where('is_active', true);
