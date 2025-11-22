@@ -9,7 +9,7 @@ class ContactTypeController extends Controller
 {
     public function index()
     {
-        $types = ContactType::ordered()->get();
+        $types = ContactType::ordered()->withCount('contacts')->get();
         
         return view('admin.contact-types.index', [
             'types' => $types,

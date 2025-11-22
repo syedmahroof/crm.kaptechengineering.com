@@ -43,7 +43,7 @@ class ContactType extends Model
 
     public function contacts(): HasMany
     {
-        return $this->hasMany(Contact::class, 'contact_type', 'name');
+        return $this->hasMany(Contact::class, 'contact_type', 'slug');
     }
 
     public function scopeActive($query)

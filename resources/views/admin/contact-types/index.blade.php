@@ -22,6 +22,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Type</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Slug</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Contacts</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Order</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
@@ -46,6 +47,11 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ Str::limit($type->description ?? '', 50) }}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                    {{ $type->contacts_count ?? 0 }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs rounded-full {{ $type->is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' }}">
                                     {{ $type->is_active ? 'Active' : 'Inactive' }}
@@ -72,7 +78,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                 <i class="fas fa-address-book text-4xl mb-4 block opacity-50"></i>
                                 <p>No contact types found</p>
                             </td>
