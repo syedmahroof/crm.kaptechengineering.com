@@ -129,7 +129,7 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                                <i class="fas fa-user mr-2 text-gray-400"></i>Project Owner
+                                <i class="fas fa-user mr-2 text-gray-400"></i>Assignee
                             </label>
                             <p class="text-gray-900 dark:text-white font-medium">{{ $project->user->name ?? 'N/A' }}</p>
                         </div>

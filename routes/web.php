@@ -156,6 +156,9 @@ Route::middleware(['auth'])->group(function () {
     // Project Types
     Route::resource('project-types', \App\Http\Controllers\ProjectTypeController::class)->except(['show']);
     
+    // Contact Types
+    Route::resource('contact-types', \App\Http\Controllers\ContactTypeController::class)->except(['show']);
+    
     // Lead Agents
     Route::resource('lead-agents', LeadAgentController::class)->except(['show', 'edit', 'update']);
     Route::get('lead-agents/{agent}', [LeadAgentController::class, 'show'])->name('lead-agents.show');

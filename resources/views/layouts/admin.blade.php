@@ -220,7 +220,7 @@
                             <p class="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Master Data</p>
                         </div>
                         
-                        <div x-data="{ open: {{ request()->routeIs('product-categories.*') || request()->routeIs('project-types.*') || request()->routeIs('lead-types.*') || request()->routeIs('lead-sources.*') || request()->routeIs('lead-priorities.*') ? 'true' : 'false' }} }">
+                        <div x-data="{ open: {{ request()->routeIs('product-categories.*') || request()->routeIs('project-types.*') || request()->routeIs('contact-types.*') || request()->routeIs('lead-types.*') || request()->routeIs('lead-sources.*') || request()->routeIs('lead-priorities.*') ? 'true' : 'false' }} }">
                             <button @click="open = !open" class="w-full sidebar-link group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" :class="{ 'justify-center': sidebarCollapsed }" title="Master Data">
                                 <div class="flex items-center" :class="{ 'justify-center': sidebarCollapsed }">
                                     <i class="fas fa-database" :class="{ 'mr-3': !sidebarCollapsed }"></i>
@@ -234,6 +234,9 @@
                                 </a>
                                 <a href="{{ route('project-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('project-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
                                     <i class="fas fa-project-diagram text-xs mr-3"></i>Project Types
+                                </a>
+                                <a href="{{ route('contact-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('contact-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-address-book text-xs mr-3"></i>Contact Types
                                 </a>
                                 @can('view lead types')
                                 <a href="{{ route('lead-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('lead-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
@@ -571,7 +574,7 @@
                             @endcanany
                             
                             <!-- Master Data - Collapsible -->
-                            <div x-data="{ open: {{ request()->routeIs('product-categories.*') || request()->routeIs('project-types.*') || request()->routeIs('lead-types.*') || request()->routeIs('lead-sources.*') || request()->routeIs('lead-priorities.*') ? 'true' : 'false' }} }">
+                            <div x-data="{ open: {{ request()->routeIs('product-categories.*') || request()->routeIs('project-types.*') || request()->routeIs('contact-types.*') || request()->routeIs('lead-types.*') || request()->routeIs('lead-sources.*') || request()->routeIs('lead-priorities.*') ? 'true' : 'false' }} }">
                                 <button @click="open = !open" class="w-full sidebar-link group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <div class="flex items-center">
                                         <i class="fas fa-database mr-3"></i>Master Data
@@ -584,6 +587,9 @@
                                     </a>
                                     <a href="{{ route('project-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('project-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
                                         <i class="fas fa-project-diagram text-xs mr-3"></i>Project Types
+                                    </a>
+                                    <a href="{{ route('contact-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('contact-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                        <i class="fas fa-address-book text-xs mr-3"></i>Contact Types
                                     </a>
                                     @can('view lead types')
                                     <a href="{{ route('lead-types.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('lead-types.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">

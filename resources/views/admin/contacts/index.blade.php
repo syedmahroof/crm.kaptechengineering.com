@@ -304,12 +304,19 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contact->created_at->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end space-x-2">
-                                    <a href="{{ route('admin.contacts.show', $contact->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400" title="View">
+                                    <a href="{{ route('admin.contacts.show', $contact->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.contacts.edit', $contact->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400" title="Edit">
+                                    <a href="{{ route('admin.contacts.edit', $contact->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    <form action="{{ route('admin.contacts.destroy', $contact->id) }}" method="POST" class="inline" data-confirm="Are you sure you want to delete this contact?">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

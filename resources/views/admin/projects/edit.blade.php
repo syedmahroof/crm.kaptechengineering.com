@@ -45,10 +45,10 @@
                 </div>
 
                 <div>
-                    <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Owner</label>
+                    <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Assignee</label>
                     <select name="user_id" id="user_id"
                             class="mt-1 block w-full px-3 py-2 border rounded-md {{ $errors->has('user_id') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} dark:bg-gray-700 dark:text-white">
-                        <option value="">Select a user...</option>
+                        <option value="">Select an assignee...</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}" {{ old('user_id', $project->user_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                         @endforeach
