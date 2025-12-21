@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Create New Product')
+@section('title', 'Edit Product')
 
 @section('content')
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create New Product</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">Add a new product to your catalog</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Edit Product</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">Update product information</p>
         </div>
         <a href="{{ route('products.index') }}" 
            class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
@@ -16,8 +16,9 @@
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        <form action="{{ route('products.store') }}" method="POST" class="space-y-6">
+        <form action="{{ route('products.update', $product->id) }}" method="POST" class="space-y-6">
             @csrf
+            @method('PUT')
             
             <!-- Basic Information -->
             <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
@@ -33,7 +34,7 @@
                         <input type="text" 
                                id="name" 
                                name="name" 
-                               value="{{ old('name') }}" 
+                               value="{{ old('name', $product->name) }}" 
                                required
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 @error('name') border-red-500 @enderror"
                                placeholder="Enter product name">
@@ -49,7 +50,7 @@
                         <input type="text" 
                                id="sku" 
                                name="sku" 
-                               value="{{ old('sku') }}"
+                               value="{{ old('sku', $product->sku) }}"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 @error('sku') border-red-500 @enderror"
                                placeholder="Enter SKU">
                         @error('sku')
@@ -64,7 +65,7 @@
                         <input type="text" 
                                id="code" 
                                name="code" 
-                               value="{{ old('code') }}"
+                               value="{{ old('code', $product->code) }}"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 @error('code') border-red-500 @enderror"
                                placeholder="Enter product code">
                         @error('code')
@@ -79,7 +80,7 @@
                         <input type="text" 
                                id="category" 
                                name="category" 
-                               value="{{ old('category') }}"
+                               value="{{ old('category', $product->category) }}"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 @error('category') border-red-500 @enderror"
                                placeholder="Enter category">
                         @error('category')
@@ -94,7 +95,7 @@
                         <input type="text" 
                                id="unit" 
                                name="unit" 
-                               value="{{ old('unit') }}"
+                               value="{{ old('unit', $product->unit) }}"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 @error('unit') border-red-500 @enderror"
                                placeholder="e.g., pcs, kg, liters">
                         @error('unit')
@@ -118,7 +119,7 @@
                         <input type="number" 
                                id="price" 
                                name="price" 
-                               value="{{ old('price') }}" 
+                               value="{{ old('price', $product->price) }}" 
                                step="0.01"
                                min="0"
                                required
@@ -136,7 +137,7 @@
                         <input type="number" 
                                id="cost" 
                                name="cost" 
-                               value="{{ old('cost') }}" 
+                               value="{{ old('cost', $product->cost) }}" 
                                step="0.01"
                                min="0"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 @error('cost') border-red-500 @enderror"
@@ -162,7 +163,7 @@
                         <input type="number" 
                                id="stock_quantity" 
                                name="stock_quantity" 
-                               value="{{ old('stock_quantity') }}" 
+                               value="{{ old('stock_quantity', $product->stock_quantity) }}" 
                                min="0"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 @error('stock_quantity') border-red-500 @enderror"
                                placeholder="0">
@@ -178,7 +179,7 @@
                         <input type="number" 
                                id="min_stock_level" 
                                name="min_stock_level" 
-                               value="{{ old('min_stock_level') }}" 
+                               value="{{ old('min_stock_level', $product->min_stock_level) }}" 
                                min="0"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 @error('min_stock_level') border-red-500 @enderror"
                                placeholder="0">
@@ -200,7 +201,7 @@
                         <input type="checkbox" 
                                name="is_active" 
                                value="1"
-                               {{ old('is_active', true) ? 'checked' : '' }}
+                               {{ old('is_active', $product->is_active) ? 'checked' : '' }}
                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Active Product</span>
                     </label>
@@ -218,11 +219,10 @@
                 </a>
                 <button type="submit" 
                         class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    <i class="fas fa-save mr-2"></i>Create Product
+                    <i class="fas fa-save mr-2"></i>Update Product
                 </button>
             </div>
         </form>
     </div>
 </div>
 @endsection
-

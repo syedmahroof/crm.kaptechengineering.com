@@ -4,6 +4,10 @@
 
 @section('content')
 <div class="space-y-6">
+    @php
+        $owner = $project->projectContacts->where('role', 'owner')->first();
+        $teamContacts = $project->projectContacts->where('role', '!=', 'owner')->values();
+    @endphp
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Edit Project</h1>
         <a href="{{ route('projects.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
@@ -16,8 +20,8 @@
             @csrf
             @method('PUT')
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="md:col-span-4">
                     <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Project Name *</label>
                     <input type="text" name="name" id="name" value="{{ old('name', $project->name) }}" required
                            class="mt-1 block w-full px-3 py-2 border rounded-md {{ $errors->has('name') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} dark:bg-gray-700 dark:text-white">
@@ -26,20 +30,126 @@
                     @enderror
                 </div>
 
-                <div class="md:col-span-2">
-                    <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                    <textarea name="description" id="description" rows="3"
-                              class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">{{ old('description', $project->description) }}</textarea>
-                    @error('description')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                <!-- Owner Details Section -->
+                <div class="md:col-span-4 border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Owner Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="owner_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                            <input type="text" name="owner_name" id="owner_name" value="{{ old('owner_name', $owner?->name ?? $project->owner_name) }}"
+                                   class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                            @error('owner_name')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="owner_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                            <input type="text" name="owner_phone" id="owner_phone" value="{{ old('owner_phone', $owner?->phone) }}"
+                                   class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                            @error('owner_phone')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="owner_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                            <input type="email" name="owner_email" id="owner_email" value="{{ old('owner_email', $owner?->email) }}"
+                                   class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                            @error('owner_email')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
-                <div class="md:col-span-2">
+
+
+
+
+                <div class="md:col-span-4">
                     <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
                     <textarea name="address" id="address" rows="2"
                               class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">{{ old('address', $project->address) }}</textarea>
                     @error('address')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="state_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">State</label>
+                    <select name="state_id" id="state_id"
+                            class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        <option value="">Select a state...</option>
+                        @foreach($states as $state)
+                            <option value="{{ $state->id }}" {{ old('state_id', $project->state_id) == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('state_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="district_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">City</label>
+                    <select name="district_id" id="district_id"
+                            class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        <option value="">Select a city...</option>
+                        @foreach($districts as $district)
+                            <option value="{{ $district->id }}" {{ old('district_id', $project->district_id) == $district->id ? 'selected' : '' }}>{{ $district->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('district_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+                    <input type="text" name="location" id="location" value="{{ old('location', $project->location) }}"
+                           class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    @error('location')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="pincode" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pincode</label>
+                    <input type="text" name="pincode" id="pincode" value="{{ old('pincode', $project->pincode) }}"
+                           class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    @error('pincode')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="expected_maturity_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Expected Maturity</label>
+                    <input type="date" name="expected_maturity_date" id="expected_maturity_date" value="{{ old('expected_maturity_date', $project->expected_maturity_date?->format('Y-m-d')) }}"
+                           class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    @error('expected_maturity_date')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="preferred_material" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preferred Material</label>
+                    <textarea name="preferred_material" id="preferred_material" rows="2"
+                              class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">{{ old('preferred_material', $project->preferred_material) }}</textarea>
+                    @error('preferred_material')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="branch_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Branch</label>
+                    <select name="branch_id" id="branch_id"
+                            class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        <option value="">Select Branch</option>
+                        @foreach($branches as $branch)
+                            <option value="{{ $branch->id }}" {{ old('branch_id', $project->branch_id) == $branch->id ? 'selected' : '' }}>
+                                {{ $branch->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('branch_id')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -98,6 +208,66 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <!-- Team Contacts Section -->
+                <div class="md:col-span-4 border-t border-gray-200 dark:border-gray-700 pt-6 mt-2" x-data="{
+                    contacts: {{ old('contacts') ? json_encode(old('contacts')) : $teamContacts->map(function($c) { return ['name' => $c->name, 'role' => $c->role, 'phone' => $c->phone, 'email' => $c->email]; })->toJson() }},
+                    addContact() {
+                        this.contacts.push({ name: '', role: '', phone: '', email: '' });
+                    },
+                    removeContact(index) {
+                        this.contacts.splice(index, 1);
+                    }
+                }">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Team Contacts</h3>
+                        <button type="button" @click="addContact()" class="px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
+                            + Add Contact
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <template x-for="(contact, index) in contacts" :key="index">
+                            <div class="flex flex-col md:flex-row gap-4 items-end bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                                <div class="flex-1">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                                    <input type="text" :name="'contacts[' + index + '][name]'" x-model="contact.name" required placeholder="Name"
+                                           class="block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                                    <select :name="'contacts[' + index + '][role]'" x-model="contact.role"
+                                            class="block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                        <option value="">Select Role...</option>
+                                        @foreach(\App\Models\ProjectContact::getRoles() as $key => $label)
+                                            @if($key !== 'owner')
+                                                <option value="{{ $key }}">{{ $label }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                                    <input type="text" :name="'contacts[' + index + '][phone]'" x-model="contact.phone" placeholder="Phone"
+                                           class="block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                    <input type="email" :name="'contacts[' + index + '][email]'" x-model="contact.email" placeholder="Email"
+                                           class="block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                </div>
+                                <div>
+                                    <button type="button" @click="removeContact(index)" class="p-2 text-red-500 hover:text-red-700 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="contacts.length === 0" class="text-gray-500 text-sm italic py-2">
+                            No team contacts added yet.
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="mt-6 flex justify-end space-x-3">
@@ -112,4 +282,45 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Load districts when state changes
+    $('#state_id').on('change', function() {
+        const stateId = $(this).val();
+        loadDistrictsForState(stateId);
+    });
+    
+    function loadDistrictsForState(stateId, selectedDistrictId = null) {
+        const districtSelect = $('#district_id');
+        districtSelect.html('<option value="">Select a city...</option>');
+        
+        if (stateId) {
+            $.ajax({
+                url: '/api/districts',
+                method: 'GET',
+                data: { state_id: stateId, active: 'true' },
+                success: function(districts) {
+                    if (districts && districts.length > 0) {
+                        districts.forEach(function(district) {
+                            const selected = selectedDistrictId && district.id == selectedDistrictId ? 'selected' : '';
+                            districtSelect.append('<option value="' + district.id + '" ' + selected + '>' + district.name + '</option>');
+                        });
+                        
+                        // Handle pre-selection if passed (for edit or old input)
+                        // Actually the loop above handles it if we pass selectedDistrictId to it?
+                        // The loop above uses 'selected' variable based on selectedDistrictId.
+                        // But wait, the loop above compares `district.id == selectedDistrictId`.
+                        // So calling loadDistrictsForState(id, id) works.
+                        
+                        // However, on edit page load, we might not want to clear and reload via AJAX if we already have them from controller?
+                        // In controller I passed $districts. So on page load, the select is already populated (see blade loop above).
+                        // So we only need AJAX if state changes.
+                    }
+                }
+            });
+        }
+    }
+</script>
+@endpush
 

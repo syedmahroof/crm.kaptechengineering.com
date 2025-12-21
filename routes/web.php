@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\BuilderController;
 use App\Http\Controllers\Leads\LeadsController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Leads\LeadSourceController;
@@ -102,49 +103,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('api/leads/{lead}/files', [LeadsController::class, 'storeFile'])->name('leads.files.store');
     Route::delete('api/leads/{lead}/files/{file}', [LeadsController::class, 'deleteFile'])->name('leads.files.delete');
     
-    // Flight Tickets Routes
-    Route::get('flight-tickets/create', [FlightTicketsController::class, 'create'])->name('flight-tickets.create');
-    Route::post('flight-tickets', [FlightTicketsController::class, 'store'])->name('flight-tickets.store');
-    Route::get('flight-tickets/{flightTicket}', [FlightTicketsController::class, 'show'])->name('flight-tickets.show');
-    Route::get('flight-tickets/{flightTicket}/edit', [FlightTicketsController::class, 'edit'])->name('flight-tickets.edit');
-    Route::put('flight-tickets/{flightTicket}', [FlightTicketsController::class, 'update'])->name('flight-tickets.update');
-    Route::delete('flight-tickets/{flightTicket}', [FlightTicketsController::class, 'destroy'])->name('flight-tickets.destroy');
-    
-    // Flight Ticket File Routes
-    Route::post('flight-tickets/{flightTicket}/files', [FlightTicketsController::class, 'storeFiles'])->name('flight-tickets.files.store');
-    Route::delete('flight-tickets/{flightTicket}/files/{file}', [FlightTicketsController::class, 'deleteFile'])->name('flight-tickets.files.delete');
-    Route::get('flight-tickets/{flightTicket}/files/{file}/download', [FlightTicketsController::class, 'downloadFile'])->name('flight-tickets.files.download');
-    
-    // Lead Itineraries Routes
-    Route::get('lead-itineraries/create', [LeadItinerariesController::class, 'create'])->name('lead-itineraries.create');
-    Route::post('lead-itineraries', [LeadItinerariesController::class, 'store'])->name('lead-itineraries.store');
-    Route::get('lead-itineraries/{itinerary}', [LeadItinerariesController::class, 'show'])->name('lead-itineraries.show');
-    
-    // Master Itineraries Routes
-    Route::get('master-itineraries', [MasterItinerariesController::class, 'index'])->name('master-itineraries.index');
-    Route::get('master-itineraries/{itinerary}', [MasterItinerariesController::class, 'show'])->name('master-itineraries.show');
-    Route::post('master-itineraries/{itinerary}/create-custom', [MasterItinerariesController::class, 'createCustom'])->name('master-itineraries.create-custom');
-    Route::post('itineraries/{itinerary}/mark-master', [MasterItinerariesController::class, 'markAsMaster'])->name('itineraries.mark-master');
-    Route::post('itineraries/{itinerary}/unmark-master', [MasterItinerariesController::class, 'unmarkAsMaster'])->name('itineraries.unmark-master');
-    
-    // Itinerary Routes
-    Route::resource('itineraries', \App\Http\Controllers\Itineraries\ItineraryController::class);
-    
-    // AI Routes
-    Route::prefix('ai')->name('ai.')->group(function () {
-        Route::get('itinerary-builder', [\App\Http\Controllers\AI\AIItineraryController::class, 'index'])->name('itinerary-builder');
-        Route::post('generate-itinerary', [\App\Http\Controllers\AI\AIItineraryController::class, 'generateItinerary'])->name('generate-itinerary');
-        Route::post('save-itinerary', [\App\Http\Controllers\AI\AIItineraryController::class, 'saveItinerary'])->name('save-itinerary');
-    });
-    
-    // PDF Routes
-    Route::get('itineraries/{itinerary}/pdf', [ItineraryPdfController::class, 'generate'])->name('itineraries.pdf');
-    Route::get('itineraries/{itinerary}/pdf/view', [ItineraryPdfController::class, 'view'])->name('itineraries.pdf.view');
-    
-    // Itinerary Builder
-    Route::get('/itinerary-builder', function () {
-        return Inertia::render('ItineraryBuilder');
-    })->name('itinerary-builder');
+   
+
     
     // Lead Sources
     Route::resource('lead-sources', LeadSourceController::class)->except(['show']);
@@ -170,44 +130,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('lead-priorities/{priority}/move-up', [LeadPriorityController::class, 'moveUp'])->name('lead-priorities.move-up');
     Route::post('lead-priorities/{priority}/move-down', [LeadPriorityController::class, 'moveDown'])->name('lead-priorities.move-down');
 
-    // Itinerary Builder Routes
-    Route::prefix('itineraries')->name('itineraries.')->group(function () {
-        // Regular Itinerary Routes
-        Route::get('/', [ItineraryController::class, 'index'])->name('index');
-        Route::get('/create', [ItineraryController::class, 'create'])->name('create');
-        
-        Route::get('/{itinerary}', [ItineraryController::class, 'show'])->name('show');
-        
-        // Itinerary Builder Wizard
-        Route::prefix('builder')->name('builder.')->group(function () {
-            Route::get('/create', [ItineraryBuilderController::class, 'create'])->name('create');
-            Route::post('/', [ItineraryBuilderController::class, 'store'])->name('store');
-            
-            // Edit wizard routes
-            Route::get('/{itinerary}/edit', [ItineraryBuilderController::class, 'edit'])
-                ->name('edit')
-                ->middleware('can:update,itinerary');
-                
-            Route::put('/{itinerary}', [ItineraryBuilderController::class, 'update'])
-                ->name('update')
-                ->middleware('can:update,itinerary');
-                
-            Route::post('/{itinerary}/publish', [ItineraryBuilderController::class, 'publish'])
-                ->name('publish')
-                ->middleware('can:update,itinerary');
-        });
-        
-        // Export routes
-        Route::prefix('export')->group(function () {
-            Route::get('/', [ItineraryController::class, 'export'])->name('export');
-        });
-        
-        // Other itinerary routes (if any)
-        Route::delete('/{itinerary}', [ItineraryController::class, 'destroy'])->name('destroy');
 
-        
-        
-    });
     
 
     
@@ -257,7 +180,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Project Contacts Routes
     Route::resource('project-contacts', \App\Http\Controllers\ProjectContactController::class)->only(['store', 'edit', 'update', 'destroy']);
-
+    
+    // Builders Routes
+    Route::resource('builders', BuilderController::class);
+  
     // Visit Reports Routes
     Route::get('/visit-reports/analytics', [\App\Http\Controllers\VisitReportController::class, 'analytics'])->name('visit-reports.analytics');
     Route::resource('visit-reports', \App\Http\Controllers\VisitReportController::class);
@@ -276,19 +202,7 @@ Route::middleware(['auth'])->group(function () {
     // Enquiries Routes
     Route::resource('enquiries', \App\Http\Controllers\EnquiryController::class);
     
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::resource('destinations', \App\Http\Controllers\Admin\DestinationController::class);
-        Route::post('/destinations/{destination}/toggle-active', [\App\Http\Controllers\Admin\DestinationController::class, 'toggleActive'])->name('destinations.toggle-active');
-        Route::post('/destinations/{destination}/toggle-featured', [\App\Http\Controllers\Admin\DestinationController::class, 'toggleFeatured'])->name('destinations.toggle-featured');
-    });
-    
-    Route::resource('attractions', \App\Http\Controllers\AttractionController::class);
-    Route::post('/attractions/{attraction}/toggle-active', [\App\Http\Controllers\AttractionController::class, 'toggleActive'])->name('attractions.toggle-active');
-    Route::post('/attractions/{attraction}/toggle-featured', [\App\Http\Controllers\AttractionController::class, 'toggleFeatured'])->name('attractions.toggle-featured');
-    
-    Route::resource('hotels', \App\Http\Controllers\HotelController::class);
-    Route::post('/hotels/{hotel}/toggle-active', [\App\Http\Controllers\HotelController::class, 'toggleActive'])->name('hotels.toggle-active');
-    Route::post('/hotels/{hotel}/toggle-featured', [\App\Http\Controllers\HotelController::class, 'toggleFeatured'])->name('hotels.toggle-featured');
+
     
     // Branch Routes
     Route::resource('branches', \App\Http\Controllers\BranchController::class);
@@ -334,6 +248,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('contacts', \App\Http\Controllers\Admin\ContactController::class);
         Route::post('/contacts/{contact}/update-status', [\App\Http\Controllers\Admin\ContactController::class, 'updateStatus'])->name('contacts.update-status');
         Route::post('/contacts/{contact}/update-priority', [\App\Http\Controllers\Admin\ContactController::class, 'updatePriority'])->name('contacts.update-priority');
+        
+        // Builders Management
+        Route::resource('builders', BuilderController::class);
         Route::post('/contacts/bulk-update', [\App\Http\Controllers\Admin\ContactController::class, 'bulkUpdate'])->name('contacts.bulk-update');
         Route::get('/contacts/export', [\App\Http\Controllers\Admin\ContactController::class, 'export'])->name('contacts.export');
         Route::post('/contacts/update-preference', [\App\Http\Controllers\Admin\ContactController::class, 'updatePreference'])->name('contacts.update-preference');

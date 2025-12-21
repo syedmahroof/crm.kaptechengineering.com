@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\VisitReport;
+use App\Models\VisitReportable;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -114,9 +115,23 @@ class VisitReportSeeder extends Seeder
         });
 
         foreach ($visitReports as $visitReportData) {
-            VisitReport::create($visitReportData);
+            // Save the project_id before removing it from the array
+            $projectId = $visitReportData['project_id'];
+            unset($visitReportData['project_id']); // Remove project_id as it's no longer a direct column
+            
+            // Create the visit report
+            $visitReport = VisitReport::create($visitReportData);
+            
+            // Create the polymorphic relationship directly using the VisitReportable model
+            VisitReportable::create([
+                'visit_report_id' => $visitReport->id,
+                'visit_reportable_id' => $projectId,
+                'visit_reportable_type' => 'App\\Models\\Project',
+                'created_at' => $visitReportData['created_at'],
+                'updated_at' => $visitReportData['updated_at']
+            ]);
         }
 
-        $this->command->info('Created ' . count($visitReports) . ' visit reports.');
+        $this->command->info('Created ' . count($visitReports) . ' visit reports with polymorphic relationships.');
     }
 }

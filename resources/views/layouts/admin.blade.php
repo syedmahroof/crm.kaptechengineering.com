@@ -1,3 +1,16 @@
+@php
+// Always ensure $contactTypes is defined
+if (!isset($contactTypes)) {
+    try {
+        $contactTypes = \App\Models\ContactType::active()
+            ->orderBy('sort_order')
+            ->get(['id', 'name', 'slug']);
+    } catch (\Exception $e) {
+        $contactTypes = collect();
+    }
+}
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
@@ -65,14 +78,14 @@
         <aside class="hidden md:flex md:flex-shrink-0 transition-all duration-300" :class="{ 'md:w-16': sidebarCollapsed, 'md:w-64': !sidebarCollapsed }">
             <div class="flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-full">
                 <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-                    <div class="flex items-center flex-shrink-0 px-4 mb-8" :class="{ 'justify-center': sidebarCollapsed }">
+                    <!-- <div class="flex items-center flex-shrink-0 px-4" :class="{ 'justify-center': sidebarCollapsed }">
                         <h2 class="text-xl font-bold text-gray-900 dark:text-white" x-show="!sidebarCollapsed">
-                            <img src="{{ asset('lansoa_light.png') }}" alt="Lansoa" style="width: 50px; height:auto"> 
+                            <img src="{{ asset('kaptech.png') }}" alt="Kaptech" style="width: 80%; height:auto"> 
                         </h2>
                         <h2 class="text-xl font-bold text-gray-900 dark:text-white" x-show="sidebarCollapsed" x-cloak>
-                            <img src="{{ asset('lansoa_light.png') }}" alt="Lansoa" style="width: 30px; height:auto"> 
+                            <img src="{{ asset('kaptech.png') }}" alt="Kaptech" style="width: 80%; height:auto"> 
                         </h2>
-                    </div>
+                    </div> -->
                     <nav class="mt-5 flex-1 space-y-1" :class="{ 'px-2': !sidebarCollapsed, 'px-1': sidebarCollapsed }" x-data="{ openMenus: {} }">
                         <a href="{{ route('dashboard') }}" class="sidebar-link group flex items-center text-sm font-medium rounded-lg {{ request()->routeIs('dashboard') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center px-2 py-2': sidebarCollapsed, 'px-3 py-2': !sidebarCollapsed }" title="Dashboard">
                             <i class="fas fa-home" :class="{ 'mr-3': !sidebarCollapsed }"></i>
@@ -128,11 +141,16 @@
                         <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700" x-show="!sidebarCollapsed">
                             <p class="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Operations</p>
                         </div>
-                        
-                        @can('view tasks')
-                        <a href="{{ route('tasks.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('tasks.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center': sidebarCollapsed }" title="Tasks">
-                            <i class="fas fa-tasks" :class="{ 'mr-3': !sidebarCollapsed }"></i>
-                            <span x-show="!sidebarCollapsed">Tasks</span>
+
+                        <a href="{{ route('projects.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('projects.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center': sidebarCollapsed }" title="Projects">
+                            <i class="fas fa-project-diagram" :class="{ 'mr-3': !sidebarCollapsed }"></i>
+                            <span x-show="!sidebarCollapsed">Projects</span>
+                        </a>
+
+                        @can('view contacts')
+                        <a href="{{ route('admin.contacts.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.contacts.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center': sidebarCollapsed }" title="Contacts">
+                            <i class="fas fa-envelope" :class="{ 'mr-3': !sidebarCollapsed }"></i>
+                            <span x-show="!sidebarCollapsed">Contacts</span>
                         </a>
                         @endcan
                         
@@ -143,17 +161,15 @@
                         </a>
                         @endcan
                         
-                        @can('view contacts')
-                        <a href="{{ route('admin.contacts.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.contacts.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center': sidebarCollapsed }" title="Contacts">
-                            <i class="fas fa-envelope" :class="{ 'mr-3': !sidebarCollapsed }"></i>
-                            <span x-show="!sidebarCollapsed">Contacts</span>
+                        @can('view builders')
+                        <a href="{{ route('builders.index') }}" 
+                           class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('builders.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" 
+                           :class="{ 'justify-center': sidebarCollapsed }" 
+                           title="Builders">
+                            <i class="fas fa-hard-hat" :class="{ 'mr-3': !sidebarCollapsed }"></i>
+                            <span x-show="!sidebarCollapsed">Builders</span>
                         </a>
                         @endcan
-                        
-                        <a href="{{ route('projects.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('projects.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center': sidebarCollapsed }" title="Projects">
-                            <i class="fas fa-project-diagram" :class="{ 'mr-3': !sidebarCollapsed }"></i>
-                            <span x-show="!sidebarCollapsed">Projects</span>
-                        </a>
                         
                         <a href="{{ route('visit-reports.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('visit-reports.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center': sidebarCollapsed }" title="Visit Reports">
                             <i class="fas fa-clipboard-list" :class="{ 'mr-3': !sidebarCollapsed }"></i>
@@ -169,51 +185,20 @@
                             <i class="fas fa-file-invoice-dollar" :class="{ 'mr-3': !sidebarCollapsed }"></i>
                             <span x-show="!sidebarCollapsed">Quotations</span>
                         </a>
+
+                        @can('view tasks')
+                        <a href="{{ route('tasks.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('tasks.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center': sidebarCollapsed }" title="Tasks">
+                            <i class="fas fa-tasks" :class="{ 'mr-3': !sidebarCollapsed }"></i>
+                            <span x-show="!sidebarCollapsed">Tasks</span>
+                        </a>
+                        @endcan
                         
                         <a href="{{ route('notes.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('notes.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}" :class="{ 'justify-center': sidebarCollapsed }" title="Notes">
                             <i class="fas fa-sticky-note" :class="{ 'mr-3': !sidebarCollapsed }"></i>
                             <span x-show="!sidebarCollapsed">Notes</span>
                         </a>
                         
-                        <!-- Content - Collapsible -->
-                        @canany(['view blogs', 'view testimonials', 'view faqs', 'view banners', 'view newsletters'])
-                        <div x-data="{ open: {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.testimonials.*') || request()->routeIs('admin.banners.*') || request()->routeIs('admin.newsletters.*') ? 'true' : 'false' }} }">
-                            <button @click="open = !open" class="w-full sidebar-link group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" :class="{ 'justify-center': sidebarCollapsed }" title="Content">
-                                <div class="flex items-center" :class="{ 'justify-center': sidebarCollapsed }">
-                                    <i class="fas fa-file-alt" :class="{ 'mr-3': !sidebarCollapsed }"></i>
-                                    <span x-show="!sidebarCollapsed">Content</span>
-                                </div>
-                                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': open, 'hidden': sidebarCollapsed }"></i>
-                            </button>
-                            <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">
-                                @can('view blogs')
-                                <a href="{{ route('admin.blogs.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blogs.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
-                                    <i class="fas fa-blog text-xs mr-3"></i>Blogs
-                        </a>
-                                @endcan
-                                @can('view testimonials')
-                                <a href="{{ route('admin.testimonials.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.testimonials.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
-                                    <i class="fas fa-quote-left text-xs mr-3"></i>Testimonials
-                        </a>
-                                @endcan
-                                @can('view faqs')
-                                <a href="{{ route('admin.faqs.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.faqs.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
-                                    <i class="fas fa-question-circle text-xs mr-3"></i>FAQs
-                        </a>
-                                @endcan
-                                @can('view banners')
-                                <a href="{{ route('admin.banners.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.banners.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
-                                    <i class="fas fa-image text-xs mr-3"></i>Banners
-                        </a>
-                                @endcan
-                                @can('view newsletters')
-                                <a href="{{ route('admin.newsletters.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.newsletters.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
-                                    <i class="fas fa-newspaper text-xs mr-3"></i>Newsletters
-                        </a>
-                                @endcan
-                            </div>
-                        </div>
-                        @endcanany
+                       
                         
                         <!-- Settings - Collapsible -->
                         <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700" x-show="!sidebarCollapsed">
@@ -255,6 +240,46 @@
                                 @endcan
                             </div>
                         </div>
+
+                         <!-- Content - Collapsible -->
+                        @canany(['view blogs', 'view testimonials', 'view faqs', 'view banners', 'view newsletters'])
+                        <div x-data="{ open: {{ request()->routeIs('admin.blogs.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.testimonials.*') || request()->routeIs('admin.banners.*') || request()->routeIs('admin.newsletters.*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="w-full sidebar-link group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" :class="{ 'justify-center': sidebarCollapsed }" title="Content">
+                                <div class="flex items-center" :class="{ 'justify-center': sidebarCollapsed }">
+                                    <i class="fas fa-file-alt" :class="{ 'mr-3': !sidebarCollapsed }"></i>
+                                    <span x-show="!sidebarCollapsed">Content</span>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{ 'rotate-180': open, 'hidden': sidebarCollapsed }"></i>
+                            </button>
+                            <div x-show="open && !sidebarCollapsed" x-collapse class="ml-4 mt-1 space-y-1">
+                                @can('view blogs')
+                                <a href="{{ route('admin.blogs.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blogs.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-blog text-xs mr-3"></i>Blogs
+                        </a>
+                                @endcan
+                                @can('view testimonials')
+                                <a href="{{ route('admin.testimonials.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.testimonials.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-quote-left text-xs mr-3"></i>Testimonials
+                        </a>
+                                @endcan
+                                @can('view faqs')
+                                <a href="{{ route('admin.faqs.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.faqs.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-question-circle text-xs mr-3"></i>FAQs
+                        </a>
+                                @endcan
+                                @can('view banners')
+                                <a href="{{ route('admin.banners.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.banners.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-image text-xs mr-3"></i>Banners
+                        </a>
+                                @endcan
+                                @can('view newsletters')
+                                <a href="{{ route('admin.newsletters.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.newsletters.*') ? 'active' : 'text-gray-600 dark:text-gray-400' }}">
+                                    <i class="fas fa-newspaper text-xs mr-3"></i>Newsletters
+                        </a>
+                                @endcan
+                            </div>
+                        </div>
+                        @endcanany
                         
                         <div>
                             <p class="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Settings</p>
@@ -340,8 +365,103 @@
                             <button @click="sidebarCollapsed = !sidebarCollapsed" class="hidden md:flex text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Toggle Sidebar">
                                 <i class="fas fa-bars text-xl"></i>
                             </button>
+                            
+                            <!-- Top Navigation Links -->
+                            <div class="hidden md:flex items-center space-x-1 ml-4">
+                                <!-- Projects Link -->
+                                <a href="{{ route('projects.index') }}" class="flex items-center px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors group {{ request()->routeIs('projects.*') ? 'bg-amber-200 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200' : 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/40 hover:text-amber-900 dark:hover:text-amber-200' }}">
+                                    <div class="flex-shrink-0 w-6 h-6 rounded bg-amber-200 dark:bg-amber-800 flex items-center justify-center text-amber-700 dark:text-amber-200 opacity-100 shadow-sm mr-2 group-hover:bg-amber-300 dark:group-hover:bg-amber-700 transition-colors">
+                                        <i class="fas fa-project-diagram text-xs"></i>
+                                    </div>
+                                    Projects
+                                </a>
+                                
+                                <!-- Builders Link -->
+                                <a href="{{ route('builders.index') }}" class="flex items-center px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors group {{ request()->routeIs('builders.*') ? 'bg-amber-200 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200' : 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/40 hover:text-amber-900 dark:hover:text-amber-200' }}">
+                                    <div class="flex-shrink-0 w-6 h-6 rounded bg-amber-200 dark:bg-amber-800 flex items-center justify-center text-amber-700 dark:text-amber-200 opacity-100 shadow-sm mr-2 group-hover:bg-amber-300 dark:group-hover:bg-amber-700 transition-colors">
+                                        <i class="fas fa-hard-hat text-xs"></i>
+                                    </div>
+                                    Builders
+                                </a>
+                                
+                                <!-- Contacts Dropdown -->
+                                <div class="relative" x-data="{ open: false }">
+                                    <button @click="open = !open" @click.away="open = false" class="px-2.5 py-1.5 rounded-lg text-sm font-medium flex items-center transition-colors group {{ request()->routeIs('contacts.*') ? 'bg-amber-200 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200' : 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/40 hover:text-amber-900 dark:hover:text-amber-200' }}">
+                                        <div class="flex-shrink-0 w-6 h-6 rounded bg-amber-200 dark:bg-amber-800 flex items-center justify-center text-amber-700 dark:text-amber-200 opacity-100 shadow-sm mr-2 group-hover:bg-amber-300 dark:group-hover:bg-amber-700 transition-colors">
+                                            <i class="fas fa-address-book text-xs"></i>
+                                        </div>
+                                        <span>Contacts</span>
+                                        <svg class="ml-1.5 h-3.5 w-3.5 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+
+                                    <div x-show="open" 
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0 scale-95"
+                                         x-transition:enter-end="opacity-100 scale-100"
+                                         x-transition:leave="transition ease-in duration-75"
+                                         x-transition:leave-start="opacity-100 scale-100"
+                                         x-transition:leave-end="opacity-0 scale-95"
+                                         class="absolute left-0 mt-2 w-80 rounded-xl shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50 p-3">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <a href="{{ route('admin.contacts.index') }}" class="flex items-center p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/20 hover:bg-indigo-200 dark:hover:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-indigo-200 transition-colors group">
+                                                <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-300 group-hover:bg-indigo-300 dark:group-hover:bg-indigo-700">
+                                                    <i class="fas fa-users text-xs"></i>
+                                                </div>
+                                                <span class="ml-2.5 text-xs font-medium uppercase tracking-wide">All</span>
+                                            </a>
+                                            @forelse($contactTypes as $key => $item)
+                                                @php
+                                                    $slug = null;
+                                                    $name = null;
+                                                    
+                                                    // Define color palettes with darker backgrounds (100-200 range)
+                                                    $colors = [
+                                                        ['bg' => 'bg-blue-100', 'text' => 'text-blue-800', 'hover_bg' => 'hover:bg-blue-200', 'hover_text' => 'hover:text-blue-900', 'icon_bg' => 'bg-blue-200', 'icon_text' => 'text-blue-700', 'icon_hover' => 'group-hover:bg-blue-300'],
+                                                        ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-800', 'hover_bg' => 'hover:bg-emerald-200', 'hover_text' => 'hover:text-emerald-900', 'icon_bg' => 'bg-emerald-200', 'icon_text' => 'text-emerald-700', 'icon_hover' => 'group-hover:bg-emerald-300'],
+                                                        ['bg' => 'bg-orange-100', 'text' => 'text-orange-800', 'hover_bg' => 'hover:bg-orange-200', 'hover_text' => 'hover:text-orange-900', 'icon_bg' => 'bg-orange-200', 'icon_text' => 'text-orange-700', 'icon_hover' => 'group-hover:bg-orange-300'],
+                                                        ['bg' => 'bg-pink-100', 'text' => 'text-pink-800', 'hover_bg' => 'hover:bg-pink-200', 'hover_text' => 'hover:text-pink-900', 'icon_bg' => 'bg-pink-200', 'icon_text' => 'text-pink-700', 'icon_hover' => 'group-hover:bg-pink-300'],
+                                                        ['bg' => 'bg-indigo-100', 'text' => 'text-indigo-800', 'hover_bg' => 'hover:bg-indigo-200', 'hover_text' => 'hover:text-indigo-900', 'icon_bg' => 'bg-indigo-200', 'icon_text' => 'text-indigo-700', 'icon_hover' => 'group-hover:bg-indigo-300'],
+                                                        ['bg' => 'bg-cyan-100', 'text' => 'text-cyan-800', 'hover_bg' => 'hover:bg-cyan-200', 'hover_text' => 'hover:text-cyan-900', 'icon_bg' => 'bg-cyan-200', 'icon_text' => 'text-cyan-700', 'icon_hover' => 'group-hover:bg-cyan-300'],
+                                                        ['bg' => 'bg-rose-100', 'text' => 'text-rose-800', 'hover_bg' => 'hover:bg-rose-200', 'hover_text' => 'hover:text-rose-900', 'icon_bg' => 'bg-rose-200', 'icon_text' => 'text-rose-700', 'icon_hover' => 'group-hover:bg-rose-300'],
+                                                        ['bg' => 'bg-violet-100', 'text' => 'text-violet-800', 'hover_bg' => 'hover:bg-violet-200', 'hover_text' => 'hover:text-violet-900', 'icon_bg' => 'bg-violet-200', 'icon_text' => 'text-violet-700', 'icon_hover' => 'group-hover:bg-violet-300'],
+                                                    ];
+                                                    
+                                                    // Get color based on loop index
+                                                    $color = $colors[$loop->index % count($colors)];
+
+                                                    if (is_string($item)) {
+                                                        // Handle ['slug' => 'Name'] format (from Controller)
+                                                        $slug = $key;
+                                                        $name = $item;
+                                                    } elseif (is_object($item) || is_array($item)) {
+                                                        // Handle Collection of Models or Array of Objects (from Layout Fallback)
+                                                        $obj = (object)$item;
+                                                        $slug = $obj->slug ?? null;
+                                                        $name = $obj->name ?? null;
+                                                    }
+                                                @endphp
+
+                                                @if($slug && $name)
+                                                    <a href="{{ route('admin.contacts.index', ['contact_type' => $slug]) }}" class="flex items-center p-2 rounded-lg {{ $color['bg'] }} dark:bg-gray-700/50 {{ $color['hover_bg'] }} dark:hover:bg-gray-700 {{ $color['text'] }} dark:text-gray-300 {{ $color['hover_text'] }} dark:hover:text-white transition-colors group">
+                                                        <div class="flex-shrink-0 w-7 h-7 rounded-lg {{ $color['icon_bg'] }} dark:bg-gray-600 flex items-center justify-center {{ $color['icon_text'] }} dark:text-gray-300 {{ $color['icon_hover'] }} dark:group-hover:bg-gray-500 transition-colors">
+                                                            <i class="fas fa-tag text-xs"></i>
+                                                        </div>
+                                                        <span class="ml-2.5 text-xs font-medium truncate uppercase tracking-wide">{{ $name }}</span>
+                                                    </a>
+                                                @endif
+                                            @empty
+                                                <div class="col-span-2 text-center py-4 text-sm text-gray-500 dark:text-gray-400">No types found</div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-4 ml-auto">
+                        
+                        <!-- Right-aligned icons -->
+                        <div class="flex items-center space-x-4 ml-4">
                             <!-- Reminders Icon -->
                             <a href="{{ route('reminders.index') }}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 relative" title="Reminders">
                                 <i class="fas fa-clock text-xl"></i>
@@ -517,6 +637,13 @@
                             <a href="{{ route('projects.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('projects.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}">
                                 <i class="fas fa-project-diagram mr-3"></i>Projects
                             </a>
+                            
+                            @can('view builders')
+                            <a href="{{ route('builders.index') }}" 
+                               class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('builders.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}">
+                                <i class="fas fa-hard-hat mr-3"></i>Builders
+                            </a>
+                            @endcan
                             
                             <a href="{{ route('visit-reports.index') }}" class="sidebar-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('visit-reports.*') ? 'active' : 'text-gray-700 dark:text-gray-300' }}">
                                 <i class="fas fa-clipboard-list mr-3"></i>Visit Reports
@@ -743,7 +870,17 @@
             $('form[data-confirm]').on('submit', function(e) {
                 e.preventDefault();
                 var message = $(this).data('confirm');
-                var form = this;
+                @php
+    $appearance = session('appearance', 'light');
+    
+    // Get contact types with fallback
+    $contactTypes = $contactTypes ?? \App\Models\ContactType::active()
+        ->orderBy('sort_order')
+        ->get(['id', 'name', 'slug']);
+    
+    // Ensure we have a collection
+    $contactTypes = collect($contactTypes);
+@endphp                var form = this;
                 
                 // Use jQuery to create a custom confirm dialog
                 if (confirm(message)) {

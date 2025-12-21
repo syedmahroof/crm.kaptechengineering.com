@@ -38,6 +38,7 @@ class ProjectContact extends Model
     public static function getRoles(): array
     {
         return [
+            'owner' => 'Owner',
             'project_manager' => 'Project Manager',
             'manager' => 'Manager',
             'site_engineer' => 'Site Engineer',

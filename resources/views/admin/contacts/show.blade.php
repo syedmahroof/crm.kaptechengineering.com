@@ -4,7 +4,7 @@
 
 @section('content')
 @php
-    $contactTypes = \App\Models\Contact::getContactTypes();
+    
     $priorityColors = [
         'low' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
         'medium' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
@@ -25,6 +25,11 @@
                     </div>
                     <div>
                         <h1 class="text-4xl font-bold mb-2">{{ $contact->name }}</h1>
+                        @if($contact->company_name)
+                            <p class="text-xl text-white/90 mb-2">
+                                <i class="fas fa-building mr-2"></i>{{ $contact->company_name }}
+                            </p>
+                        @endif
                         <div class="flex items-center space-x-3 flex-wrap">
                             @if($contact->contact_type)
                                 <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-white/20 backdrop-blur-sm border border-white/30">

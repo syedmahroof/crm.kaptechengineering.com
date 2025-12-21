@@ -75,7 +75,7 @@
         <div class="w-full max-w-md">
             <!-- Logo and Title Section -->
             <div class="text-center mb-8">
-                <img src="{{ asset('lansoa_light.png') }}" alt="{{ config('app.name') }}" style="width: 100px; height:auto; margin: 0 auto;" class="mb-4">
+                <img src="{{ asset('kaptech.png') }}" alt="{{ config('app.name') }}" style="width: 100px; height:auto; margin: 0 auto;" class="mb-4">
                 
             </div>
 

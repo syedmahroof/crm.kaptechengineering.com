@@ -28,117 +28,117 @@
             </div>
         </div>
         
-        <!-- Clean White Stats Grid with Minimal Colors -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <!-- Total Leads Card -->
-            <a href="{{ route('leads.index') }}" class="stat-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200 cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-users text-blue-600 dark:text-blue-400 text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">View</span>
+        <!-- Compact Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
+            <!-- Total Leads -->
+            <a href="{{ route('leads.index') }}" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-blue-50 dark:bg-blue-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-users text-blue-600 dark:text-blue-400 text-sm"></i>
                 </div>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Leads</h3>
-                <p class="text-3xl font-semibold text-gray-900 dark:text-white mb-1">{{ number_format($stats['totalLeads']) }}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['newLeads'] }} new today</p>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">Total Leads</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['totalLeads']) }}</p>
+                    <p class="text-[10px] text-blue-600 dark:text-blue-400 truncate">+{{ $stats['newLeads'] }} Today</p>
+                </div>
             </a>
 
-            <!-- Total Projects Card -->
-            <a href="{{ route('projects.index') }}" class="stat-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg hover:border-indigo-200 dark:hover:border-indigo-700 transition-all duration-200 cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-project-diagram text-indigo-600 dark:text-indigo-400 text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-2 py-1 rounded">View</span>
+            <!-- Total Projects -->
+            <a href="{{ route('projects.index') }}" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-indigo-200 dark:hover:border-indigo-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-project-diagram text-indigo-600 dark:text-indigo-400 text-sm"></i>
                 </div>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Projects</h3>
-                <p class="text-3xl font-semibold text-gray-900 dark:text-white mb-1">{{ number_format($stats['totalProjects']) }}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['activeProjects'] }} active</p>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">Projects</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['totalProjects']) }}</p>
+                    <p class="text-[10px] text-indigo-600 dark:text-indigo-400 truncate">{{ $stats['activeProjects'] }} Active</p>
+                </div>
             </a>
 
-            <!-- Total Contacts Card -->
-            <a href="{{ route('admin.contacts.index') }}" class="stat-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-700 transition-all duration-200 cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-envelope text-purple-600 dark:text-purple-400 text-lg"></i>
-                    </div>
-                    @if($stats['urgentContacts'] > 0)
-                    <span class="text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">{{ $stats['urgentContacts'] }} urgent</span>
-                    @else
-                    <span class="text-xs font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded">View</span>
-                    @endif
+            <!-- Total Companies -->
+            <a href="{{ route('admin.contacts.index') }}?type=company" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-amber-200 dark:hover:border-amber-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-amber-50 dark:bg-amber-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-building text-amber-600 dark:text-amber-400 text-sm"></i>
                 </div>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Contacts</h3>
-                <p class="text-3xl font-semibold text-gray-900 dark:text-white mb-1">{{ number_format($stats['totalContacts']) }}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['newContacts'] }} new today</p>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">Companies</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['totalCompanies']) }}</p>
+                    <p class="text-[10px] text-amber-600 dark:text-amber-400 truncate">Registered</p>
+                </div>
             </a>
 
-            <!-- Visit Reports Card -->
-            <a href="{{ route('visit-reports.index') }}" class="stat-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg hover:border-green-200 dark:hover:border-green-700 transition-all duration-200 cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-clipboard-list text-green-600 dark:text-green-400 text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">View</span>
+            <!-- Total Contacts -->
+            <a href="{{ route('admin.contacts.index') }}" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-purple-200 dark:hover:border-purple-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-purple-50 dark:bg-purple-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-envelope text-purple-600 dark:text-purple-400 text-sm"></i>
                 </div>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Visit Reports</h3>
-                <p class="text-3xl font-semibold text-gray-900 dark:text-white mb-1">{{ number_format($stats['totalVisitReports']) }}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['recentVisitReports'] }} this week</p>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">Contacts</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['totalContacts']) }}</p>
+                    <p class="text-[10px] text-purple-600 dark:text-purple-400 truncate">+{{ $stats['newContacts'] }} Today</p>
+                </div>
+            </a>
+
+            <!-- Visit Reports -->
+            <a href="{{ route('visit-reports.index') }}" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-green-200 dark:hover:border-green-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-green-50 dark:bg-green-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-clipboard-list text-green-600 dark:text-green-400 text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">Reports</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['totalVisitReports']) }}</p>
+                    <p class="text-[10px] text-green-600 dark:text-green-400 truncate">{{ $stats['recentVisitReports'] }} this week</p>
+                </div>
             </a>
         </div>
 
-        <!-- Additional Stats Row -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <!-- New Leads Card -->
-            <a href="{{ route('leads.index', ['status' => 'new']) }}" class="stat-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-700 transition-all duration-200 cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-user-plus text-purple-600 dark:text-purple-400 text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">Today</span>
+        <!-- Compact Secondary Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+            <!-- New Leads -->
+            <a href="{{ route('leads.index', ['status' => 'new']) }}" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-purple-200 dark:hover:border-purple-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-purple-50 dark:bg-purple-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-user-plus text-purple-600 dark:text-purple-400 text-sm"></i>
                 </div>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">New Leads</h3>
-                <p class="text-3xl font-semibold text-gray-900 dark:text-white mb-1">{{ number_format($stats['newLeads']) }}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">Created today</p>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">New Leads</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['newLeads']) }}</p>
+                    <p class="text-[10px] text-purple-600 dark:text-purple-400 truncate">Today</p>
+                </div>
             </a>
 
-            <!-- Convert This Week Card -->
-            <a href="{{ route('leads.index', ['status' => 'convert_this_week']) }}" class="stat-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg hover:border-amber-200 dark:hover:border-amber-700 transition-all duration-200 cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-calendar-week text-amber-600 dark:text-amber-400 text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded">This Week</span>
+            <!-- Convert This Week -->
+            <a href="{{ route('leads.index', ['status' => 'convert_this_week']) }}" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-amber-200 dark:hover:border-amber-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-amber-50 dark:bg-amber-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-calendar-week text-amber-600 dark:text-amber-400 text-sm"></i>
                 </div>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Convert This Week</h3>
-                <p class="text-3xl font-semibold text-gray-900 dark:text-white mb-1">{{ number_format($stats['convertThisWeek'] ?? 0) }}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">Leads to convert</p>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">Convert</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['convertThisWeek'] ?? 0) }}</p>
+                    <p class="text-[10px] text-amber-600 dark:text-amber-400 truncate">This Week</p>
+                </div>
             </a>
 
-            <!-- Converted Card -->
-            <a href="{{ route('leads.index', ['status' => 'converted']) }}" class="stat-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg hover:border-green-200 dark:hover:border-green-700 transition-all duration-200 cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-check-double text-green-600 dark:text-green-400 text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">Total</span>
+            <!-- Converted -->
+            <a href="{{ route('leads.index', ['status' => 'converted']) }}" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-green-200 dark:hover:border-green-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-green-50 dark:bg-green-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-check-double text-green-600 dark:text-green-400 text-sm"></i>
                 </div>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Converted</h3>
-                <p class="text-3xl font-semibold text-gray-900 dark:text-white mb-1">{{ number_format($stats['converted'] ?? 0) }}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">Successfully converted</p>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">Converted</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['converted'] ?? 0) }}</p>
+                    <p class="text-[10px] text-green-600 dark:text-green-400 truncate">Total</p>
+                </div>
             </a>
 
-            <!-- Upcoming Meetings Card -->
-            <a href="{{ route('visit-reports.index') }}" class="stat-card bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200 cursor-pointer">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-calendar-check text-blue-600 dark:text-blue-400 text-lg"></i>
-                    </div>
-                    <span class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">Next 7 Days</span>
+            <!-- Upcoming Meetings -->
+            <a href="{{ route('visit-reports.index') }}" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-sm hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200 cursor-pointer flex items-center space-x-3">
+                <div class="w-8 h-8 bg-blue-50 dark:bg-blue-900/20 rounded flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-calendar-check text-blue-600 dark:text-blue-400 text-sm"></i>
                 </div>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Upcoming Meetings</h3>
-                <p class="text-3xl font-semibold text-gray-900 dark:text-white mb-1">{{ number_format($stats['upcomingMeetings'] ?? 0) }}</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">Scheduled meetings</p>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">Meetings</p>
+                    <p class="text-lg font-bold text-gray-900 dark:text-white leading-tight">{{ number_format($stats['upcomingMeetings'] ?? 0) }}</p>
+                    <p class="text-[10px] text-blue-600 dark:text-blue-400 truncate">Next 7 Days</p>
+                </div>
             </a>
         </div>
 
@@ -307,27 +307,59 @@
                 </div>
             </div>
 
-            <!-- Clean White Quote of the Day - Business Quotes -->
-            <div class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-800 p-6 shadow-lg hover:shadow-xl transition-all duration-200">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-md">
-                        <i class="fas fa-quote-left text-white text-2xl"></i>
-                    </div>
-                    <div class="mb-2">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Quote of the Day</h3>
-                        <p class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">Business Inspiration</p>
-                    </div>
-                    <blockquote class="space-y-4 mt-4">
-                        <div class="relative">
-                            <i class="fas fa-quote-left text-indigo-300 dark:text-indigo-600 text-3xl absolute -top-2 -left-2 opacity-50"></i>
-                            <p class="text-lg italic text-gray-800 dark:text-gray-200 leading-relaxed px-6 py-2 relative z-10">"{{ $quoteOfTheDay['text'] }}"</p>
+            <!-- Upcoming Maturity Projects -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-lg hover:border-indigo-200 dark:hover:border-indigo-700 transition-all duration-200">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-hourglass-half text-indigo-600 dark:text-indigo-400"></i>
                         </div>
-                        <footer class="flex items-center justify-center space-x-2 pt-2">
-                            <div class="w-8 h-px bg-indigo-300 dark:bg-indigo-600"></div>
-                            <p class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">— {{ $quoteOfTheDay['author'] }}</p>
-                            <div class="w-8 h-px bg-indigo-300 dark:bg-indigo-600"></div>
-                        </footer>
-                    </blockquote>
+                        <div>
+                            <h3 class="font-semibold text-gray-900 dark:text-white">Upcoming Maturity</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Projects nearing completion</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('projects.index') }}" class="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 text-sm font-medium transition-colors">
+                        View All →
+                    </a>
+                </div>
+                <div class="space-y-2">
+                    @forelse($upcomingMaturityProjects as $project)
+                        <a href="{{ route('projects.show', $project->id) }}" class="flex items-center justify-between p-3 rounded-lg hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-colors border border-gray-100 dark:border-gray-700/30 group">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded flex items-center justify-center flex-shrink-0">
+                                    <span class="text-indigo-700 dark:text-indigo-300 font-semibold text-xs">
+                                        {{ strtoupper(substr($project->name, 0, 1)) }}
+                                    </span>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-medium text-gray-900 dark:text-white text-sm truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $project->name }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                                        <i class="fas fa-user-circle mr-1.5 text-gray-400"></i>
+                                        {{ $project->user->name ?? 'Unassigned' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right flex-shrink-0 ml-2">
+                                <span class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium 
+                                    {{ $project->expected_maturity_date->isPast() ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800' :
+                                       ($project->expected_maturity_date->isToday() ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200 dark:border-amber-800' :
+                                       'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 border border-green-200 dark:border-green-800') }}">
+                                    {{ $project->expected_maturity_date->format('M d') }}
+                                </span>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                    {{ $project->expected_maturity_date->diffForHumans() }}
+                                </p>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="text-center py-8">
+                            <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-hourglass-start text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No upcoming projects</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>

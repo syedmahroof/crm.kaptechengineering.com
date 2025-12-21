@@ -39,15 +39,9 @@ class VisitReport extends Model
     /**
      * Get all related entities (projects, customers, contacts).
      */
-    public function visitReportables(): MorphToMany
+    public function visitReportables()
     {
-        return $this->morphToMany(
-            Model::class,
-            'visit_reportable',
-            'visit_reportables',
-            'visit_report_id',
-            'visit_reportable_id'
-        )->withTimestamps();
+        return $this->hasMany(VisitReportable::class, 'visit_report_id');
     }
 
     /**

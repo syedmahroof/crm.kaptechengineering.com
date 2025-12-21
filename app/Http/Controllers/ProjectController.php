@@ -113,11 +113,16 @@ class ProjectController extends Controller
         $users = \App\Models\User::orderBy('name')->get();
         $india = \App\Models\Country::where('iso_code', 'IN')->first();
         $projectTypes = \App\Models\ProjectType::active()->ordered()->get();
+        $branches = \App\Models\Branch::active()->get();
+
+        $states = \App\Models\State::where('country_id', $india?->id)->active()->ordered()->get();
 
         return view('admin.projects.create', [
             'users' => $users,
             'india' => $india,
             'projectTypes' => $projectTypes,
+            'states' => $states,
+            'branches' => $branches,
         ]);
     }
 
@@ -128,16 +133,57 @@ class ProjectController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'owner_name' => 'nullable|string|max:255',
+            'owner_phone' => 'nullable|string|max:20',
+            'owner_email' => 'nullable|email|max:255',
+            'contacts' => 'nullable|array',
+            'contacts.*.name' => 'required|string|max:255',
+            'contacts.*.role' => 'nullable|string|max:50',
+            'contacts.*.phone' => 'nullable|string|max:20',
+            'contacts.*.email' => 'nullable|email|max:255',
             'description' => 'nullable|string',
             'address' => 'nullable|string',
+            'state_id' => 'nullable|exists:states,id',
+            'district_id' => 'nullable|exists:districts,id',
+            'location' => 'nullable|string',
+            'pincode' => 'nullable|string',
+            'expected_maturity_date' => 'nullable|date',
             'user_id' => 'nullable|exists:users,id',
             'status' => 'nullable|in:planning,in_progress,on_hold,completed,cancelled',
             'project_type' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'branch_id' => 'nullable|exists:branches,id',
+            'preferred_material' => 'nullable|string',
         ]);
 
-        Project::create($validated);
+        $projectData = \Illuminate\Support\Arr::except($validated, ['owner_phone', 'owner_email', 'contacts']);
+        $project = Project::create($projectData);
+
+        // Handle Owner Contact
+        if ($request->filled('owner_name') || $request->filled('owner_phone') || $request->filled('owner_email')) {
+            $project->projectContacts()->create([
+                'name' => $request->owner_name ?? 'Owner',
+                'role' => 'owner',
+                'phone' => $request->owner_phone,
+                'email' => $request->owner_email,
+                'is_primary' => true,
+            ]);
+        }
+
+        // Handle Team Contacts
+        if ($request->has('contacts') && is_array($request->contacts)) {
+            foreach ($request->contacts as $contact) {
+                if (!empty($contact['name'])) {
+                    $project->projectContacts()->create([
+                        'name' => $contact['name'],
+                        'role' => $contact['role'] ?? 'other',
+                        'phone' => $contact['phone'] ?? null,
+                        'email' => $contact['email'] ?? null,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('projects.index')
                         ->with('success', 'Project created successfully.');
@@ -172,10 +218,24 @@ class ProjectController extends Controller
         $users = \App\Models\User::orderBy('name')->get();
         $projectTypes = \App\Models\ProjectType::active()->ordered()->get();
 
+        $states = \App\Models\State::where('country_id', 1)->active()->ordered()->get(); // Assuming India (1) for now or load based on dependency
+        // Better: Load all active states or based on project's country if we had it. For now, let's load active states.
+        $states = \App\Models\State::active()->ordered()->get();
+        // Even better, reuse the logic from contact controller? 
+        // Let's just load all active states to be safe, or just Indian states if that's the primary use case. 
+        // Given '$india' usage in create, let's fetch India's ID or just all.
+        // Let's go with all active states to be safe.
+        $states = \App\Models\State::active()->ordered()->get();
+        $districts = $project->state_id ? \App\Models\District::where('state_id', $project->state_id)->active()->ordered()->get() : collect();
+        $branches = \App\Models\Branch::active()->get();
+
         return view('admin.projects.edit', [
             'project' => $project,
             'users' => $users,
             'projectTypes' => $projectTypes,
+            'states' => $states,
+            'districts' => $districts,
+            'branches' => $branches,
         ]);
     }
 
@@ -186,16 +246,81 @@ class ProjectController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'owner_name' => 'nullable|string|max:255',
+            'owner_phone' => 'nullable|string|max:20',
+            'owner_email' => 'nullable|email|max:255',
+            'contacts' => 'nullable|array',
+            'contacts.*.name' => 'required|string|max:255',
+            'contacts.*.role' => 'nullable|string|max:50',
+            'contacts.*.phone' => 'nullable|string|max:20',
+            'contacts.*.email' => 'nullable|email|max:255',
             'description' => 'nullable|string',
             'address' => 'nullable|string',
+            'state_id' => 'nullable|exists:states,id',
+            'district_id' => 'nullable|exists:districts,id',
+            'location' => 'nullable|string',
+            'pincode' => 'nullable|string',
+            'expected_maturity_date' => 'nullable|date',
             'user_id' => 'nullable|exists:users,id',
             'status' => 'nullable|in:planning,in_progress,on_hold,completed,cancelled',
             'project_type' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'branch_id' => 'nullable|exists:branches,id',
         ]);
 
-        $project->update($validated);
+        $projectData = \Illuminate\Support\Arr::except($validated, ['owner_phone', 'owner_email', 'contacts']);
+        $project->update($projectData);
+
+        // Update Owner Contact
+        if ($request->filled('owner_name') || $request->filled('owner_phone') || $request->filled('owner_email')) {
+            $ownerContact = $project->projectContacts()->where('role', 'owner')->first();
+            if ($ownerContact) {
+                $ownerContact->update([
+                    'name' => $request->owner_name ?? $ownerContact->name, // Keep existing name if not cleared? Or allow clearing? User request implies fields are present.
+                    'phone' => $request->owner_phone,
+                    'email' => $request->owner_email,
+                ]);
+            } else {
+                $project->projectContacts()->create([
+                    'name' => $request->owner_name ?? 'Owner',
+                    'role' => 'owner',
+                    'phone' => $request->owner_phone,
+                    'email' => $request->owner_email,
+                    'is_primary' => true,
+                ]);
+            }
+        }
+
+        // Sync Team Contacts (non-owner)
+        // Simplest approach: Delete all non-owner/non-primary contacts and recreate? 
+        // Or better: keep existing IDs if we were passing them. Since we are using a simple repeater without IDs in create/edit for now, 
+        // and 'show' page handles management better, maybe we only ADD new ones here or replace list.
+        // User asked to "add multiple team contacts". 
+        // Let's implement a "Replace All Non-Owner Contacts" strategy for the Edit page input if provided, 
+        // OR just append. 
+        // Given the request "also when create and edit project need to add multiple team contacts", 
+        // usually implies a full management capability. 
+        // I will clear non-owner contacts and recreate from the list if 'contacts' is present in request.
+        // This assumes the Edit form sends ALL contacts.
+        
+        if ($request->has('contacts')) {
+            // Remove existing non-owner contacts
+            $project->projectContacts()->where('role', '!=', 'owner')->delete();
+            
+            if (is_array($request->contacts)) {
+                foreach ($request->contacts as $contact) {
+                    if (!empty($contact['name'])) {
+                        $project->projectContacts()->create([
+                            'name' => $contact['name'],
+                            'role' => $contact['role'] ?? 'other',
+                            'phone' => $contact['phone'] ?? null,
+                            'email' => $contact['email'] ?? null,
+                        ]);
+                    }
+                }
+            }
+        }
 
         return redirect()->route('projects.index')
                         ->with('success', 'Project updated successfully.');

@@ -31,6 +31,7 @@ final class Project extends Model
 
     protected $fillable = [
         'name',
+        'owner_name',
         'description',
         'address',
         'user_id',
@@ -38,12 +39,40 @@ final class Project extends Model
         'project_type',
         'start_date',
         'end_date',
+        'state_id',
+        'district_id',
+        'location',
+        'pincode',
+        'expected_maturity_date',
+        'branch_id',
+        'preferred_material',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'expected_maturity_date' => 'date',
     ];
+
+    /**
+     * Get the state that the project belongs to.
+     *
+     * @return BelongsTo<State, $this>
+     */
+    public function state(): BelongsTo
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    /**
+     * Get the district that the project belongs to.
+     *
+     * @return BelongsTo<District, $this>
+     */
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo(District::class);
+    }
 
     /**
      * Get the user that owns the project.

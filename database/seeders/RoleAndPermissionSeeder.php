@@ -141,6 +141,12 @@ class RoleAndPermissionSeeder extends Seeder
             
             // Calendar permissions
             'view calendar',
+            
+            // Builder permissions
+            'view builders',
+            'create builders',
+            'edit builders',
+            'delete builders',
         ];
 
         foreach ($permissions as $permission) {
@@ -178,13 +184,15 @@ class RoleAndPermissionSeeder extends Seeder
             'view users', 'create users', 'edit users', 'delete users',
             'view roles', 'view permissions', 'manage_roles',
             'view leads', 'create leads', 'edit leads', 'delete leads', 'export leads',
-            'view banners', 'create banners', 'edit banners', 'delete banners', 'manage_banners'
+            'view banners', 'create banners', 'edit banners', 'delete banners', 'manage_banners',
+            'view builders', 'create builders', 'edit builders', 'delete builders'
         ]);
         
         // Assign specific permissions to manager
         $managerRole->syncPermissions([
             'view users',
-            'view leads', 'create leads', 'edit leads', 'export leads'
+            'view leads', 'create leads', 'edit leads', 'export leads',
+            'view builders', 'create builders', 'edit builders'
         ]);
         
         // Assign specific permissions to agent

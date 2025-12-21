@@ -60,39 +60,58 @@
                         </div>
                     </div>
                 </div>
-                @if(!empty($stats['by_type']))
-                    @foreach($stats['by_type'] as $type => $count)
-                        @if($loop->index < 3)
-                        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-lg p-5 border border-indigo-200 dark:border-indigo-800">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-xs font-medium text-indigo-600 dark:text-indigo-400">{{ Str::limit($contactTypes[$type] ?? $type, 20) }}</p>
-                                    <p class="text-2xl font-bold text-indigo-900 dark:text-indigo-100 mt-1">{{ number_format($count) }}</p>
-                                </div>
-                                <div class="w-10 h-10 bg-indigo-200 dark:bg-indigo-800 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-tag text-indigo-700 dark:text-indigo-300"></i>
-                                </div>
+                @php
+                    // Merge counts with all contact types to show 0 counts as well
+                    $allTypeCounts = [];
+                    foreach($contactTypes as $slug => $name) {
+                        $allTypeCounts[$slug] = $stats['by_type'][$slug] ?? 0;
+                    }
+                    // Sort by count desc
+                    arsort($allTypeCounts);
+                @endphp
+                
+                @foreach($allTypeCounts as $type => $count)
+                    @if($loop->index < 3)
+                    <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-lg p-5 border border-indigo-200 dark:border-indigo-800">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-indigo-600 dark:text-indigo-400">{{ Str::limit($contactTypes[$type] ?? $type, 20) }}</p>
+                                <p class="text-2xl font-bold text-indigo-900 dark:text-indigo-100 mt-1">{{ number_format($count) }}</p>
+                            </div>
+                            <div class="w-10 h-10 bg-indigo-200 dark:bg-indigo-800 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-tag text-indigo-700 dark:text-indigo-300"></i>
                             </div>
                         </div>
-                        @endif
-                    @endforeach
-                @endif
+                    </div>
+                    @endif
+                @endforeach
             </div>
             
             <!-- All Contact Types Breakdown (only show types beyond the first 3) -->
-            @if(!empty($stats['by_type']) && count($stats['by_type']) > 3)
+            @php
+                // Get all types beyond the first 3
+                $otherTypes = [];
+                $shownCount = 0;
+                
+                foreach ($allTypeCounts as $type => $count) {
+                    if ($shownCount >= 3) {
+                        $otherTypes[$type] = $count;
+                    }
+                    $shownCount++;
+                }
+            @endphp
+            
+            @if(!empty($otherTypes))
             <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                     <i class="fas fa-chart-pie mr-2 text-gray-400"></i>All Contact Types
                 </h4>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    @foreach($stats['by_type'] as $type => $count)
-                        @if($loop->index >= 3)
+                    @foreach($otherTypes as $type => $count)
                         <div class="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($count) }}</p>
                             <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ Str::limit($contactTypes[$type] ?? $type, 15) }}</p>
                         </div>
-                        @endif
                     @endforeach
                 </div>
             </div>
@@ -253,6 +272,11 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="font-medium text-gray-900 dark:text-white">{{ $contact->name }}</div>
+                                @if($contact->company_name)
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                        <i class="fas fa-building mr-1"></i>{{ $contact->company_name }}
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{{ $contact->email }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">

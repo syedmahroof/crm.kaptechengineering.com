@@ -15,7 +15,7 @@ class ContactTypeSeeder extends Seeder
     public function run(): void
     {
         // Get all contact types from the static method
-        $contactTypesMap = Contact::getContactTypes();
+    
         
         // Get all unique contact_type values from contacts table
         $existingTypes = \DB::table('contacts')

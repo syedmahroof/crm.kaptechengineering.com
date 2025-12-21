@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('results', function (Blueprint $table): void {
-            $table->id();
-            $table->timestamps();
+        Schema::table('projects', function (Blueprint $table) {
+            $table->string('owner_name')->nullable()->after('name');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('results');
+        Schema::table('projects', function (Blueprint $table) {
+            $table->dropColumn('owner_name');
+        });
     }
 };

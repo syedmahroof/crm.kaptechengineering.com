@@ -44,6 +44,7 @@ class ContactController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('company_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
                   ->orWhere('subject', 'like', "%{$search}%")
@@ -90,6 +91,7 @@ class ContactController extends Controller
             $search = $request->search;
             $statsQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('company_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
                   ->orWhere('subject', 'like', "%{$search}%")
@@ -106,11 +108,17 @@ class ContactController extends Controller
             ->pluck('count', 'project_type')
             ->toArray();
 
+        // First get all active contact type slugs
+        $activeContactTypeSlugs = \App\Models\ContactType::active()
+            ->pluck('slug')
+            ->toArray();
+            
         $stats = [
             'total' => $statsQuery->count(),
             'by_type' => (clone $statsQuery)
                 ->selectRaw('contact_type, COUNT(*) as count')
                 ->whereNotNull('contact_type')
+                ->whereIn('contact_type', $activeContactTypeSlugs)
                 ->groupBy('contact_type')
                 ->pluck('count', 'contact_type')
                 ->toArray(),
@@ -118,7 +126,11 @@ class ContactController extends Controller
         ];
 
         $projects = \App\Models\Project::orderBy('name')->get();
-        $contactTypes = Contact::getContactTypes();
+        $contactTypes = \App\Models\ContactType::active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name', 'slug')
+            ->toArray();
         $countries = \App\Models\Country::active()->ordered()->get();
         $states = collect();
         $districts = collect();
@@ -159,11 +171,16 @@ class ContactController extends Controller
     public function create()
     {
         $projects = \App\Models\Project::orderBy('name')->get();
-        $contactTypes = Contact::getContactTypes();
+        $contactTypes = \App\Models\ContactType::active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name', 'slug')
+            ->toArray();
         $countries = \App\Models\Country::active()->ordered()->get();
         $india = \App\Models\Country::where('iso_code', 'IN')->first();
         $states = collect();
         $districts = collect();
+        $branches = \App\Models\Branch::active()->get();
         
         // If India exists, load its states
         if ($india) {
@@ -177,6 +194,7 @@ class ContactController extends Controller
             'india' => $india,
             'states' => $states,
             'districts' => $districts,
+            'branches' => $branches,
         ]);
     }
 
@@ -187,16 +205,20 @@ class ContactController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'company_name' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:255',
             'contact_type' => 'nullable|string',
             'country_id' => 'nullable|exists:countries,id',
             'state_id' => 'nullable|exists:states,id',
             'district_id' => 'nullable|exists:districts,id',
+            'address' => 'nullable|string',
             'subject' => 'required|string|max:255',
             'message' => 'required|string',
             'priority' => 'nullable|in:low,medium,high,urgent',
+            'priority' => 'nullable|in:low,medium,high,urgent',
             'project_id' => 'nullable|exists:projects,id',
+            'branch_id' => 'nullable|exists:branches,id',
         ]);
 
         Contact::create($validated);
@@ -241,7 +263,12 @@ class ContactController extends Controller
     {
         $contact->load('repliedBy');
         $projects = \App\Models\Project::orderBy('name')->get();
-        $contactTypes = Contact::getContactTypes();
+        $contactTypes = \App\Models\ContactType::active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name', 'slug')
+            ->toArray();
+        $branches = \App\Models\Branch::active()->get();
         $countries = \App\Models\Country::active()->ordered()->get();
         $states = collect();
         $districts = collect();
@@ -260,7 +287,9 @@ class ContactController extends Controller
             'contactTypes' => $contactTypes,
             'countries' => $countries,
             'states' => $states,
+            'states' => $states,
             'districts' => $districts,
+            'branches' => $branches,
         ]);
     }
 
@@ -270,16 +299,20 @@ class ContactController extends Controller
     public function update(Request $request, Contact $contact)
     {
         $request->validate([
+            'company_name' => 'nullable|string|max:255',
             'priority' => 'required|in:low,medium,high,urgent',
             'admin_notes' => 'nullable|string',
             'project_id' => 'nullable|exists:projects,id',
             'contact_type' => 'nullable|string',
             'country_id' => 'nullable|exists:countries,id',
             'state_id' => 'nullable|exists:states,id',
+            'country_id' => 'nullable|exists:countries,id',
+            'state_id' => 'nullable|exists:states,id',
             'district_id' => 'nullable|exists:districts,id',
+            'branch_id' => 'nullable|exists:branches,id',
         ]);
 
-        $data = $request->only(['priority', 'admin_notes', 'project_id', 'contact_type', 'country_id', 'state_id', 'district_id']);
+        $data = $request->only(['company_name', 'priority', 'admin_notes', 'project_id', 'contact_type', 'country_id', 'state_id', 'district_id', 'branch_id']);
 
         $contact->update($data);
 
@@ -371,6 +404,7 @@ class ContactController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('company_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
                   ->orWhere('subject', 'like', "%{$search}%");
@@ -378,7 +412,11 @@ class ContactController extends Controller
         }
 
         $contacts = $query->orderBy('created_at', 'desc')->get();
-        $contactTypes = Contact::getContactTypes();
+        $contactTypes = \App\Models\ContactType::active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name', 'slug')
+            ->toArray();
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -396,6 +434,7 @@ class ContactController extends Controller
             fputcsv($file, [
                 'ID',
                 'Name',
+                'Company Name',
                 'Email',
                 'Phone',
                 'Contact Type',
@@ -418,6 +457,7 @@ class ContactController extends Controller
                 fputcsv($file, [
                     $contact->id,
                     $contact->name,
+                    $contact->company_name ?? '',
                     $contact->email,
                     $contact->phone ?? '',
                     $contact->contact_type ? ($contactTypes[$contact->contact_type] ?? $contact->contact_type) : '',

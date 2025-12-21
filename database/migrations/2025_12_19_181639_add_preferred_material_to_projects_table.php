@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('diagnoses', function (Blueprint $table): void {
-            $table->string('suit_id')->nullable()->after('inventory_id'); // Adjust placement as needed
+        Schema::table('projects', function (Blueprint $table) {
+            $table->text('preferred_material')->nullable()->after('branch_id');
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('diagnoses', function (Blueprint $table): void {
-            $table->dropColumn('suit_id'); // Correctly removes the column
+        Schema::table('projects', function (Blueprint $table) {
+            $table->dropColumn('preferred_material');
         });
     }
 };

@@ -14,12 +14,15 @@ class Contact extends Model
 
     protected $fillable = [
         'name',
+        'company_name',
         'email',
         'phone',
         'contact_type',
         'country_id',
         'state_id',
         'district_id',
+        'branch_id',
+        'address',
         'subject',
         'message',
         'priority',
@@ -34,6 +37,11 @@ class Contact extends Model
     ];
 
     // Relationships
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function repliedBy()
     {
         return $this->belongsTo(User::class, 'replied_by');
@@ -97,29 +105,7 @@ class Contact extends Model
         return $this->priority === 'urgent';
     }
 
-    /**
-     * Get all available contact types
-     */
-    public static function getContactTypes(): array
-    {
-        return [
-            'builders_developers' => 'Builders and Developers',
-            'hospitals' => 'Hospitals',
-            'mep_consultants' => 'MEP Consultants',
-            'architects' => 'Architects',
-            'project' => 'Project',
-            'plumbing_contractors' => 'Plumbing Contractors',
-            'electrical_contractors' => 'Electrical Contractors',
-            'hvac_contractors' => 'HVAC Contractors',
-            'petrol_pump_contractors' => 'Petrol Pump Contractors',
-            'civil_eng_contractors' => 'Civil Eng. Contractors',
-            'fire_fighting_contractors' => 'Fire Fighting Contractors',
-            'interior_designers' => 'Interior Designers',
-            'swimming_pool_stp' => 'Swimming pool & STP',
-            'biomedicals' => 'Biomedicals',
-            'shop_retail' => 'Shop & Retail',
-        ];
-    }
+  
 
     /**
      * Get the visit reports for the contact.

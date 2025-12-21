@@ -20,6 +20,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         LeadAgent::class => LeadAgentPolicy::class,
         Lead::class => LeadPolicy::class,
+        \App\Models\Builder::class => \App\Policies\BuilderPolicy::class,
     ];
 
     /**

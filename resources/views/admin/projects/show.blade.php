@@ -129,6 +129,13 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                <i class="fas fa-user-circle mr-2 text-gray-400"></i>Owner Name
+                            </label>
+                            <p class="text-gray-900 dark:text-white font-medium">{{ $project->owner_name ?? 'N/A' }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                                 <i class="fas fa-user mr-2 text-gray-400"></i>Assignee
                             </label>
                             <p class="text-gray-900 dark:text-white font-medium">{{ $project->user->name ?? 'N/A' }}</p>
@@ -296,6 +303,40 @@
 
         <!-- Sidebar -->
         <div class="space-y-6">
+            <!-- Next Actions -->
+            <!-- Expected Maturity Date -->
+            @if($project->expected_maturity_date)
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-hourglass-half text-amber-600 dark:text-amber-400"></i>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Expected Maturity</h3>
+                </div>
+                <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-calendar-alt text-amber-600 dark:text-amber-400"></i>
+                        <div>
+                            <p class="text-xs font-medium text-amber-600 dark:text-amber-400">Target Date</p>
+                            <p class="text-sm font-semibold text-amber-900 dark:text-amber-100">{{ $project->expected_maturity_date->format('M d, Y') }}</p>
+                            <p class="text-xs text-amber-700 dark:text-amber-300 mt-1">{{ $project->expected_maturity_date->diffForHumans() }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Preferred Materials -->
+            @if($project->preferred_material)
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-layer-group text-indigo-600 dark:text-indigo-400"></i>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Preferred Materials</h3>
+                </div>
+                <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                    <p class="text-sm text-indigo-900 dark:text-indigo-100 whitespace-pre-line">{{ $project->preferred_material }}</p>
+                </div>
+            </div>
+            @endif
+
             <!-- Next Actions -->
             @if($latestVisitReport && ($latestVisitReport->next_meeting_date || $latestVisitReport->next_call_date))
             <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">

@@ -153,6 +153,7 @@ class DashboardController extends Controller
             ->whereDate('created_at', '<=', $endOfDay)
             ->count();
         $urgentContacts = Contact::where('priority', 'urgent')->count();
+        $totalCompanies = Contact::whereNotNull('company_name')->distinct('company_name')->count('company_name');
 
         // Get visit reports statistics
         $totalVisitReports = VisitReport::count();
@@ -162,6 +163,14 @@ class DashboardController extends Controller
         $upcomingMeetings = VisitReport::where('next_meeting_date', '>=', $startOfDay)
             ->where('next_meeting_date', '<=', $endOfDay->copy()->addDays(7))
             ->count();
+
+        // Get projects with upcoming maturity date
+        $upcomingMaturityProjects = Project::with('user')
+            ->whereNotNull('expected_maturity_date')
+            ->where('expected_maturity_date', '>=', $startOfDay)
+            ->orderBy('expected_maturity_date')
+            ->limit(5)
+            ->get();
 
         // Get quote of the day - Business Quotes
         $businessQuotes = [
@@ -231,6 +240,7 @@ class DashboardController extends Controller
                 'totalContacts' => $totalContacts,
                 'newContacts' => $newContacts,
                 'urgentContacts' => $urgentContacts,
+                'totalCompanies' => $totalCompanies,
                 'totalVisitReports' => $totalVisitReports,
                 'recentVisitReports' => $recentVisitReports,
                 'upcomingMeetings' => $upcomingMeetings,
@@ -239,6 +249,7 @@ class DashboardController extends Controller
             'todos' => $todos,
             'assignedLeads' => $assignedLeads,
             'pendingTasksList' => $pendingTasksList,
+            'upcomingMaturityProjects' => $upcomingMaturityProjects,
             'quoteOfTheDay' => $quoteOfTheDay
         ]);
     }

@@ -14,12 +14,34 @@
     <form action="{{ route('admin.contacts.store') }}" method="POST" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-6">
         @csrf
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name *</label>
                 <input type="text" name="name" value="{{ old('name') }}" required
                        class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
                 @error('name')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company Name</label>
+                <input type="text" name="company_name" value="{{ old('company_name') }}"
+                       class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                @error('company_name')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Branch</label>
+                <select name="branch_id" id="branch_id" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                    <option value="">Select a branch...</option>
+                    @foreach($branches as $branch)
+                        <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                    @endforeach
+                </select>
+                @error('branch_id')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -125,6 +147,14 @@
                     <option value="urgent" {{ old('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
                 </select>
             </div>
+
+            <div class="md:col-span-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
+                <textarea name="address" rows="3" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">{{ old('address') }}</textarea>
+                @error('address')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
 
         <div>
@@ -192,6 +222,13 @@
 <script>
     $(document).ready(function() {
         // Initialize Select2 for all select boxes (searchable)
+        $('#branch_id').select2({
+            placeholder: 'Select a branch...',
+            allowClear: true,
+            width: '100%',
+            theme: 'bootstrap-5'
+        });
+
         $('#contact_type').select2({
             placeholder: 'Select a type...',
             allowClear: true,

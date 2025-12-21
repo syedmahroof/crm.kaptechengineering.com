@@ -15,7 +15,50 @@
         @csrf
         @method('PUT')
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Contact Information (Read-only) -->
+        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-6">
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <i class="fas fa-info-circle mr-2"></i>Contact Information (Read-only)
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Name</label>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $contact->name }}</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Email</label>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $contact->email }}</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Phone</label>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $contact->phone ?? '-' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company Name</label>
+                <input type="text" name="company_name" value="{{ old('company_name', $contact->company_name) }}"
+                       class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                @error('company_name')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Branch</label>
+                <select name="branch_id" id="branch_id" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                    <option value="">Select a branch...</option>
+                    @foreach($branches as $branch)
+                        <option value="{{ $branch->id }}" {{ old('branch_id', $contact->branch_id) == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                    @endforeach
+                </select>
+                @error('branch_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</label>
                 <select name="priority" required class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
@@ -74,6 +117,14 @@
                         <option value="{{ $project->id }}" {{ old('project_id', $contact->project_id) == $project->id ? 'selected' : '' }}>{{ $project->name }}</option>
                     @endforeach
                 </select>
+            </div>
+
+            <div class="md:col-span-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
+                <textarea name="address" rows="3" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">{{ old('address', $contact->address) }}</textarea>
+                @error('address')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
         </div>
 

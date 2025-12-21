@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inventories', function (Blueprint $table): void {
-            $table->id();
-            $table->string('imei')->unique();
-            $table->string('status')->default('available'); // Available, Diagnosing, Repaired, etc.
-            $table->timestamps();
+        Schema::table('contacts', function (Blueprint $table) {
+            $table->text('address')->nullable()->after('email');
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inventories');
+        Schema::table('contacts', function (Blueprint $table) {
+            $table->dropColumn('address');
+        });
     }
 };

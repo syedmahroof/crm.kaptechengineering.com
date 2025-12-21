@@ -92,4 +92,20 @@ class Branch extends Model
     {
         return $this->hasMany(Customer::class);
     }
+
+    /**
+     * Get the projects for the branch.
+     */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    /**
+     * Get the builders for the branch.
+     */
+    public function builders(): HasMany
+    {
+        return $this->hasMany(Builder::class);
+    }
 }
