@@ -147,6 +147,8 @@ class RoleAndPermissionSeeder extends Seeder
             'create builders',
             'edit builders',
             'delete builders',
+            'restore builders',
+            'force delete builders',
         ];
 
         foreach ($permissions as $permission) {

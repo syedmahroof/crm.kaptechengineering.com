@@ -50,4 +50,13 @@ class Builder extends Model
     {
         return $this->hasMany(Project::class);
     }
+
+    /**
+     * Get the purchase managers for the builder.
+     */
+    public function purchaseManagers()
+    {
+        return $this->belongsToMany(Contact::class, 'builder_purchase_manager', 'builder_id', 'contact_id')
+                    ->withTimestamps();
+    }
 }

@@ -35,7 +35,8 @@ class BuilderController extends Controller
         
         $countries = Country::orderBy('name')->get();
         $branches = \App\Models\Branch::active()->get();
-        return view('admin.builders.create', compact('countries', 'branches'));
+        $contacts = \App\Models\Contact::orderBy('name')->get();
+        return view('admin.builders.create', compact('countries', 'branches', 'contacts'));
     }
 
     /**
@@ -69,9 +70,15 @@ class BuilderController extends Controller
             'gst_number' => 'nullable|string|max:50|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/',
             'status' => 'boolean',
             'branch_id' => 'nullable|exists:branches,id',
+            'purchase_managers' => 'nullable|array',
+            'purchase_managers.*' => 'exists:contacts,id',
         ]);
 
         $builder = Builder::create($validated);
+
+        if ($request->has('purchase_managers')) {
+            $builder->purchaseManagers()->sync($request->purchase_managers);
+        }
 
         return redirect()->route('builders.show', $builder)
             ->with('success', 'Builder created successfully');
@@ -84,7 +91,7 @@ class BuilderController extends Controller
     {
         $this->authorize('view', $builder);
         
-        $builder->load(['country', 'state', 'district', 'projects']);
+        $builder->load(['country', 'state', 'district', 'projects', 'purchaseManagers']);
         return view('admin.builders.show', compact('builder'));
     }
 
@@ -99,8 +106,9 @@ class BuilderController extends Controller
         $states = State::where('country_id', $builder->country_id)->orderBy('name')->get();
         $districts = District::where('state_id', $builder->state_id)->orderBy('name')->get();
         $branches = \App\Models\Branch::active()->get();
+        $contacts = \App\Models\Contact::orderBy('name')->get();
 
-        return view('admin.builders.edit', compact('builder', 'countries', 'states', 'districts', 'branches'));
+        return view('admin.builders.edit', compact('builder', 'countries', 'states', 'districts', 'branches', 'contacts'));
     }
 
     /**
@@ -144,9 +152,17 @@ class BuilderController extends Controller
             ],
             'status' => 'boolean',
             'branch_id' => 'nullable|exists:branches,id',
+            'purchase_managers' => 'nullable|array',
+            'purchase_managers.*' => 'exists:contacts,id',
         ]);
 
         $builder->update($validated);
+
+        if ($request->has('purchase_managers')) {
+            $builder->purchaseManagers()->sync($request->purchase_managers);
+        } else {
+            $builder->purchaseManagers()->detach();
+        }
 
         return redirect()->route('builders.show', $builder)
             ->with('success', 'Builder updated successfully');

@@ -202,6 +202,23 @@
                     @enderror
                 </div>
 
+                <!-- Purchase Managers -->
+                <div class="col-span-1 md:col-span-4">
+                    <label for="purchase_managers" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Purchase Managers
+                    </label>
+                    <select name="purchase_managers[]" id="purchase_managers" class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500" multiple>
+                        @foreach($contacts as $contact)
+                            <option value="{{ $contact->id }}" {{ collect(old('purchase_managers', $builder->purchaseManagers->pluck('id')))->contains($contact->id) ? 'selected' : '' }}>
+                                {{ $contact->name }} @if($contact->company_name) ({{ $contact->company_name }}) @endif - {{ $contact->phone ?? $contact->email }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('purchase_managers')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Status -->
                 <div class="col-span-1 md:col-span-4 flex items-center">
                     <input type="hidden" name="status" value="0">
@@ -237,6 +254,12 @@
         // Initialize Select2
         $('#country_id, #state_id, #district_id').select2({
             theme: 'classic',
+            width: '100%'
+        });
+
+        $('#purchase_managers').select2({
+            placeholder: 'Select Purchase Managers',
+            allowClear: true,
             width: '100%'
         });
 

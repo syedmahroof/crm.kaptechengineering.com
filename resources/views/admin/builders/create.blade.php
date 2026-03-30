@@ -205,15 +205,32 @@
                     @enderror
                 </div>
 
+                <!-- Purchase Managers -->
+                <div class="col-span-1 md:col-span-4">
+                    <label for="purchase_managers" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Purchase Managers
+                    </label>
+                    <select name="purchase_managers[]" id="purchase_managers" class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-blue-500" multiple>
+                        @foreach($contacts as $contact)
+                            <option value="{{ $contact->id }}" {{ collect(old('purchase_managers'))->contains($contact->id) ? 'selected' : '' }}>
+                                {{ $contact->name }} @if($contact->company_name) ({{ $contact->company_name }}) @endif - {{ $contact->phone ?? $contact->email }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('purchase_managers')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Status -->
                 <div class="col-span-1 md:col-span-4 flex items-center">
-                    <input type="hidden" name="is_active" value="0">
-                    <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', 1) ? 'checked' : '' }}
+                    <input type="hidden" name="status" value="0">
+                    <input type="checkbox" name="status" id="status" value="1" {{ old('status', 1) ? 'checked' : '' }}
                         class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                    <label for="is_active" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    <label for="status" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                         Active
                     </label>
-                    @error('is_active')
+                    @error('status')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
@@ -241,6 +258,12 @@
         // Initialize Select2
         $('#country_id, #state_id, #district_id').select2({
             theme: 'classic',
+            width: '100%'
+        });
+
+        $('#purchase_managers').select2({
+            placeholder: 'Select Purchase Managers',
+            allowClear: true,
             width: '100%'
         });
 

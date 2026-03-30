@@ -15,7 +15,7 @@ class BuilderPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_builders');
+        return $user->can('view builders');
     }
 
     /**
@@ -23,7 +23,7 @@ class BuilderPolicy
      */
     public function view(User $user, Builder $builder): bool
     {
-        return $user->can('view_builders');
+        return $user->can('view builders');
     }
 
     /**
@@ -31,7 +31,7 @@ class BuilderPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_builders');
+        return $user->can('create builders');
     }
 
     /**
@@ -39,7 +39,7 @@ class BuilderPolicy
      */
     public function update(User $user, Builder $builder): bool
     {
-        return $user->can('edit_builders');
+        return $user->can('edit builders');
     }
 
     /**
@@ -47,7 +47,7 @@ class BuilderPolicy
      */
     public function delete(User $user, Builder $builder): bool
     {
-        return $user->can('delete_builders');
+        return $user->can('delete builders');
     }
 
     /**
@@ -55,7 +55,7 @@ class BuilderPolicy
      */
     public function restore(User $user, Builder $builder): bool
     {
-        return $user->can('restore_builders');
+        return $user->can('restore builders');
     }
 
     /**
@@ -63,6 +63,6 @@ class BuilderPolicy
      */
     public function forceDelete(User $user, Builder $builder): bool
     {
-        return $user->can('force_delete_builders');
+        return $user->can('force delete builders');
     }
 }
