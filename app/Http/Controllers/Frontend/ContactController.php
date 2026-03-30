@@ -28,7 +28,6 @@ class ContactController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
-            'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
         ]);
 
@@ -37,12 +36,11 @@ class ContactController extends Controller
         $urgentKeywords = ['urgent', 'emergency', 'asap', 'immediately'];
         $highKeywords = ['important', 'priority', 'help', 'issue'];
         
-        $subjectLower = strtolower($request->subject);
         $messageLower = strtolower($request->message);
         
-        if (collect($urgentKeywords)->contains(fn($keyword) => str_contains($subjectLower, $keyword) || str_contains($messageLower, $keyword))) {
+        if (collect($urgentKeywords)->contains(fn($keyword) => str_contains($messageLower, $keyword))) {
             $priority = 'urgent';
-        } elseif (collect($highKeywords)->contains(fn($keyword) => str_contains($subjectLower, $keyword) || str_contains($messageLower, $keyword))) {
+        } elseif (collect($highKeywords)->contains(fn($keyword) => str_contains($messageLower, $keyword))) {
             $priority = 'high';
         }
 
@@ -50,7 +48,6 @@ class ContactController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'subject' => $request->subject,
             'message' => $request->message,
             'status' => 'new',
             'priority' => $priority,
@@ -77,14 +74,13 @@ class ContactController extends Controller
                     $adminUsers,
                     'contact.new',
                     'New Contact Message',
-                    'New message from ' . $contact->name . ': ' . $contact->subject,
+                    'New message from ' . $contact->name,
                     route('admin.contacts.show', $contact->id),
                     [
                         'priority' => $contact->priority,
                         'contact_id' => $contact->id,
                         'contact_name' => $contact->name,
                         'contact_email' => $contact->email,
-                        'contact_subject' => $contact->subject,
                     ]
                 );
             }

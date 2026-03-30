@@ -86,6 +86,7 @@ class VisitReportController extends Controller
     {
         $validated = $request->validate([
             'visit_date' => 'required|date',
+            'type' => 'required|string|in:Call Report,Meeting,TeleCall',
             'objective' => 'required|string',
             'report' => 'nullable|string',
             'next_meeting_date' => 'nullable|date',
@@ -185,6 +186,7 @@ class VisitReportController extends Controller
     {
         $validated = $request->validate([
             'visit_date' => 'required|date',
+            'type' => 'required|string|in:Call Report,Meeting,TeleCall',
             'objective' => 'required|string',
             'report' => 'nullable|string',
             'next_meeting_date' => 'nullable|date',
@@ -387,5 +389,17 @@ class VisitReportController extends Controller
                 'end_date' => $endDate->toDateString(),
             ],
         ]);
+    }
+
+    /**
+     * Get available visit report types.
+     */
+    public static function getVisitReportTypes(): array
+    {
+        return [
+            'Call Report' => 'Call Report',
+            'Meeting' => 'Meeting',
+            'TeleCall' => 'TeleCall',
+        ];
     }
 }

@@ -28,6 +28,9 @@
                         @if($contact->company_name)
                             <p class="text-xl text-white/90 mb-2">
                                 <i class="fas fa-building mr-2"></i>{{ $contact->company_name }}
+                                @if($contact->gst_number)
+                                    <span class="ml-3 text-sm bg-white/10 px-2 py-0.5 rounded border border-white/20">GST: {{ $contact->gst_number }}</span>
+                                @endif
                             </p>
                         @endif
                         <div class="flex items-center space-x-3 flex-wrap">
@@ -39,6 +42,11 @@
                             <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
                                 <i class="fas fa-flag mr-1"></i>{{ ucfirst($contact->priority ?? 'N/A') }}
                             </span>
+                            @if($contact->discount)
+                                <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-yellow-400 text-yellow-900 border border-yellow-500/30">
+                                    <i class="fas fa-percent mr-1"></i>Discount: {{ $contact->discount }}
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -184,6 +192,24 @@
                             </a>
                         </div>
                         @endif
+
+                        @if($contact->gst_number)
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                                <i class="fas fa-file-invoice mr-2 text-gray-400"></i>GST Number
+                            </label>
+                            <p class="text-gray-900 dark:text-white font-medium italic">{{ $contact->gst_number }}</p>
+                        </div>
+                        @endif
+
+                        @if($contact->discount)
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                                <i class="fas fa-percent mr-2 text-gray-400"></i>Special Discount
+                            </label>
+                            <p class="text-gray-900 dark:text-white font-medium">{{ $contact->discount }}</p>
+                        </div>
+                        @endif
                     </div>
                     
                     <div class="space-y-4">
@@ -222,6 +248,10 @@
                                     <p class="text-gray-900 dark:text-white font-medium">{{ $contact->created_at->format('F d, Y') }}</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ $contact->created_at->diffForHumans() }}</p>
                                 </div>
+                                <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Assigned To</p>
+                                    <p class="text-gray-900 dark:text-white font-medium">{{ $contact->assignedUser->name ?? 'Unassigned' }}</p>
+                                </div>
                                 @if($contact->replied_at)
                                 <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Replied</p>
@@ -246,12 +276,6 @@
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Message</h2>
                 </div>
                 <div class="space-y-4">
-                    @if($contact->subject)
-                    <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Subject</label>
-                        <p class="text-lg font-semibold text-gray-900 dark:text-white p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">{{ $contact->subject }}</p>
-                    </div>
-                    @endif
                     <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Content</label>
                         <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-gray-900 dark:text-white whitespace-pre-wrap border border-gray-200 dark:border-gray-600">

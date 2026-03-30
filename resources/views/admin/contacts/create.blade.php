@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-6">
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Create Contact</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Create Contact <span id="selected-type-display" class="text-blue-600 dark:text-blue-400"></span></h1>
         <a href="{{ route('admin.contacts.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
             <i class="fas fa-arrow-left mr-2"></i>Back
         </a>
@@ -34,6 +34,15 @@
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">GST Number</label>
+                <input type="text" name="gst_number" value="{{ old('gst_number') }}"
+                       class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                @error('gst_number')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Branch</label>
                 <select name="branch_id" id="branch_id" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
                     <option value="">Select a branch...</option>
@@ -42,6 +51,19 @@
                     @endforeach
                 </select>
                 @error('branch_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned To *</label>
+                <select name="assigned_user_id" id="assigned_user_id" required class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                    <option value="">Select a user...</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('assigned_user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                    @endforeach
+                </select>
+                @error('assigned_user_id')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -95,7 +117,7 @@
                 <select name="state_id" id="state_id" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
                     <option value="">Select a state...</option>
                     @foreach($states as $state)
-                        <option value="{{ $state->id }}" {{ old('state_id') == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
+                        <option value="{{ $state->id }}" {{ (old('state_id') == $state->id || (!old('state_id') && $state->name == 'Kerala')) ? 'selected' : '' }}>{{ $state->name }}</option>
                     @endforeach
                 </select>
                 @error('state_id')
@@ -129,14 +151,6 @@
                 @enderror
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject *</label>
-                <input type="text" name="subject" value="{{ old('subject') }}" required
-                       class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
-                @error('subject')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</label>
@@ -146,6 +160,15 @@
                     <option value="high" {{ old('priority') == 'high' ? 'selected' : '' }}>High</option>
                     <option value="urgent" {{ old('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
                 </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discount</label>
+                <input type="text" name="discount" value="{{ old('discount') }}" placeholder="e.g. 10% or $50"
+                       class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                @error('discount')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="md:col-span-4">
@@ -229,6 +252,13 @@
             theme: 'bootstrap-5'
         });
 
+        $('#assigned_user_id').select2({
+            placeholder: 'Select a user...',
+            allowClear: false,
+            width: '100%',
+            theme: 'bootstrap-5'
+        });
+
         $('#contact_type').select2({
             placeholder: 'Select a type...',
             allowClear: true,
@@ -271,6 +301,13 @@
             theme: 'bootstrap-5',
             minimumResultsForSearch: Infinity // Hide search for small lists
         });
+        
+        // Update header type display
+        $('#contact_type').on('change', function() {
+            const selectedOption = $(this).find('option:selected');
+            const typeText = selectedOption.val() ? ' - ' + selectedOption.text() : '';
+            $('#selected-type-display').text(typeText);
+        }).trigger('change');
         
         // Load states when country changes
         $('#country_id').on('change', function() {
@@ -323,6 +360,11 @@
                 });
             }
         });
+
+        // Trigger change on load if there's a pre-selected value
+        if ($('#state_id').val()) {
+            $('#state_id').trigger('change');
+        }
     });
 </script>
 @endpush

@@ -149,6 +149,17 @@
                 <div class="space-y-4">
                     <div class="p-4 bg-white dark:bg-white rounded-lg border border-gray-200 dark:border-gray-600">
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-500 mb-1">
+                            <i class="fas fa-list-ul mr-1"></i>Visit Type
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-900">
+                            <span class="px-2 py-0.5 rounded-full {{ $visitReport->type == 'Meeting' ? 'bg-indigo-100 text-indigo-800' : ($visitReport->type == 'Call Report' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800') }}">
+                                {{ $visitReport->type ?? 'N/A' }}
+                            </span>
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-white dark:bg-white rounded-lg border border-gray-200 dark:border-gray-600">
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-500 mb-1">
                             <i class="fas fa-calendar mr-1"></i>Visit Date
                         </label>
                         <p class="text-lg font-semibold text-gray-900 dark:text-gray-900">{{ $visitReport->visit_date->format('M d, Y') }}</p>

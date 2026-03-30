@@ -13,6 +13,7 @@ class VisitReport extends Model
 
     protected $fillable = [
         'user_id',
+        'type',
         'visit_date',
         'objective',
         'report',

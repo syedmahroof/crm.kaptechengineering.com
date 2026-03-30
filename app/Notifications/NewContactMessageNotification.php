@@ -45,11 +45,10 @@ class NewContactMessageNotification extends Notification implements ShouldQueue
         };
 
         return (new MailMessage)
-                    ->subject('New Contact Message - ' . $this->contact->subject)
+                    ->subject('New Contact Message from ' . $this->contact->name)
                     ->greeting('New Contact Message Received')
                     ->line('A new contact message has been submitted:')
                     ->line('**From:** ' . $this->contact->name . ' (' . $this->contact->email . ')')
-                    ->line('**Subject:** ' . $this->contact->subject)
                     ->line('**Priority:** ' . ucfirst($this->contact->priority))
                     ->line('**Message:** ' . $this->contact->message)
                     ->action('View Contact Message', route('admin.contacts.show', $this->contact->id))
@@ -74,14 +73,13 @@ class NewContactMessageNotification extends Notification implements ShouldQueue
         return [
             'type' => 'contact.new',
             'title' => 'New Contact Message',
-            'message' => 'New message from ' . $this->contact->name . ': ' . $this->contact->subject,
+            'message' => 'New message from ' . $this->contact->name,
             'url' => route('admin.contacts.show', $this->contact->id),
             'priority' => $this->contact->priority,
             'priority_color' => $priorityColor,
             'contact_id' => $this->contact->id,
             'contact_name' => $this->contact->name,
             'contact_email' => $this->contact->email,
-            'contact_subject' => $this->contact->subject,
         ];
     }
 }

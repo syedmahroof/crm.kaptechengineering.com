@@ -13,7 +13,7 @@ class ContactController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Contact::with(['repliedBy', 'project', 'country', 'state', 'district']);
+        $query = Contact::with(['repliedBy', 'assignedUser', 'project', 'country', 'state', 'district']);
 
         // Apply filters
         if ($request->filled('priority')) {
@@ -47,7 +47,6 @@ class ContactController extends Controller
                   ->orWhere('company_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%")
                   ->orWhere('message', 'like', "%{$search}%");
             });
         }
@@ -94,7 +93,6 @@ class ContactController extends Controller
                   ->orWhere('company_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%")
                   ->orWhere('message', 'like', "%{$search}%");
             });
         }
@@ -181,10 +179,15 @@ class ContactController extends Controller
         $states = collect();
         $districts = collect();
         $branches = \App\Models\Branch::active()->get();
+        $users = \App\Models\User::orderBy('name')->get();
         
         // If India exists, load its states
         if ($india) {
             $states = \App\Models\State::where('country_id', $india->id)->active()->ordered()->get();
+            $kerala = $states->where('name', 'Kerala')->first();
+            if ($kerala) {
+                $districts = \App\Models\District::where('state_id', $kerala->id)->active()->ordered()->get();
+            }
         }
         
         return view('admin.contacts.create', [
@@ -195,6 +198,7 @@ class ContactController extends Controller
             'states' => $states,
             'districts' => $districts,
             'branches' => $branches,
+            'users' => $users,
         ]);
     }
 
@@ -206,6 +210,7 @@ class ContactController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'company_name' => 'nullable|string|max:255',
+            'gst_number' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:255',
             'contact_type' => 'nullable|string',
@@ -213,12 +218,12 @@ class ContactController extends Controller
             'state_id' => 'nullable|exists:states,id',
             'district_id' => 'nullable|exists:districts,id',
             'address' => 'nullable|string',
-            'subject' => 'required|string|max:255',
             'message' => 'required|string',
             'priority' => 'nullable|in:low,medium,high,urgent',
-            'priority' => 'nullable|in:low,medium,high,urgent',
+            'discount' => 'nullable|string|max:255',
             'project_id' => 'nullable|exists:projects,id',
             'branch_id' => 'nullable|exists:branches,id',
+            'assigned_user_id' => 'required|exists:users,id',
         ]);
 
         Contact::create($validated);
@@ -232,7 +237,7 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
-        $contact->load(['repliedBy', 'project', 'country', 'state', 'district']);
+        $contact->load(['repliedBy', 'assignedUser', 'project', 'country', 'state', 'district']);
 
         // Find projects where this contact appears as a project contact (matching by name, email, or phone)
         $projectContacts = \App\Models\ProjectContact::where(function($query) use ($contact) {
@@ -280,6 +285,7 @@ class ContactController extends Controller
         if ($contact->state_id) {
             $districts = \App\Models\District::where('state_id', $contact->state_id)->active()->ordered()->get();
         }
+        $users = \App\Models\User::orderBy('name')->get();
 
         return view('admin.contacts.edit', [
             'contact' => $contact,
@@ -287,9 +293,9 @@ class ContactController extends Controller
             'contactTypes' => $contactTypes,
             'countries' => $countries,
             'states' => $states,
-            'states' => $states,
             'districts' => $districts,
             'branches' => $branches,
+            'users' => $users,
         ]);
     }
 
@@ -300,19 +306,21 @@ class ContactController extends Controller
     {
         $request->validate([
             'company_name' => 'nullable|string|max:255',
+            'gst_number' => 'nullable|string|max:255',
             'priority' => 'required|in:low,medium,high,urgent',
+            'discount' => 'nullable|string|max:255',
             'admin_notes' => 'nullable|string',
             'project_id' => 'nullable|exists:projects,id',
             'contact_type' => 'nullable|string',
             'country_id' => 'nullable|exists:countries,id',
             'state_id' => 'nullable|exists:states,id',
-            'country_id' => 'nullable|exists:countries,id',
             'state_id' => 'nullable|exists:states,id',
             'district_id' => 'nullable|exists:districts,id',
             'branch_id' => 'nullable|exists:branches,id',
+            'assigned_user_id' => 'required|exists:users,id',
         ]);
 
-        $data = $request->only(['company_name', 'priority', 'admin_notes', 'project_id', 'contact_type', 'country_id', 'state_id', 'district_id', 'branch_id']);
+        $data = $request->only(['company_name', 'gst_number', 'priority', 'discount', 'admin_notes', 'project_id', 'contact_type', 'country_id', 'state_id', 'district_id', 'branch_id', 'assigned_user_id']);
 
         $contact->update($data);
 
@@ -379,7 +387,7 @@ class ContactController extends Controller
      */
     public function export(Request $request)
     {
-        $query = Contact::with(['repliedBy', 'project', 'country', 'state', 'district']);
+        $query = Contact::with(['repliedBy', 'assignedUser', 'project', 'country', 'state', 'district']);
 
         // Apply same filters as index
         if ($request->filled('priority')) {
@@ -406,8 +414,7 @@ class ContactController extends Controller
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('company_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%");
+                  ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
@@ -438,7 +445,6 @@ class ContactController extends Controller
                 'Email',
                 'Phone',
                 'Contact Type',
-                'Subject',
                 'Message',
                 'Priority',
                 'Country',
@@ -461,7 +467,6 @@ class ContactController extends Controller
                     $contact->email,
                     $contact->phone ?? '',
                     $contact->contact_type ? ($contactTypes[$contact->contact_type] ?? $contact->contact_type) : '',
-                    $contact->subject,
                     $contact->message,
                     ucfirst($contact->priority ?? ''),
                     $contact->country->name ?? '',

@@ -46,15 +46,9 @@
                                     <input type="tel" class="form-control" id="phone" name="phone" >
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="subject">Subject *</label>
-                                    <input type="text" class="form-control" id="subject" name="subject" required>
-                                </div>
-                            </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="subject">Subject *</label>
+                                    <label for="message">Message *</label>
                                     <textarea class="form-control" id="message" name="message" rows="6" required></textarea>
                                 </div>
                             </div>

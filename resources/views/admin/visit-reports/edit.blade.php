@@ -128,6 +128,24 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-list-ul mr-2 text-gray-400"></i>Visit Type <span class="text-red-500">*</span>
+                    </label>
+                    <select name="type" id="type" required
+                            class="w-full px-4 py-2.5 border rounded-lg {{ $errors->has('type') ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500' }} dark:bg-gray-700 dark:text-white transition-colors">
+                        <option value="">Select a type...</option>
+                        @foreach(\App\Http\Controllers\VisitReportController::getVisitReportTypes() as $key => $label)
+                            <option value="{{ $key }}" {{ old('type', $visitReport->type) == $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('type')
+                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
                 <div class="md:col-span-2">
                     <label for="objective" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         <i class="fas fa-bullseye mr-2 text-gray-400"></i>Objective of Visiting <span class="text-red-500">*</span>

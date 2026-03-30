@@ -32,17 +32,6 @@
                             <input type="text" id="company" name="company">
                         </div>
                         <div class="form-group">
-                            <label for="subject">Subject *</label>
-                            <select id="subject" name="subject" required>
-                                <option value="">Select a subject</option>
-                                <option value="product-inquiry">Product Inquiry</option>
-                                <option value="quote-request">Quote Request</option>
-                                <option value="technical-support">Technical Support</option>
-                                <option value="partnership">Partnership Opportunity</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label for="message">Message *</label>
                             <textarea id="message" name="message" required></textarea>
                         </div>

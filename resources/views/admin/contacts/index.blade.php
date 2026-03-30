@@ -261,8 +261,10 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Phone</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Assigned To</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Project</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Priority</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Discount</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
                     </tr>
@@ -275,6 +277,9 @@
                                 @if($contact->company_name)
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                         <i class="fas fa-building mr-1"></i>{{ $contact->company_name }}
+                                        @if($contact->gst_number)
+                                            <span class="ml-2 text-[10px] bg-gray-100 dark:bg-gray-800 px-1 rounded border border-gray-200 dark:border-gray-700">GST: {{ $contact->gst_number }}</span>
+                                        @endif
                                     </div>
                                 @endif
                             </td>
@@ -303,6 +308,18 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-3">
+                                        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
+                                            {{ $contact->assignedUser ? strtoupper(substr($contact->assignedUser->name, 0, 1)) : '?' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm text-gray-900 dark:text-white">
+                                        {{ $contact->assignedUser->name ?? 'Unassigned' }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @if($contact->project)
                                     <a href="{{ route('projects.show', $contact->project->id) }}" class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800">
                                         {{ Str::limit($contact->project->name, 20) }}
@@ -324,6 +341,15 @@
                                 <span class="px-2 py-1 text-xs rounded-full {{ $priorityColor }}">
                                     {{ ucfirst($contact->priority ?? 'N/A') }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($contact->discount)
+                                    <span class="text-sm font-medium text-orange-600 dark:text-orange-400">
+                                        <i class="fas fa-percent mr-1"></i>{{ $contact->discount }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400 text-xs">-</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contact->created_at->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right">

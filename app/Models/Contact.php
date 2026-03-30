@@ -15,6 +15,7 @@ class Contact extends Model
     protected $fillable = [
         'name',
         'company_name',
+        'gst_number',
         'email',
         'phone',
         'contact_type',
@@ -23,12 +24,13 @@ class Contact extends Model
         'district_id',
         'branch_id',
         'address',
-        'subject',
         'message',
         'priority',
+        'discount',
         'admin_notes',
         'replied_at',
         'replied_by',
+        'assigned_user_id',
         'project_id',
     ];
 
@@ -45,6 +47,11 @@ class Contact extends Model
     public function repliedBy()
     {
         return $this->belongsTo(User::class, 'replied_by');
+    }
+
+    public function assignedUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_user_id');
     }
 
     public function project()

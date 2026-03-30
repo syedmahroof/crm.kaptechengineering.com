@@ -47,6 +47,15 @@
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">GST Number</label>
+                <input type="text" name="gst_number" value="{{ old('gst_number', $contact->gst_number) }}"
+                       class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                @error('gst_number')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Branch</label>
                 <select name="branch_id" id="branch_id" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
                     <option value="">Select a branch...</option>
@@ -60,6 +69,19 @@
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned To *</label>
+                <select name="assigned_user_id" id="assigned_user_id" required class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                    <option value="">Select a user...</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('assigned_user_id', $contact->assigned_user_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                    @endforeach
+                </select>
+                @error('assigned_user_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priority</label>
                 <select name="priority" required class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
                     <option value="low" {{ old('priority', $contact->priority) == 'low' ? 'selected' : '' }}>Low</option>
@@ -67,6 +89,15 @@
                     <option value="high" {{ old('priority', $contact->priority) == 'high' ? 'selected' : '' }}>High</option>
                     <option value="urgent" {{ old('priority', $contact->priority) == 'urgent' ? 'selected' : '' }}>Urgent</option>
                 </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discount</label>
+                <input type="text" name="discount" value="{{ old('discount', $contact->discount) }}" placeholder="e.g. 10% or $50"
+                       class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                @error('discount')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div>

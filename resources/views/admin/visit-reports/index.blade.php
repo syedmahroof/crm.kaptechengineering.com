@@ -51,6 +51,7 @@
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Type</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Linked Entities</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Objective</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Report</th>
@@ -63,6 +64,11 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                 {{ $visitReport->visit_date->format('M d, Y') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $visitReport->type == 'Meeting' ? 'bg-indigo-100 text-indigo-800' : ($visitReport->type == 'Call Report' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800') }}">
+                                    {{ $visitReport->type ?? 'N/A' }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <div class="flex flex-wrap gap-1">
@@ -110,7 +116,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                 No visit reports found.
                             </td>
                         </tr>
