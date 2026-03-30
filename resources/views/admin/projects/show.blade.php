@@ -141,6 +141,19 @@
                             <p class="text-gray-900 dark:text-white font-medium">{{ $project->user->name ?? 'N/A' }}</p>
                         </div>
                         
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                <i class="fas fa-building mr-2 text-gray-400"></i>Builder
+                            </label>
+                            @if($project->builder)
+                                <a href="{{ route('admin.builders.show', $project->builder_id) }}" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
+                                    {{ $project->builder->name }}
+                                </a>
+                            @else
+                                <p class="text-gray-900 dark:text-white font-medium">N/A</p>
+                            @endif
+                        </div>
+                        
                         @if($project->address)
                         <div>
                             <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">

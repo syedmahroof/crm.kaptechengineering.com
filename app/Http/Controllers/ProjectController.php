@@ -116,6 +116,7 @@ class ProjectController extends Controller
         $branches = \App\Models\Branch::active()->get();
 
         $states = \App\Models\State::where('country_id', $india?->id)->active()->ordered()->get();
+        $builders = \App\Models\Builder::orderBy('name')->get();
 
         return view('admin.projects.create', [
             'users' => $users,
@@ -123,6 +124,7 @@ class ProjectController extends Controller
             'projectTypes' => $projectTypes,
             'states' => $states,
             'branches' => $branches,
+            'builders' => $builders,
         ]);
     }
 
@@ -155,6 +157,7 @@ class ProjectController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'branch_id' => 'nullable|exists:branches,id',
             'preferred_material' => 'nullable|string',
+            'builder_id' => 'nullable|exists:builders,id',
         ]);
 
         $projectData = \Illuminate\Support\Arr::except($validated, ['owner_phone', 'owner_email', 'contacts']);
@@ -228,6 +231,7 @@ class ProjectController extends Controller
         $states = \App\Models\State::active()->ordered()->get();
         $districts = $project->state_id ? \App\Models\District::where('state_id', $project->state_id)->active()->ordered()->get() : collect();
         $branches = \App\Models\Branch::active()->get();
+        $builders = \App\Models\Builder::orderBy('name')->get();
 
         return view('admin.projects.edit', [
             'project' => $project,
@@ -236,6 +240,7 @@ class ProjectController extends Controller
             'states' => $states,
             'districts' => $districts,
             'branches' => $branches,
+            'builders' => $builders,
         ]);
     }
 
@@ -267,6 +272,7 @@ class ProjectController extends Controller
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'branch_id' => 'nullable|exists:branches,id',
+            'builder_id' => 'nullable|exists:builders,id',
         ]);
 
         $projectData = \Illuminate\Support\Arr::except($validated, ['owner_phone', 'owner_email', 'contacts']);

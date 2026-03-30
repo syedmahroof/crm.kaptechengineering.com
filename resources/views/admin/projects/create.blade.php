@@ -145,6 +145,22 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <div>
+                    <label for="builder_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Builder</label>
+                    <select name="builder_id" id="builder_id"
+                            class="mt-1 block w-full px-3 py-2 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        <option value="">Select Builder</option>
+                        @foreach($builders as $builder)
+                            <option value="{{ $builder->id }}" {{ old('builder_id') == $builder->id ? 'selected' : '' }}>
+                                {{ $builder->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('builder_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
                 
                 <div>
                     <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Assignee</label>

@@ -46,6 +46,7 @@ final class Project extends Model
         'expected_maturity_date',
         'branch_id',
         'preferred_material',
+        'builder_id',
     ];
 
     protected $casts = [
@@ -53,6 +54,16 @@ final class Project extends Model
         'end_date' => 'date',
         'expected_maturity_date' => 'date',
     ];
+
+    /**
+     * Get the builder that the project belongs to.
+     *
+     * @return BelongsTo<Builder, $this>
+     */
+    public function builder(): BelongsTo
+    {
+        return $this->belongsTo(Builder::class);
+    }
 
     /**
      * Get the state that the project belongs to.

@@ -244,6 +244,11 @@
                                 @if($project->description)
                                     <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ Str::limit($project->description, 60) }}</div>
                                 @endif
+                                @if($project->builder)
+                                    <div class="text-xs text-indigo-600 dark:text-indigo-400 mt-1 italic">
+                                        <i class="fas fa-building mr-1"></i>{{ $project->builder->name }}
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 @if($project->project_type)
