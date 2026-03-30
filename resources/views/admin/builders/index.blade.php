@@ -14,11 +14,26 @@
 
 @section('content')
 <div class="px-6 py-4">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Builders</h2>
-        <a href="{{ route('admin.builders.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:border-blue-900 focus:ring focus:ring-blue-300 disabled:opacity-25 transition">
-            <i class="fas fa-plus mr-2"></i> Add New Builder
-        </a>
+        
+        <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+            <!-- Search Form -->
+            <form action="{{ route('builders.index') }}" method="GET" class="w-full md:w-72">
+                <div class="relative">
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           placeholder="Search builders..." 
+                           class="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <div class="absolute left-3 top-2.5 text-gray-400">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </form>
+
+            <a href="{{ route('builders.create') }}" class="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                <i class="fas fa-plus mr-2"></i> Add New Builder
+            </a>
+        </div>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -31,6 +46,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Phone</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -38,7 +54,9 @@
                     @forelse($builders as $builder)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                {{ $builder->name }}
+                                <a href="{{ route('builders.show', $builder) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                    {{ $builder->name }}
+                                </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                 {{ $builder->contact_person ?? 'N/A' }}
@@ -56,14 +74,24 @@
                                     N/A
                                 @endif
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $builder->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ $builder->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end space-x-2">
-                                    <a href="{{ route('admin.builders.edit', $builder) }}" 
+                                    <a href="{{ route('builders.show', $builder) }}" 
+                                       class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                       title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('builders.edit', $builder) }}" 
                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                                        title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('admin.builders.destroy', $builder) }}" method="POST" class="inline" 
+                                    <form action="{{ route('builders.destroy', $builder) }}" method="POST" class="inline" 
                                           onsubmit="return confirm('Are you sure you want to delete this builder?');">
                                         @csrf
                                         @method('DELETE')
@@ -78,8 +106,16 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                No builders found.
+                            <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                @if(request('search'))
+                                    <div class="flex flex-col items-center">
+                                        <i class="fas fa-search text-3xl mb-3 opacity-20"></i>
+                                        <p>No builders found matching "<strong>{{ request('search') }}</strong>"</p>
+                                        <a href="{{ route('builders.index') }}" class="mt-2 text-blue-600 hover:underline text-xs">Clear search</a>
+                                    </div>
+                                @else
+                                    No builders found.
+                                @endif
                             </td>
                         </tr>
                     @endforelse

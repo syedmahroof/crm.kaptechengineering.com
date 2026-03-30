@@ -15,13 +15,27 @@ class BuilderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //$this->authorize('viewAny', Builder::class);
         
-        $builders = Builder::with(['country', 'state', 'district'])
-            ->latest()
-            ->paginate(15);
+        $query = Builder::with(['country', 'state', 'district']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('contact_person', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%");
+            });
+        }
+
+        $builders = $query->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('admin.builders.index', compact('builders'));
     }
