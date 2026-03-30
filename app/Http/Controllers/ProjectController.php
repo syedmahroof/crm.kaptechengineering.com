@@ -12,7 +12,7 @@ class ProjectController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Project::with(['user'])->withCount(['contacts', 'visitReports'])->orderBy('created_at', 'desc');
+        $query = Project::with(['user', 'builder'])->withCount(['contacts', 'visitReports'])->orderBy('created_at', 'desc');
         
         // Get total project count and counts by type
         $totalProjects = Project::count();
@@ -199,6 +199,7 @@ class ProjectController extends Controller
     {
         $project->load([
             'user',
+            'builder',
             'contacts',
             'visitReports.user',
             'projectContacts' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('role')->orderBy('name'),
