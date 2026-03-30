@@ -7,8 +7,8 @@
     <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $builder->name }}</h1>
-            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $builder->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                {{ $builder->status ? 'Active' : 'Inactive' }}
+            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $builder->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                {{ $builder->is_active ? 'Active' : 'Inactive' }}
             </span>
         </div>
         <div class="flex space-x-3">

@@ -67,14 +67,13 @@ class BuilderController extends Controller
             ],
             'pincode' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
-            'gst_number' => 'nullable|string|max:50|regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/',
-            'status' => 'boolean',
+            'is_active' => 'boolean',
             'branch_id' => 'nullable|exists:branches,id',
             'purchase_managers' => 'nullable|array',
             'purchase_managers.*' => 'exists:contacts,id',
         ]);
 
-        $builder = Builder::create($validated);
+        $builder = Builder::create(\Illuminate\Support\Arr::except($validated, ['purchase_managers']));
 
         if ($request->has('purchase_managers')) {
             $builder->purchaseManagers()->sync($request->purchase_managers);
@@ -143,20 +142,13 @@ class BuilderController extends Controller
             ],
             'pincode' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
-            'gst_number' => [
-                'nullable',
-                'string',
-                'max:50',
-                'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/',
-                Rule::unique('builders')->ignore($builder->id)
-            ],
-            'status' => 'boolean',
+            'is_active' => 'boolean',
             'branch_id' => 'nullable|exists:branches,id',
             'purchase_managers' => 'nullable|array',
             'purchase_managers.*' => 'exists:contacts,id',
         ]);
 
-        $builder->update($validated);
+        $builder->update(\Illuminate\Support\Arr::except($validated, ['purchase_managers']));
 
         if ($request->has('purchase_managers')) {
             $builder->purchaseManagers()->sync($request->purchase_managers);
@@ -194,7 +186,7 @@ class BuilderController extends Controller
         $this->authorize('update', $builder);
         
         $builder->update([
-            'status' => !$builder->status
+            'is_active' => !$builder->is_active
         ]);
 
         return response()->json(['success' => true]);

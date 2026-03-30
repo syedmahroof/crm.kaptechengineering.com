@@ -15,15 +15,19 @@ class Builder extends Model
         'phone',
         'email',
         'address',
+        'pincode',
+        'country_id',
+        'state_id',
+        'district_id',
         'location',
         'website',
         'description',
-        'status',
+        'is_active',
         'branch_id',
     ];
 
     protected $casts = [
-        'status' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     public function branch()

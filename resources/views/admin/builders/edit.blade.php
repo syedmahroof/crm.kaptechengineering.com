@@ -219,15 +219,15 @@
                     @enderror
                 </div>
 
-                <!-- Status -->
+                <!-- Active Status -->
                 <div class="col-span-1 md:col-span-4 flex items-center">
-                    <input type="hidden" name="status" value="0">
-                    <input type="checkbox" name="status" id="status" value="1" {{ old('status', $builder->status) ? 'checked' : '' }}
+                    <input type="hidden" name="is_active" value="0">
+                    <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', $builder->is_active) ? 'checked' : '' }}
                         class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                    <label for="status" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    <label for="is_active" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                         Active
                     </label>
-                    @error('status')
+                    @error('is_active')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
