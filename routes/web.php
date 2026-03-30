@@ -214,6 +214,10 @@ Route::middleware(['auth'])->group(function () {
     
     // Admin Banner Routes
     Route::prefix('admin')->name('admin.')->group(function () {
+        // Country and State helper routes for dropdowns
+        Route::get('countries/{country}/states', [\App\Http\Controllers\CountryController::class, 'getStates'])->name('countries.states');
+        Route::get('states/{state}/districts', [\App\Http\Controllers\StateController::class, 'getDistricts'])->name('states.districts');
+
         // Define banners resource with custom update route using POST
         Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class, [
             'except' => ['update']

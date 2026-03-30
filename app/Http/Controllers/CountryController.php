@@ -157,6 +157,12 @@ class CountryController extends Controller
             'is_active' => $country->is_active,
         ]);
     }
+
+    /**
+     * Get states for the specified country.
+     */
+    public function getStates(Country $country)
+    {
+        return response()->json($country->states()->where('is_active', true)->orderBy('name')->get());
+    }
 }
-
-

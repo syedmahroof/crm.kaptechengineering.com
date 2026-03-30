@@ -143,5 +143,12 @@ class StateController extends Controller
             'is_active' => $state->is_active,
         ]);
     }
-}
 
+    /**
+     * Get districts for the specified state.
+     */
+    public function getDistricts(State $state)
+    {
+        return response()->json($state->districts()->where('is_active', true)->orderBy('name')->get());
+    }
+}
